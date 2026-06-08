@@ -1,0 +1,11 @@
+{
+    "db.config": {
+        "url": "jdbc:postgresql://localhost:5432/testdb",
+        "user": "test",
+        "password": "p@$$word"
+    },
+    "testing" : {
+        "user" : "test",
+        "password" : "p@$$word"
+    }
+}

@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<entity-mappings>
+    <package>io.opns.app.model</package>
+    <entity class="io.opns.app.model.Payment" name="Payment">
+        <table name="fks_payments"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>Payment.selectAll</name>
+                <query>SELECT * FROM fks_payments</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="paymentId" type="java.lang.Long">
+                <column name="payment_id" precision="64"/>
+            </id>
+            <basic name="bookingId" type="java.math.BigInteger">
+                <column name="booking_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="amount" type="java.math.BigDecimal">
+                <column name="amount" nullable="false" updatable="true" precision="10" scale="2"/>
+            </basic>
+            <basic name="paymentMethod" type="java.lang.Enum">
+                <column name="payment_method" length="32" nullable="true" updatable="true" check="payment_method IN ('CARD', 'UPI', 'WALLET', 'COD')"/>
+            </basic>
+            <basic name="paymentStatus" type="java.lang.Enum">
+                <column name="payment_status" length="32" nullable="true" updatable="true" check="payment_status IN ('INITIATED', 'SUCCESS', 'FAILED', 'REFUNDED')"/>
+            </basic>
+            <basic name="transactionRef" type="java.lang.String">
+                <column name="transaction_ref" length="128" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="paidAt" type="java.sql.Timestamp">
+                <column name="paid_at" nullable="false" updatable="true"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.User" name="User">
+        <table name="fks_users"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>User.selectAll</name>
+                <query>SELECT * FROM fks_users</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="userId" type="java.lang.Long">
+                <column name="user_id" precision="64"/>
+            </id>
+            <basic name="fullName" type="java.lang.String">
+                <column name="full_name" length="96" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="email" type="java.lang.String">
+                <column name="email" length="128" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="phone1" type="java.lang.String">
+                <column name="phone1" length="20" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="phone2" type="java.lang.String">
+                <column name="phone2" length="20" nullable="true" updatable="true"/>
+            </basic>
+            <basic name="passwordHash" type="java.lang.String">
+                <column name="password_hash" length="1000000000" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="role" type="java.lang.Enum">
+                <column name="role" length="32" nullable="true" updatable="true" check="role IN ('CUSTOMER', 'PROFESSIONAL', 'ADMIN')"/>
+            </basic>
+            <basic name="status" type="java.lang.Enum">
+                <column name="status" length="32" nullable="true" updatable="true" check="status IN ('ACTIVE', 'INACTIVE', 'BLOCKED')"/>
+            </basic>
+            <basic name="createdAt" type="java.sql.Timestamp">
+                <column name="created_at" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="updatedAt" type="java.sql.Timestamp">
+                <column name="updated_at" nullable="true" updatable="true"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.Address" name="Address">
+        <table name="fks_addresses"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>Address.selectAll</name>
+                <query>SELECT * FROM fks_addresses</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="addressId" type="java.lang.Long">
+                <column name="address_id" precision="64"/>
+            </id>
+            <basic name="userId" type="java.math.BigInteger">
+                <column name="user_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="addressLine1" type="java.lang.String">
+                <column name="address_line1" length="255" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="addressLine2" type="java.lang.String">
+                <column name="address_line2" length="255" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="city" type="java.lang.String">
+                <column name="city" length="64" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="state" type="java.lang.String">
+                <column name="state" length="64" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="pincode" type="java.lang.String">
+                <column name="pincode" length="20" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="latitude" type="java.math.BigDecimal">
+                <column name="latitude" nullable="true" updatable="true" precision="10" scale="7"/>
+            </basic>
+            <basic name="longitude" type="java.math.BigDecimal">
+                <column name="longitude" nullable="true" updatable="true" precision="10" scale="7"/>
+            </basic>
+            <basic name="isDefault" type="java.lang.Short">
+                <column name="is_default" nullable="false" updatable="true" precision="16"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.Category" name="Category">
+        <table name="fks_categories"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>Category.selectAll</name>
+                <query>SELECT * FROM fks_categories</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="categoryId" type="java.lang.Long">
+                <column name="category_id" precision="64"/>
+            </id>
+            <basic name="name" type="java.lang.String">
+                <column name="name" length="128" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="parentId" type="java.math.BigInteger">
+                <column name="parent_id" nullable="true" updatable="true" precision="64"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.Service" name="Service">
+        <table name="fks_services"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>Service.selectAll</name>
+                <query>SELECT * FROM fks_services</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="serviceId" type="java.lang.Long">
+                <column name="service_id" precision="64"/>
+            </id>
+            <basic name="categoryId" type="java.math.BigInteger">
+                <column name="category_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="name" type="java.lang.String">
+                <column name="name" length="128" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="description" type="java.lang.String">
+                <column name="description" length="1000000000" nullable="true" updatable="true"/>
+            </basic>
+            <basic name="basePrice" type="java.math.BigDecimal">
+                <column name="base_price" nullable="false" updatable="true" precision="10" scale="2"/>
+            </basic>
+            <basic name="durationMinutes" type="java.lang.Integer">
+                <column name="duration_minutes" nullable="true" updatable="true" precision="32"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.Professional" name="Professional">
+        <table name="fks_professionals"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>Professional.selectAll</name>
+                <query>SELECT * FROM fks_professionals</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="professionalId" type="java.lang.Long">
+                <column name="professional_id" precision="64"/>
+            </id>
+            <basic name="userId" type="java.math.BigInteger">
+                <column name="user_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="bio" type="java.lang.String">
+                <column name="bio" length="1000000000" nullable="true" updatable="true"/>
+            </basic>
+            <basic name="experienceYears" type="java.lang.Integer">
+                <column name="experience_years" nullable="false" updatable="true" precision="32"/>
+            </basic>
+            <basic name="ratingAvg" type="java.math.BigDecimal">
+                <column name="rating_avg" nullable="true" updatable="true" precision="3" scale="2"/>
+            </basic>
+            <basic name="isVerified" type="java.lang.Short">
+                <column name="is_verified" nullable="false" updatable="true" precision="16"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.ProfessionalService" name="ProfessionalService">
+        <table name="fks_professional_services"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>ProfessionalService.selectAll</name>
+                <query>SELECT * FROM fks_professional_services</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="id" type="java.lang.Long">
+                <column name="id" precision="64"/>
+            </id>
+            <basic name="professionalId" type="java.math.BigInteger">
+                <column name="professional_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="serviceId" type="java.math.BigInteger">
+                <column name="service_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="price" type="java.math.BigDecimal">
+                <column name="price" nullable="false" updatable="true" precision="10" scale="2"/>
+            </basic>
+            <basic name="isActive" type="java.lang.Short">
+                <column name="is_active" nullable="false" updatable="true" precision="16"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.Booking" name="Booking">
+        <table name="fks_bookings"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>Booking.selectAll</name>
+                <query>SELECT * FROM fks_bookings</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="bookingId" type="java.lang.Long">
+                <column name="booking_id" precision="64"/>
+            </id>
+            <basic name="customerId" type="java.math.BigInteger">
+                <column name="customer_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="professionalId" type="java.math.BigInteger">
+                <column name="professional_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="serviceId" type="java.math.BigInteger">
+                <column name="service_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="addressId" type="java.math.BigInteger">
+                <column name="address_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="scheduledAt" type="java.sql.Timestamp">
+                <column name="scheduled_at" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="status" type="java.lang.Enum">
+                <column name="status" length="32" nullable="true" updatable="true" check="status IN ('PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')"/>
+            </basic>
+            <basic name="totalAmount" type="java.math.BigDecimal">
+                <column name="total_amount" nullable="false" updatable="true" precision="10" scale="2"/>
+            </basic>
+            <basic name="createdAt" type="java.sql.Timestamp">
+                <column name="created_at" nullable="false" updatable="true"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.Availability" name="Availability">
+        <table name="fks_availability"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>Availability.selectAll</name>
+                <query>SELECT * FROM fks_availability</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="availabilityId" type="java.lang.Long">
+                <column name="availability_id" precision="64"/>
+            </id>
+            <basic name="professionalId" type="java.math.BigInteger">
+                <column name="professional_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="date" type="java.sql.Date">
+                <column name="date" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="startTime" type="java.sql.Timestamp">
+                <column name="start_time" nullable="true" updatable="true"/>
+            </basic>
+            <basic name="endTime" type="java.sql.Timestamp">
+                <column name="end_time" nullable="true" updatable="true"/>
+            </basic>
+            <basic name="isBooked" type="java.lang.Short">
+                <column name="is_booked" nullable="false" updatable="true" precision="16"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.Review" name="Review">
+        <table name="fks_reviews"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>Review.selectAll</name>
+                <query>SELECT * FROM fks_reviews</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="reviewId" type="java.lang.Long">
+                <column name="review_id" precision="64"/>
+            </id>
+            <basic name="bookingId" type="java.math.BigInteger">
+                <column name="booking_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="customerId" type="java.math.BigInteger">
+                <column name="customer_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="professionalId" type="java.math.BigInteger">
+                <column name="professional_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="rating" type="java.lang.Integer">
+                <column name="rating" nullable="true" updatable="true" precision="32"/>
+            </basic>
+            <basic name="comment" type="java.lang.String">
+                <column name="comment" length="1000000000" nullable="true" updatable="true"/>
+            </basic>
+            <basic name="createdAt" type="java.sql.Timestamp">
+                <column name="created_at" nullable="false" updatable="true"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.Conversation" name="Conversation">
+        <table name="fks_conversations"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>Conversation.selectAll</name>
+                <query>SELECT * FROM fks_conversations</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="conversationId" type="java.lang.Long">
+                <column name="conversation_id" precision="64"/>
+            </id>
+            <basic name="bookingId" type="java.math.BigInteger">
+                <column name="booking_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="createdAt" type="java.sql.Timestamp">
+                <column name="created_at" nullable="false" updatable="true"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.Message" name="Message">
+        <table name="fks_messages"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>Message.selectAll</name>
+                <query>SELECT * FROM fks_messages</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="messageId" type="java.lang.Long">
+                <column name="message_id" precision="64"/>
+            </id>
+            <basic name="conversationId" type="java.math.BigInteger">
+                <column name="conversation_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="senderId" type="java.math.BigInteger">
+                <column name="sender_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="messageText" type="java.lang.String">
+                <column name="message_text" length="1000000000" nullable="true" updatable="true"/>
+            </basic>
+            <basic name="sentAt" type="java.sql.Timestamp">
+                <column name="sent_at" nullable="false" updatable="true"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.JobStatus" name="JobStatus">
+        <table name="fks_job_status"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>JobStatus.selectAll</name>
+                <query>SELECT * FROM fks_job_status</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="logId" type="java.lang.Long">
+                <column name="log_id" precision="64"/>
+            </id>
+            <basic name="bookingId" type="java.math.BigInteger">
+                <column name="booking_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="status" type="java.lang.String">
+                <column name="status" length="32" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="updatedAt" type="java.sql.Timestamp">
+                <column name="updated_at" nullable="true" updatable="true"/>
+            </basic>
+            <basic name="updatedBy" type="java.math.BigInteger">
+                <column name="updated_by" nullable="true" updatable="true" precision="64"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.Document" name="Document">
+        <table name="fks_documents"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>Document.selectAll</name>
+                <query>SELECT * FROM fks_documents</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="documentId" type="java.lang.Long">
+                <column name="document_id" precision="64"/>
+            </id>
+            <basic name="userId" type="java.math.BigInteger">
+                <column name="user_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="documentType" type="java.lang.String">
+                <column name="document_type" length="50" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="documentUrl" type="java.lang.String">
+                <column name="document_url" length="1000000000" nullable="true" updatable="true"/>
+            </basic>
+            <basic name="verificationStatus" type="java.lang.Enum">
+                <column name="verification_status" length="32" nullable="true" updatable="true" check="verification_status IN ('PENDING', 'APPROVED', 'REJECTED')"/>
+            </basic>
+            <basic name="uploadedAt" type="java.sql.Timestamp">
+                <column name="uploaded_at" nullable="true" updatable="true"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.AuditLog" name="AuditLog">
+        <table name="fks_audit_logs"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>AuditLog.selectAll</name>
+                <query>SELECT * FROM fks_audit_logs</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="logId" type="java.lang.Long">
+                <column name="log_id" precision="64"/>
+            </id>
+            <basic name="userId" type="java.math.BigInteger">
+                <column name="user_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="action" type="java.lang.String">
+                <column name="action" length="255" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="entityType" type="java.lang.String">
+                <column name="entity_type" length="50" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="entityId" type="java.math.BigInteger">
+                <column name="entity_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="createdAt" type="java.sql.Timestamp">
+                <column name="created_at" nullable="false" updatable="true"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.PricingRule" name="PricingRule">
+        <table name="fks_pricing_rules"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>PricingRule.selectAll</name>
+                <query>SELECT * FROM fks_pricing_rules</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="ruleId" type="java.lang.Long">
+                <column name="rule_id" precision="64"/>
+            </id>
+            <basic name="serviceId" type="java.math.BigInteger">
+                <column name="service_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="city" type="java.lang.String">
+                <column name="city" length="100" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="multiplier" type="java.math.BigDecimal">
+                <column name="multiplier" nullable="false" updatable="true" precision="5" scale="2"/>
+            </basic>
+            <basic name="startTime" type="java.sql.Timestamp">
+                <column name="start_time" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="endTime" type="java.sql.Timestamp">
+                <column name="end_time" nullable="false" updatable="true"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.Wallet" name="Wallet">
+        <table name="fks_wallets"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>Wallet.selectAll</name>
+                <query>SELECT * FROM fks_wallets</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="walletId" type="java.lang.Long">
+                <column name="wallet_id" precision="64"/>
+            </id>
+            <basic name="userId" type="java.math.BigInteger">
+                <column name="user_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="balance" type="java.math.BigDecimal">
+                <column name="balance" nullable="true" updatable="true" precision="10" scale="2"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.WalletTransaction" name="WalletTransaction">
+        <table name="fks_wallet_transactions"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>WalletTransaction.selectAll</name>
+                <query>SELECT * FROM fks_wallet_transactions</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="txnId" type="java.lang.Long">
+                <column name="txn_id" precision="64"/>
+            </id>
+            <basic name="walletId" type="java.math.BigInteger">
+                <column name="wallet_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="amount" type="java.math.BigDecimal">
+                <column name="amount" nullable="false" updatable="true" precision="10" scale="2"/>
+            </basic>
+            <basic name="type" type="java.lang.Enum">
+                <column name="type" length="32" nullable="true" updatable="true" check="type IN ('CREDIT', 'DEBIT')"/>
+            </basic>
+            <basic name="createdAt" type="java.sql.Timestamp">
+                <column name="created_at" nullable="false" updatable="true"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.Coupon" name="Coupon">
+        <table name="fks_coupons"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>Coupon.selectAll</name>
+                <query>SELECT * FROM fks_coupons</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="couponId" type="java.lang.Long">
+                <column name="coupon_id" precision="64"/>
+            </id>
+            <basic name="code" type="java.lang.String">
+                <column name="code" length="50" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="discountType" type="java.lang.Enum">
+                <column name="discount_type" length="16" nullable="true" updatable="true" check="discount_type IN ('PERCENT', 'FLAT')"/>
+            </basic>
+            <basic name="discountValue" type="java.math.BigDecimal">
+                <column name="discount_value" nullable="true" updatable="true" precision="10" scale="2"/>
+            </basic>
+            <basic name="maxDiscount" type="java.math.BigDecimal">
+                <column name="max_discount" nullable="true" updatable="true" precision="10" scale="2"/>
+            </basic>
+            <basic name="expiryDate" type="java.sql.Date">
+                <column name="expiry_date" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="usageLimit" type="java.lang.Integer">
+                <column name="usage_limit" nullable="true" updatable="true" precision="32"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.CouponUsage" name="CouponUsage">
+        <table name="fks_coupon_usage"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>CouponUsage.selectAll</name>
+                <query>SELECT * FROM fks_coupon_usage</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="id" type="java.lang.Long">
+                <column name="id" precision="64"/>
+            </id>
+            <basic name="couponId" type="java.math.BigInteger">
+                <column name="coupon_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="userId" type="java.math.BigInteger">
+                <column name="user_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="bookingId" type="java.math.BigInteger">
+                <column name="booking_id" nullable="false" updatable="true" precision="64"/>
+            </basic>
+            <basic name="usedAt" type="java.sql.Timestamp">
+                <column name="used_at" nullable="false" updatable="true"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="io.opns.app.model.PanInfo" name="PanInfo">
+        <table name="pan_info"/>
+        <named-native-queries>
+            <named-native-query>
+                <name>PanInfo.selectAll</name>
+                <query>SELECT * FROM pan_info</query>
+            </named-native-query>
+        </named-native-queries>
+        <attributes>
+            <id name="panHash" type="java.lang.String">
+                <column name="pan_hash" length="32"/>
+            </id>
+            <basic name="panRefId" type="java.lang.String">
+                <column name="pan_ref_id" length="64" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="status" type="java.lang.String">
+                <column name="status" length="16" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="createdDate" type="java.sql.Timestamp">
+                <column name="created_date" nullable="false" updatable="true"/>
+            </basic>
+            <basic name="lastAccessedDate" type="java.sql.Timestamp">
+                <column name="last_accessed_date" nullable="true" updatable="true"/>
+            </basic>
+            <basic name="accessCount" type="java.math.BigInteger">
+                <column name="access_count" nullable="false" updatable="true" precision="64"/>
+            </basic>
+        </attributes>
+    </entity>
+</entity-mappings>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<persistence version="2">
+    <persistence-unit name="folks-app-pu">
+        <description>Persistence Unit for folks-app</description>
+        <provider>org.javalabs.jpa.LitePersistenceProvider</provider>
+        <class>io.opns.app.model.Payment</class>
+        <class>io.opns.app.model.User</class>
+        <class>io.opns.app.model.Address</class>
+        <class>io.opns.app.model.Category</class>
+        <class>io.opns.app.model.Service</class>
+        <class>io.opns.app.model.Professional</class>
+        <class>io.opns.app.model.ProfessionalService</class>
+        <class>io.opns.app.model.Booking</class>
+        <class>io.opns.app.model.Availability</class>
+        <class>io.opns.app.model.Review</class>
+        <class>io.opns.app.model.Conversation</class>
+        <class>io.opns.app.model.Message</class>
+        <class>io.opns.app.model.JobStatus</class>
+        <class>io.opns.app.model.Document</class>
+        <class>io.opns.app.model.AuditLog</class>
+        <class>io.opns.app.model.PricingRule</class>
+        <class>io.opns.app.model.Wallet</class>
+        <class>io.opns.app.model.WalletTransaction</class>
+        <class>io.opns.app.model.Coupon</class>
+        <class>io.opns.app.model.CouponUsage</class>
+        <class>io.opns.app.model.PanInfo</class>
+        <shared-cache-mode>NONE</shared-cache-mode>
+        <properties>
+            <property name="jpa-lite.entity.package" value="io.opns.app.model"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1"/>
+            <property name="javax.persistence.jdbc.user" value="test"/>
+            <property name="javax.persistence.jdbc.password" value="p@$$word"/>
+            <property name="javax.persistence.schema-generation.scripts.action" value="drop-and-create"/>
+            <property name="javax.persistence.schema-generation.scripts.create-target" value="db/schema.sql"/>
+            <property name="javax.persistence.sql-load-script-source" value="db/user.sql"/>
+            <property name="javax.persistence.schema-generation.create-database-schemas" value="true"/>
+            <property name="jpa-lite.logging.level" value="TRACE"/>
+            <property name="jpa-lite.dao.package" value="io.opns.app.dao"/>
+            <property name="jpa-lite.post.construct.listener" value="org.javalabs.jpa.util.CreateScriptListener"/>
+        </properties>
+    </persistence-unit>
+</persistence>

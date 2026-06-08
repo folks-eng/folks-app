@@ -1,0 +1,42 @@
+<!-- 
+################################################################################
+#                                                                              #
+#                       Http server configuration                              #
+#                                                                              #
+################################################################################     
+-->
+<server-config>
+    <server-opts>
+    	<ssl>false</ssl>
+	<port>8080</port>
+    </server-opts>
+    
+    <keystore-config>
+        <store-name>server.pkcs</store-name>
+        <store-password>secret</store-password>
+    </keystore-config>
+    
+    <context-root>/api/v1</context-root>
+    
+    <security-constraint>
+        <auth-handler>org.javalabs.decl.vertx.container.handler.AuthorizationHandler</auth-handler>
+        <jwt-opts>
+            <issuer>folks-app</issuer>
+        </jwt-opts>
+        
+        <!-- 
+            NO_AUTH is a special tag, which indicates no authentication will be
+            performed for the below set of url pattern(s).
+        -->
+        <auth-constraint>
+            <auth-type>NO_AUTH</auth-type>
+            <url-patterns>
+                <!-- Adding CTX_ROOT will prepend the value from the context-root tag -->
+                <url-pattern>{CTX_ROOT}/mgmt/</url-pattern>
+            </url-patterns>
+        </auth-constraint>
+    </security-constraint>
+    
+    <!-- The vert.x routing configuration file for the http server -->
+    <routing-config>routing-config.xml</routing-config>
+</server-config>

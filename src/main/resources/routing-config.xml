@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<routing-config>
+    <package name="io.opns.app.handler"/>
+    <api version="1.0" basePath="/api/v1" produce="application/vnd.ex+json.v1" consume="application/json"/>
+    <resource-mapping name="error" path="/*" failure="true" resource="org.javalabs.decl.vertx.container.handler.HttpErrorHandler"/>
+    <resource-mapping name="AuthToken" path="/mgmt/login" resource="io.opns.app.handler.AuthenticationHandler" schema="io.opns.app.auth.AuthToken">
+        <mapping uri="" method="POST" api="authenticate"/>
+    </resource-mapping>
+    <resource-mapping name="Payment" path="/payments" resource="io.opns.app.handler.PaymentHandler" schema="io.opns.app.model.Payment">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="User" path="/users" resource="io.opns.app.handler.UserHandler" schema="io.opns.app.model.User">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="Address" path="/addresss" resource="io.opns.app.handler.AddressHandler" schema="io.opns.app.model.Address">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="Category" path="/categorys" resource="io.opns.app.handler.CategoryHandler" schema="io.opns.app.model.Category">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="Service" path="/services" resource="io.opns.app.handler.ServiceHandler" schema="io.opns.app.model.Service">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="Professional" path="/professionals" resource="io.opns.app.handler.ProfessionalHandler" schema="io.opns.app.model.Professional">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="ProfessionalService" path="/professionalServices" resource="io.opns.app.handler.ProfessionalServiceHandler" schema="io.opns.app.model.ProfessionalService">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="Booking" path="/bookings" resource="io.opns.app.handler.BookingHandler" schema="io.opns.app.model.Booking">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="Availability" path="/availabilitys" resource="io.opns.app.handler.AvailabilityHandler" schema="io.opns.app.model.Availability">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="Review" path="/reviews" resource="io.opns.app.handler.ReviewHandler" schema="io.opns.app.model.Review">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="Conversation" path="/conversations" resource="io.opns.app.handler.ConversationHandler" schema="io.opns.app.model.Conversation">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="Message" path="/messages" resource="io.opns.app.handler.MessageHandler" schema="io.opns.app.model.Message">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="JobStatus" path="/jobStatuss" resource="io.opns.app.handler.JobStatusHandler" schema="io.opns.app.model.JobStatus">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="Document" path="/documents" resource="io.opns.app.handler.DocumentHandler" schema="io.opns.app.model.Document">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="AuditLog" path="/auditLogs" resource="io.opns.app.handler.AuditLogHandler" schema="io.opns.app.model.AuditLog">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="PricingRule" path="/pricingRules" resource="io.opns.app.handler.PricingRuleHandler" schema="io.opns.app.model.PricingRule">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="Wallet" path="/wallets" resource="io.opns.app.handler.WalletHandler" schema="io.opns.app.model.Wallet">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="WalletTransaction" path="/walletTransactions" resource="io.opns.app.handler.WalletTransactionHandler" schema="io.opns.app.model.WalletTransaction">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="Coupon" path="/coupons" resource="io.opns.app.handler.CouponHandler" schema="io.opns.app.model.Coupon">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="CouponUsage" path="/couponUsages" resource="io.opns.app.handler.CouponUsageHandler" schema="io.opns.app.model.CouponUsage">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="PanInfo" path="/panInfos" resource="io.opns.app.handler.PanInfoHandler" schema="io.opns.app.model.PanInfo">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+</routing-config>

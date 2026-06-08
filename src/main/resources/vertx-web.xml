@@ -1,0 +1,38 @@
+<!-- 
+################################################################################
+#                                                                              #
+#                        Vert.x web configuration                              #
+#                                                                              #
+################################################################################     
+-->
+
+<!--
+    This file is a configuration file that provides configuration and deployment information for Vert.x.
+    It's the standard name used by decl-vertx-container module as a deployment descriptor in Vert.x applications.
+    Apart from standard vert.x configuration, this file also defines the Verticles that will be deployed
+    and mappings between URL paths and the servlets that handle requests with those paths.
+
+    If any of the verticles is an Http verticle, then the Vert.x container uses this configuration to identify
+    the verticle to handle a given request and call the class method that corresponds to the request method.
+-->
+
+<vertx-web>
+    <verticles>
+        <verticle>
+            <name>app.http.server</name>
+            <class>io.opns.app.core.AppHttpServer</class>
+            <!-- Specify http configuration file only if the verticle is supposed to start an embedded http server -->
+            <config>server.xml</config>
+            <deploy-options>
+                <worker>false</worker>
+            </deploy-options>
+        </verticle>
+        <verticle>
+            <name>app.processor</name>
+            <class>io.opns.app.core.AppProcessor</class>
+            <deploy-options>
+                <worker>true</worker>
+            </deploy-options>
+        </verticle>
+    </verticles>
+</vertx-web>

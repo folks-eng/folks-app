@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <entity-mappings>
-    <package>io.opns.app.model</package>
-    <entity class="io.opns.app.model.Payment" name="Payment">
+    <package>com.folks.app.model</package>
+    <entity class="com.folks.app.model.Payment" name="Payment">
         <table name="fks_payments"/>
         <named-native-queries>
             <named-native-query>
@@ -33,7 +33,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.User" name="User">
+    <entity class="com.folks.app.model.User" name="User">
         <table name="fks_users"/>
         <named-native-queries>
             <named-native-query>
@@ -74,7 +74,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.Address" name="Address">
+    <entity class="com.folks.app.model.Address" name="Address">
         <table name="fks_addresses"/>
         <named-native-queries>
             <named-native-query>
@@ -115,7 +115,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.Category" name="Category">
+    <entity class="com.folks.app.model.Category" name="Category">
         <table name="fks_categories"/>
         <named-native-queries>
             <named-native-query>
@@ -135,7 +135,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.Service" name="Service">
+    <entity class="com.folks.app.model.Service" name="Service">
         <table name="fks_services"/>
         <named-native-queries>
             <named-native-query>
@@ -164,7 +164,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.Professional" name="Professional">
+    <entity class="com.folks.app.model.Professional" name="Professional">
         <table name="fks_professionals"/>
         <named-native-queries>
             <named-native-query>
@@ -193,7 +193,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.ProfessionalService" name="ProfessionalService">
+    <entity class="com.folks.app.model.ProfessionalService" name="ProfessionalService">
         <table name="fks_professional_services"/>
         <named-native-queries>
             <named-native-query>
@@ -219,7 +219,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.Booking" name="Booking">
+    <entity class="com.folks.app.model.Booking" name="Booking">
         <table name="fks_bookings"/>
         <named-native-queries>
             <named-native-query>
@@ -257,7 +257,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.Availability" name="Availability">
+    <entity class="com.folks.app.model.Availability" name="Availability">
         <table name="fks_availability"/>
         <named-native-queries>
             <named-native-query>
@@ -286,7 +286,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.Review" name="Review">
+    <entity class="com.folks.app.model.Review" name="Review">
         <table name="fks_reviews"/>
         <named-native-queries>
             <named-native-query>
@@ -318,7 +318,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.Conversation" name="Conversation">
+    <entity class="com.folks.app.model.Conversation" name="Conversation">
         <table name="fks_conversations"/>
         <named-native-queries>
             <named-native-query>
@@ -338,7 +338,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.Message" name="Message">
+    <entity class="com.folks.app.model.Message" name="Message">
         <table name="fks_messages"/>
         <named-native-queries>
             <named-native-query>
@@ -364,7 +364,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.JobStatus" name="JobStatus">
+    <entity class="com.folks.app.model.JobStatus" name="JobStatus">
         <table name="fks_job_status"/>
         <named-native-queries>
             <named-native-query>
@@ -390,7 +390,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.Document" name="Document">
+    <entity class="com.folks.app.model.Document" name="Document">
         <table name="fks_documents"/>
         <named-native-queries>
             <named-native-query>
@@ -419,7 +419,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.AuditLog" name="AuditLog">
+    <entity class="com.folks.app.model.AuditLog" name="AuditLog">
         <table name="fks_audit_logs"/>
         <named-native-queries>
             <named-native-query>
@@ -448,7 +448,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.PricingRule" name="PricingRule">
+    <entity class="com.folks.app.model.PricingRule" name="PricingRule">
         <table name="fks_pricing_rules"/>
         <named-native-queries>
             <named-native-query>
@@ -477,7 +477,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.Wallet" name="Wallet">
+    <entity class="com.folks.app.model.Wallet" name="Wallet">
         <table name="fks_wallets"/>
         <named-native-queries>
             <named-native-query>
@@ -497,7 +497,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.WalletTransaction" name="WalletTransaction">
+    <entity class="com.folks.app.model.WalletTransaction" name="WalletTransaction">
         <table name="fks_wallet_transactions"/>
         <named-native-queries>
             <named-native-query>
@@ -523,7 +523,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.Coupon" name="Coupon">
+    <entity class="com.folks.app.model.Coupon" name="Coupon">
         <table name="fks_coupons"/>
         <named-native-queries>
             <named-native-query>
@@ -555,7 +555,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.CouponUsage" name="CouponUsage">
+    <entity class="com.folks.app.model.CouponUsage" name="CouponUsage">
         <table name="fks_coupon_usage"/>
         <named-native-queries>
             <named-native-query>
@@ -581,7 +581,7 @@
             </basic>
         </attributes>
     </entity>
-    <entity class="io.opns.app.model.PanInfo" name="PanInfo">
+    <entity class="com.folks.app.model.PanInfo" name="PanInfo">
         <table name="pan_info"/>
         <named-native-queries>
             <named-native-query>

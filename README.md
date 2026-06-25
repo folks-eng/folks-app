@@ -31,8 +31,8 @@ The application should start and have an output similar to this:
     [...]
     [vert.x-eventloop-thread-1] INFO org.javalabs.decl.vertx.container.VertxHttpServer - Started Http Server. Listening to port: 8080
     [main] INFO org.javalabs.decl.vertx.container.VertxContainer - Deployment of verticle app.http.server is successful. Deployment Id: 3abd2b35-4cf7-426f-83a9-7b394710df08
-    [vert.x-worker-thread-0] INFO io.opns.app.core.AppProcessor - Scheduled default timer. Initial Delay: 0. Pause Time (ms): 1800000
-    [vert.x-worker-thread-0] INFO io.opns.app.core.AppProcessor - Started Verticle: AppProcessor
+    [vert.x-worker-thread-0] INFO com.folks.app.core.AppProcessor - Scheduled default timer. Initial Delay: 0. Pause Time (ms): 1800000
+    [vert.x-worker-thread-0] INFO com.folks.app.core.AppProcessor - Started Verticle: AppProcessor
     [main] INFO org.javalabs.decl.vertx.container.VertxContainer - Deployment of verticle app.processor is successful. Deployment Id: 04595511-d20a-43e2-abda-52c931c2d531
 
 

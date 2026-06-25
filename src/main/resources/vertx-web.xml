@@ -20,7 +20,7 @@
     <verticles>
         <verticle>
             <name>app.http.server</name>
-            <class>io.opns.app.core.AppHttpServer</class>
+            <class>com.folks.app.core.AppHttpServer</class>
             <!-- Specify http configuration file only if the verticle is supposed to start an embedded http server -->
             <config>server.xml</config>
             <deploy-options>
@@ -29,7 +29,7 @@
         </verticle>
         <verticle>
             <name>app.processor</name>
-            <class>io.opns.app.core.AppProcessor</class>
+            <class>com.folks.app.core.AppProcessor</class>
             <deploy-options>
                 <worker>true</worker>
             </deploy-options>

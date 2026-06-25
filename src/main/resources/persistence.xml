@@ -3,30 +3,30 @@
     <persistence-unit name="folks-app-pu">
         <description>Persistence Unit for folks-app</description>
         <provider>org.javalabs.jpa.LitePersistenceProvider</provider>
-        <class>io.opns.app.model.Payment</class>
-        <class>io.opns.app.model.User</class>
-        <class>io.opns.app.model.Address</class>
-        <class>io.opns.app.model.Category</class>
-        <class>io.opns.app.model.Service</class>
-        <class>io.opns.app.model.Professional</class>
-        <class>io.opns.app.model.ProfessionalService</class>
-        <class>io.opns.app.model.Booking</class>
-        <class>io.opns.app.model.Availability</class>
-        <class>io.opns.app.model.Review</class>
-        <class>io.opns.app.model.Conversation</class>
-        <class>io.opns.app.model.Message</class>
-        <class>io.opns.app.model.JobStatus</class>
-        <class>io.opns.app.model.Document</class>
-        <class>io.opns.app.model.AuditLog</class>
-        <class>io.opns.app.model.PricingRule</class>
-        <class>io.opns.app.model.Wallet</class>
-        <class>io.opns.app.model.WalletTransaction</class>
-        <class>io.opns.app.model.Coupon</class>
-        <class>io.opns.app.model.CouponUsage</class>
-        <class>io.opns.app.model.PanInfo</class>
+        <class>com.folks.app.model.Payment</class>
+        <class>com.folks.app.model.User</class>
+        <class>com.folks.app.model.Address</class>
+        <class>com.folks.app.model.Category</class>
+        <class>com.folks.app.model.Service</class>
+        <class>com.folks.app.model.Professional</class>
+        <class>com.folks.app.model.ProfessionalService</class>
+        <class>com.folks.app.model.Booking</class>
+        <class>com.folks.app.model.Availability</class>
+        <class>com.folks.app.model.Review</class>
+        <class>com.folks.app.model.Conversation</class>
+        <class>com.folks.app.model.Message</class>
+        <class>com.folks.app.model.JobStatus</class>
+        <class>com.folks.app.model.Document</class>
+        <class>com.folks.app.model.AuditLog</class>
+        <class>com.folks.app.model.PricingRule</class>
+        <class>com.folks.app.model.Wallet</class>
+        <class>com.folks.app.model.WalletTransaction</class>
+        <class>com.folks.app.model.Coupon</class>
+        <class>com.folks.app.model.CouponUsage</class>
+        <class>com.folks.app.model.PanInfo</class>
         <shared-cache-mode>NONE</shared-cache-mode>
         <properties>
-            <property name="jpa-lite.entity.package" value="io.opns.app.model"/>
+            <property name="jpa-lite.entity.package" value="com.folks.app.model"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1"/>
             <property name="javax.persistence.jdbc.user" value="test"/>
             <property name="javax.persistence.jdbc.password" value="p@$$word"/>
@@ -35,7 +35,7 @@
             <property name="javax.persistence.sql-load-script-source" value="db/user.sql"/>
             <property name="javax.persistence.schema-generation.create-database-schemas" value="true"/>
             <property name="jpa-lite.logging.level" value="TRACE"/>
-            <property name="jpa-lite.dao.package" value="io.opns.app.dao"/>
+            <property name="jpa-lite.dao.package" value="com.folks.app.dao"/>
             <property name="jpa-lite.post.construct.listener" value="org.javalabs.jpa.util.CreateScriptListener"/>
         </properties>
     </persistence-unit>

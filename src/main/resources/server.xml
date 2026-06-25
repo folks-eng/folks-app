@@ -11,6 +11,27 @@
 	<port>8080</port>
     </server-opts>
     
+    <cross-origin>
+        <allowed-headers>
+            <allowed-header>Access-Control-Allow-Origin</allowed-header>
+            <allowed-header>Access-Control-Allow-Headers</allowed-header>
+            <allowed-header>Content-Type</allowed-header>
+            <allowed-header>Accept</allowed-header>
+            <allowed-header>User-Agent</allowed-header>
+        </allowed-headers>
+            
+        <allowed-methods>
+            <allowed-method>HEAD</allowed-method>
+            <allowed-method>OPTIONS</allowed-method>
+            <allowed-method>CONNECT</allowed-method>
+            <allowed-method>GET</allowed-method>
+            <allowed-method>POST</allowed-method>
+            <allowed-method>PUT</allowed-method>
+            <allowed-method>PATCH</allowed-method>
+            <allowed-method>DELETE</allowed-method>
+        </allowed-methods>
+    </cross-origin>
+    
     <keystore-config>
         <store-name>server.pkcs</store-name>
         <store-password>secret</store-password>

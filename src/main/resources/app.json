@@ -2,10 +2,15 @@
     "db.config": {
         "url": "jdbc:postgresql://localhost:5432/testdb",
         "user": "test",
-        "password": "p@$$word"
+        "password": "test"
+    },
+    "redis.config": {
+        "url": "redis://localhost:6379",
+        "user": "",
+        "password": ""
     },
     "testing" : {
         "user" : "test",
-        "password" : "p@$$word"
+        "password" : "test"
     }
 }

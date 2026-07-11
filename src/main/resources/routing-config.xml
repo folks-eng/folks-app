@@ -14,6 +14,10 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
+    <resource-mapping name="UserLogin" path="/user/registration" resource="com.folks.app.handler.RegistrationHandler" schema="com.folks.app.model.RegistrationInfo">
+        <mapping uri="/login" method="POST" api="registerUser"/>
+        <mapping uri="/verify" method="POST" api="verifyUser"/>
+    </resource-mapping>
     <resource-mapping name="User" path="/users" resource="com.folks.app.handler.UserHandler" schema="com.folks.app.model.User">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>

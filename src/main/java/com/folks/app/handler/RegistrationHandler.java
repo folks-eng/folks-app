@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.HttpURLConnection;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,10 +34,14 @@ public class RegistrationHandler extends AbstractHandler {
         super(vertx);
 
         Map<String, Object> props = ApplicationConfiguration.getInstance().get("redis.config");
-        //Object propVal = props.get("url");
         //System.out.println("URL : " + propVal.getClass().getName() + ":" +propVal.toString());
-        Redis redis = Redis.createClient(vertx, props.get("url").toString()); //"redis://localhost:6379"
+        Redis redis = Redis.createClient(vertx, props.get("url").toString());  //"redis://localhost:6379"
         RedisAPI redisAPI = RedisAPI.api(redis);
+
+        //RedisOptions options = new RedisOptions()
+//                .setConnectionString("redis://localhost:6379")
+//                .setMaxPoolSize(8)
+//                .setMaxPoolWaiting(32);
         this.regBO = new RegistrationBO(redisAPI);
     }
 

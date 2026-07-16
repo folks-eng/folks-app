@@ -5,22 +5,17 @@ import java.util.Objects;
 
 
 /**
- * This class is auto generated with jpa-lite framework.
+ * This class has the OTP and related info for User Registration.
  *
  * @author schan280
  */
-
-//@IdClass(RegistrationInfo.AddressPK.class)
-//@NamedNativeQueries({
-//    @NamedNativeQuery(name = "Address.selectAll", query = "SELECT * FROM fks_addresses")
-//})
-public class RegistrationInfo implements Serializable {
+public class RegistrationInfo implements Serializable, Cloneable {
 
     private String mobileNum;
 
     private String otp;
 
-    private long createdTime;
+    //private long createdTime;
 
     //private boolean used/existing;
 
@@ -42,13 +37,13 @@ public class RegistrationInfo implements Serializable {
         return this.otp;
     }
 
-    public long getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(long time) {
-        this.createdTime = time;
-    }
+//    public long getCreatedTime() {
+//        return createdTime;
+//    }
+//
+//    public void setCreatedTime(long time) {
+//        this.createdTime = time;
+//    }
 
     @Override
     public int hashCode() {
@@ -77,6 +72,6 @@ public class RegistrationInfo implements Serializable {
 
     @Override
     public String toString() {
-        return mobileNum + ":" + otp + " : " + String.valueOf(createdTime);
+        return mobileNum + ":" + otp;
     }
 }

@@ -1,13 +1,15 @@
 {
     "db.config": {
         "url": "jdbc:postgresql://localhost:5432/testdb",
-        "user": "test",
-        "password": "test"
+        "user": "xx",
+        "password": "xx"
     },
     "redis.config": {
         "url": "redis://localhost:6379",
         "user": "",
-        "password": ""
+        "password": "",
+        "maxPoolSize": 8,
+        "maxPoolWaiting":32
     },
     "testing" : {
         "user" : "test",

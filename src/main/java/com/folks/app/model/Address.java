@@ -1,12 +1,8 @@
 package com.folks.app.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.NamedNativeQueries;
-import jakarta.persistence.NamedNativeQuery;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -28,10 +24,12 @@ import java.util.Objects;
 public class Address implements Serializable, Cloneable {
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @JsonIgnore
     @Column(name = "address_id", nullable = false, updatable = false, precision = 64)
     private Long addressId;
 
-    @Column(name = "user_id", nullable = false, updatable = true, precision = 64)
+    @Column(name = "user_id", nullable = false, updatable = false, precision = 64)
     private BigInteger userId;
 
     @Column(name = "address_line1", nullable = false, updatable = true, length = 255)

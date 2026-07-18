@@ -1,6 +1,7 @@
 package com.folks.app.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import org.javalabs.decl.util.MapperUtil;
 import org.javalabs.decl.vertx.config.model.ServerMessage;
 import com.folks.app.bo.UserBO;
@@ -11,6 +12,7 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Example REST handler.
@@ -57,70 +59,15 @@ public class UserHandler extends AbstractHandler {
                 sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
             }
             else {
-                ctx.fail(result.cause());
-            }
-        });
-    }
-
-    public void batchCreate(RoutingContext ctx) {
-        // If you use a remote store, this method will safely execute the blocking code.
-        vertx().executeBlocking(() -> {
-            List<User> list = MapperUtil.mapper().readValue(ctx.body().buffer().getBytes(), new TypeReference<List<User>>() {});
-            userBO.create(user(ctx), list);
-            
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_CREATED);
-            msg.setMessage("Inserted " + list.size() + " record(s)");
-            
-            return msg;
-        }).onComplete(result -> {
-            if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
-            }
-            else {
-                ctx.fail(result.cause());
-            }
-        });
-    }
-    
-    /**
-     * Modify an existing resource by it's id (PUT request).
-     * 
-     * <p>
-     * If no corresponding resource is found then this method will throw {@link NoSuchElementException}
-     * resulting a <code>404</code> response.
-     * 
-     * <p>
-     * For a PUT request, the server expects you to include all the information for the resource, even if
-     * you only want to update a small part of it. If you leave something out, that part of the resource
-     * will be erased or set to default.
-     * 
-     * @param ctx   Vertx {@link RoutingContext} object.
-     */
-    public void modify(RoutingContext ctx) {
-        final String id = ctx.pathParam("id");
-        
-        // If you use a remote store, this method will safely execute the blocking code.
-        vertx().executeBlocking(() -> {
-            User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
-            user.setUserId(Long.valueOf(id));
-
-
-            // First fetch the entry, to see if this already exists.
-            User rs = userBO.modify(user(ctx), user);
-
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_OK);
-            msg.setMessage("User modified successfully");
-
-            return msg;
-            
-        }).onComplete(result -> {
-            if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
-            }
-            else {
-                ctx.fail(result.cause());
+//                Throwable cause = result.cause();
+//                if (cause instanceof com.fasterxml.jackson.databind.exc.InvalidFormatException) {
+//                    // Send a 400 Bad Request if the format is invalid
+//                    ctx.response()
+//                            .setStatusCode(HttpResponseStatus.BAD_REQUEST.code())
+//                            .end("Invalid data format: " + cause.getMessage());
+//                } else {
+                    ctx.fail(result.cause());
+               // }
             }
         });
     }
@@ -152,7 +99,102 @@ public class UserHandler extends AbstractHandler {
             }
         });
     }
-    
+
+    /**
+     * Remove the element for the given id.
+     *
+     * <p>
+     * The element will be evicted from the in-memory store.
+     * If no corresponding resource is found then this method will throw {@link NoSuchElementException}
+     * resulting a <code>404</code> response.
+     *
+     * @param ctx   Vertx {@link RoutingContext} object.
+     */
+    public void remove(RoutingContext ctx) {
+        final String id = ctx.pathParam("id");
+
+        // If you use a remote store, this method will safely execute the blocking code.
+        vertx().executeBlocking(() -> {
+            User user = userBO.remove(user(ctx), Long.valueOf(id));
+
+
+            ServerMessage msg = new ServerMessage();
+            msg.setCode(HttpURLConnection.HTTP_NO_CONTENT);
+            msg.setMessage("User deleted successfully");
+
+            return msg;
+
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_NO_CONTENT, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+
+    /**
+     * Modify an existing resource by it's id (PUT request).
+     *
+     * <p>
+     * If no corresponding resource is found then this method will throw {@link NoSuchElementException}
+     * resulting a <code>404</code> response.
+     *
+     * <p>
+     * For a PUT request, the server expects you to include all the information for the resource, even if
+     * you only want to update a small part of it. If you leave something out, that part of the resource
+     * will be erased or set to default.
+     *
+     * @param ctx   Vertx {@link RoutingContext} object.
+     */
+    public void modify(RoutingContext ctx) {
+        final String id = ctx.pathParam("id");
+
+        // If you use a remote store, this method will safely execute the blocking code.
+        vertx().executeBlocking(() -> {
+            User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
+            user.setUserId(Long.valueOf(id));
+
+            // First fetch the entry, to see if this already exists.
+            User modifiedUser = userBO.modify(user(ctx), user);
+
+//            ServerMessage msg = new ServerMessage();
+//            msg.setCode(HttpURLConnection.HTTP_OK);
+//            msg.setMessage("User modified successfully");
+            return modifiedUser;
+
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+
+    public void batchCreate(RoutingContext ctx) {
+        // If you use a remote store, this method will safely execute the blocking code.
+        vertx().executeBlocking(() -> {
+            List<User> list = MapperUtil.mapper().readValue(ctx.body().buffer().getBytes(), new TypeReference<List<User>>() {});
+            userBO.create(user(ctx), list);
+
+            ServerMessage msg = new ServerMessage();
+            msg.setCode(HttpURLConnection.HTTP_CREATED);
+            msg.setMessage("Inserted " + list.size() + " record(s)");
+
+            return msg;
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+
     /**
      * View all the elements from the store.
      * 
@@ -171,40 +213,6 @@ public class UserHandler extends AbstractHandler {
         }).onComplete(result -> {
             if (result.succeeded()) {
                 sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
-            }
-            else {
-                ctx.fail(result.cause());
-            }
-        });
-    }
-    
-    /**
-     * Remove the element for the given id.
-     * 
-     * <p>
-     * The element will be evicted from the in-memory store.
-     * If no corresponding resource is found then this method will throw {@link NoSuchElementException}
-     * resulting a <code>404</code> response.
-     * 
-     * @param ctx   Vertx {@link RoutingContext} object.
-     */
-    public void remove(RoutingContext ctx) {
-        final String id = ctx.pathParam("id");
-        
-        // If you use a remote store, this method will safely execute the blocking code.
-        vertx().executeBlocking(() -> {
-            User user = userBO.remove(user(ctx), Long.valueOf(id));
-
-
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_NO_CONTENT);
-            msg.setMessage("User deleted successfully");
-
-            return msg;
-            
-        }).onComplete(result -> {
-            if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_NO_CONTENT, result.result());
             }
             else {
                 ctx.fail(result.cause());

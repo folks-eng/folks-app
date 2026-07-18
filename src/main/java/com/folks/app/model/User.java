@@ -63,10 +63,10 @@ public class User implements Serializable, Cloneable {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Column(name = "created_at", nullable = false, updatable = true)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at", nullable = true, updatable = true)
+    @Column(name = "updated_at", nullable = true, insertable = false, updatable = true)
     private Timestamp updatedAt;
 
     public User() {}

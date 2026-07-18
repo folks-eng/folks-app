@@ -26,7 +26,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="Address" path="/addresss" resource="com.folks.app.handler.AddressHandler" schema="com.folks.app.model.Address">
+    <resource-mapping name="Address" path="/address" resource="com.folks.app.handler.AddressHandler" schema="com.folks.app.model.Address">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>

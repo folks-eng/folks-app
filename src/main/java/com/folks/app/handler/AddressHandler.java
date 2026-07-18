@@ -62,44 +62,85 @@ public class AddressHandler extends AbstractHandler {
         });
     }
 
-    public void batchCreate(RoutingContext ctx) {
+    /**
+     * View a specific resource by it's id.
+     *
+     * <p>
+     * If no corresponding resource is found then this method will throw {@link NoSuchElementException}
+     * resulting a <code>404</code> response.
+     *
+     * @param ctx   Vertx {@link RoutingContext} object.
+     */
+    public void view(RoutingContext ctx) {
+        final String id = ctx.pathParam("id");
+
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            List<Address> list = MapperUtil.mapper().readValue(ctx.body().buffer().getBytes(), new TypeReference<List<Address>>() {});
-            addressBO.create(user(ctx), list);
-            
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_CREATED);
-            msg.setMessage("Inserted " + list.size() + " record(s)");
-            
-            return msg;
+            Address address = addressBO.view(user(ctx), Long.valueOf(id));
+
+            return address;
+
         }).onComplete(result -> {
             if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
             }
             else {
                 ctx.fail(result.cause());
             }
         });
     }
-    
+
+    /**
+     * Remove the element for the given id.
+     *
+     * <p>
+     * The element will be evicted from the in-memory store.
+     * If no corresponding resource is found then this method will throw {@link NoSuchElementException}
+     * resulting a <code>404</code> response.
+     *
+     * @param ctx   Vertx {@link RoutingContext} object.
+     */
+    public void remove(RoutingContext ctx) {
+        final String id = ctx.pathParam("id");
+
+        // If you use a remote store, this method will safely execute the blocking code.
+        vertx().executeBlocking(() -> {
+            Address address = addressBO.remove(user(ctx), Long.valueOf(id));
+
+
+            ServerMessage msg = new ServerMessage();
+            msg.setCode(HttpURLConnection.HTTP_NO_CONTENT);
+            msg.setMessage("Address deleted successfully");
+
+            return msg;
+
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_NO_CONTENT, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+
     /**
      * Modify an existing resource by it's id (PUT request).
-     * 
+     *
      * <p>
      * If no corresponding resource is found then this method will throw {@link NoSuchElementException}
      * resulting a <code>404</code> response.
-     * 
+     *
      * <p>
      * For a PUT request, the server expects you to include all the information for the resource, even if
      * you only want to update a small part of it. If you leave something out, that part of the resource
      * will be erased or set to default.
-     * 
+     *
      * @param ctx   Vertx {@link RoutingContext} object.
      */
     public void modify(RoutingContext ctx) {
         final String id = ctx.pathParam("id");
-        
+
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             Address address = MapperUtil.decode(ctx.body().buffer().getBytes(), Address.class);
@@ -114,7 +155,7 @@ public class AddressHandler extends AbstractHandler {
             msg.setMessage("Address modified successfully");
 
             return msg;
-            
+
         }).onComplete(result -> {
             if (result.succeeded()) {
                 sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
@@ -124,28 +165,22 @@ public class AddressHandler extends AbstractHandler {
             }
         });
     }
-    
-    /**
-     * View a specific resource by it's id.
-     * 
-     * <p>
-     * If no corresponding resource is found then this method will throw {@link NoSuchElementException}
-     * resulting a <code>404</code> response.
-     * 
-     * @param ctx   Vertx {@link RoutingContext} object.
-     */
-    public void view(RoutingContext ctx) {
-        final String id = ctx.pathParam("id");
-        
+
+
+    public void batchCreate(RoutingContext ctx) {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Address address = addressBO.view(user(ctx), Long.valueOf(id));
-
-            return address;
+            List<Address> list = MapperUtil.mapper().readValue(ctx.body().buffer().getBytes(), new TypeReference<List<Address>>() {});
+            addressBO.create(user(ctx), list);
             
+            ServerMessage msg = new ServerMessage();
+            msg.setCode(HttpURLConnection.HTTP_CREATED);
+            msg.setMessage("Inserted " + list.size() + " record(s)");
+            
+            return msg;
         }).onComplete(result -> {
             if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+                sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
             }
             else {
                 ctx.fail(result.cause());
@@ -171,40 +206,6 @@ public class AddressHandler extends AbstractHandler {
         }).onComplete(result -> {
             if (result.succeeded()) {
                 sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
-            }
-            else {
-                ctx.fail(result.cause());
-            }
-        });
-    }
-    
-    /**
-     * Remove the element for the given id.
-     * 
-     * <p>
-     * The element will be evicted from the in-memory store.
-     * If no corresponding resource is found then this method will throw {@link NoSuchElementException}
-     * resulting a <code>404</code> response.
-     * 
-     * @param ctx   Vertx {@link RoutingContext} object.
-     */
-    public void remove(RoutingContext ctx) {
-        final String id = ctx.pathParam("id");
-        
-        // If you use a remote store, this method will safely execute the blocking code.
-        vertx().executeBlocking(() -> {
-            Address address = addressBO.remove(user(ctx), Long.valueOf(id));
-
-
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_NO_CONTENT);
-            msg.setMessage("Address deleted successfully");
-
-            return msg;
-            
-        }).onComplete(result -> {
-            if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_NO_CONTENT, result.result());
             }
             else {
                 ctx.fail(result.cause());

@@ -1,5 +1,6 @@
 package com.folks.app.bo;
 
+import com.folks.app.model.User;
 import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
@@ -34,27 +35,33 @@ public class AddressBO {
     public Address create(AppUser usr, Address address) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-        
-        
+        validate(address);
+
         addressDAO.insert(address);
         timer.stop();
-
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Address created successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+            LOGGER.info("Address created successfully with id {}. Elapsed time(ms): {}", address.getAddressId(),
+                    timer.elapsedTimeMillis());
         }
         return address;
     }
 
-    public void create(AppUser usr, List<Address> records) {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        
-        addressDAO.insert(records);
-        timer.stop();
-
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Created {} Address record(s) successfully. Elapsed time(ms): {}", records.size(), timer.elapsedTimeMillis());
+    private void validate(Address addr) {
+        String line1 = addr.getAddressLine1();
+        if (line1 == null || line1.trim().isEmpty()) {
+            throw new IllegalArgumentException("Address line1 is required.");
+        }
+        String city = addr.getCity();
+        if (city == null || city.trim().isEmpty()) {
+            throw new IllegalArgumentException("City is required.");
+        }
+        String state = addr.getState();
+        if (state == null || state.trim().isEmpty()) {
+            throw new IllegalArgumentException("State is required.");
+        }
+        String pinCode = addr.getPincode();
+        if (pinCode == null || pinCode.trim().isEmpty()) {
+            throw new IllegalArgumentException("PinCode is required.");
         }
     }
 
@@ -85,20 +92,6 @@ public class AddressBO {
             LOGGER.info("Address record modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
         return existing;
-    }
-
-    public List<Address> viewAll(AppUser usr, QueryParams params) {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        SearchCriteria search = SearchCriteria.from(params);
-        List<Address> rows = addressDAO.query(search);
-
-        timer.stop();
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched {} expanded address record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
-        }
-        return rows;
     }
 
     public Address view(AppUser usr, Long id) {
@@ -134,4 +127,31 @@ public class AddressBO {
         }
         return address;
     }
+
+    public void create(AppUser usr, List<Address> records) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        addressDAO.insert(records);
+        timer.stop();
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Created {} Address record(s) successfully. Elapsed time(ms): {}", records.size(), timer.elapsedTimeMillis());
+        }
+    }
+
+    public List<Address> viewAll(AppUser usr, QueryParams params) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        SearchCriteria search = SearchCriteria.from(params);
+        List<Address> rows = addressDAO.query(search);
+
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched {} expanded address record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
+        }
+        return rows;
+    }
+
 }

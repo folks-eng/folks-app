@@ -3,13 +3,12 @@ package com.folks.app.bo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.folks.app.model.SmsServiceResponse;
+import com.folks.app.util.Constants;
 import io.vertx.core.Future;
 import io.vertx.redis.client.RedisAPI;
 import org.javalabs.decl.util.MapperUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-//import io.vertx.redis.client.RedisOptions;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -21,7 +20,6 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.folks.app.auth.AppUser;
@@ -34,8 +32,6 @@ import com.folks.app.model.RegistrationInfo;
 public class RegistrationBO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationBO.class);
-
-    private static final Pattern MOBILENUM_PATTERN = Pattern.compile("\\d{10}");
 
     private static final String EXPIRY_TIME_SEC = "300"; //5 mins
 
@@ -55,7 +51,7 @@ public class RegistrationBO {
         if (mobileNum == null || mobileNum.trim().isEmpty()) {
             return Future.failedFuture(new IllegalArgumentException("Mobile number is required."));
         }
-        if (!MOBILENUM_PATTERN.matcher(mobileNum).matches()) {
+        if (!Constants.MOBILENUM_PATTERN.matcher(mobileNum).matches()) {
             return Future.failedFuture(new IllegalArgumentException("Mobile number invalid." + mobileNum));
         }
 

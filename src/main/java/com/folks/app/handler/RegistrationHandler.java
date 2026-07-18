@@ -52,7 +52,9 @@ public class RegistrationHandler extends AbstractHandler {
         automatically trigger future.fail()
          */
         System.out.println("Start of register user");
+        //deserialize
         RegistrationInfo regInfo = MapperUtil.decode(ctx.body().buffer().getBytes(), RegistrationInfo.class);
+
         regBO.registerUser(user(ctx), regInfo)
             .onSuccess(newRegInfo -> {
                 System.out.println(" User registered and OTP sent: " + newRegInfo.getOtp());

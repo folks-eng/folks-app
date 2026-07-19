@@ -36,8 +36,7 @@ public class User implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @JsonIgnore
-    @Column(name = "user_id", nullable = false, updatable = false, precision = 64)
+    @Column(name = "user_id", nullable = false, precision = 64)
     private Long userId;
 
     @Column(name = "full_name", nullable = false, updatable = true, length = 96)

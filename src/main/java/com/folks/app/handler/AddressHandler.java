@@ -11,6 +11,7 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Example REST handler.
@@ -146,15 +147,9 @@ public class AddressHandler extends AbstractHandler {
             Address address = MapperUtil.decode(ctx.body().buffer().getBytes(), Address.class);
             address.setAddressId(Long.valueOf(id));
 
-
             // First fetch the entry, to see if this already exists.
-            Address rs = addressBO.modify(user(ctx), address);
-
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_OK);
-            msg.setMessage("Address modified successfully");
-
-            return msg;
+            Address newAddr = addressBO.modify(user(ctx), address);
+            return newAddr;
 
         }).onComplete(result -> {
             if (result.succeeded()) {

@@ -85,7 +85,7 @@ public class AddressBO {
         existing.setLongitude(address.getLongitude());
         existing.setIsDefault(address.getIsDefault());
 
-        addressDAO.update(address);
+        addressDAO.update(existing);
         timer.stop();
 
         if (LOGGER.isInfoEnabled()) {

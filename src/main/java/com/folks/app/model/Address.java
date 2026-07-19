@@ -25,8 +25,7 @@ public class Address implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @JsonIgnore
-    @Column(name = "address_id", nullable = false, updatable = false, precision = 64)
+    @Column(name = "address_id", nullable = false, precision = 64)
     private Long addressId;
 
     @Column(name = "user_id", nullable = false, updatable = false, precision = 64)

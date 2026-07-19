@@ -88,7 +88,6 @@ public class UserBO {
         }
     }
 
-    //@Transactional
     public User modify(AppUser usr, User user) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();

@@ -1,7 +1,5 @@
 package com.folks.app.bo;
 
-import com.folks.app.model.User;
-import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
@@ -9,8 +7,9 @@ import com.folks.app.dao.AddressDAO;
 import com.folks.app.model.Address;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
-import java.sql.Timestamp;
+
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,6 +125,20 @@ public class AddressBO {
             LOGGER.info("Deleted Address. Id: {}. Elapsed time(ms): {}", id, timer.elapsedTimeMillis());
         }
         return address;
+    }
+
+    public List<Address> viewAddressList(AppUser usr, QueryParams params) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        SearchCriteria search = SearchCriteria.from(params);
+        List<Address> rows = addressDAO.query(search);
+
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched {} expanded user record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
+        }
+        return rows;
     }
 
     public void create(AppUser usr, List<Address> records) {

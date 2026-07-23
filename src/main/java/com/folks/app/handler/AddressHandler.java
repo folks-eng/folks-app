@@ -190,6 +190,7 @@ public class AddressHandler extends AbstractHandler {
      */
     public void viewAll(RoutingContext ctx) {
         final QueryParams params = params(ctx);
+        System.out.println(params.keys().toArray());
 
         vertx().executeBlocking(() -> {
             List<Address> addresss = addressBO.viewAll(user(ctx), params);

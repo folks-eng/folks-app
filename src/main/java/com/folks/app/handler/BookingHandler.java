@@ -11,6 +11,7 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Example REST handler.

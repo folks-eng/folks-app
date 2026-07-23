@@ -66,15 +66,7 @@ public class UserHandler extends AbstractHandler {
                 sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
             }
             else {
-//                Throwable cause = result.cause();
-//                if (cause instanceof com.fasterxml.jackson.databind.exc.InvalidFormatException) {
-//                    // Send a 400 Bad Request if the format is invalid
-//                    ctx.response()
-//                            .setStatusCode(HttpResponseStatus.BAD_REQUEST.code())
-//                            .end("Invalid data format: " + cause.getMessage());
-//                } else {
-                    ctx.fail(result.cause());
-               // }
+                ctx.fail(result.cause());
             }
         });
     }
@@ -123,8 +115,6 @@ public class UserHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             User user = userBO.remove(user(ctx), Long.valueOf(id));
-
-
             ServerMessage msg = new ServerMessage();
             msg.setCode(HttpURLConnection.HTTP_NO_CONTENT);
             msg.setMessage("User deleted successfully");
@@ -166,10 +156,6 @@ public class UserHandler extends AbstractHandler {
 
             // First fetch the entry, to see if this already exists.
             User modifiedUser = userBO.modify(user(ctx), user);
-
-//            ServerMessage msg = new ServerMessage();
-//            msg.setCode(HttpURLConnection.HTTP_OK);
-//            msg.setMessage("User modified successfully");
             return modifiedUser;
 
         }).onComplete(result -> {

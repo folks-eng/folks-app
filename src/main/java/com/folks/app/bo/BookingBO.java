@@ -43,26 +43,14 @@ public class BookingBO {
         timer.stop();
 
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Booking created successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+            LOGGER.info("Booking created successfully with id {}. Elapsed time(ms): {}", booking.getBookingId(),
+                    timer.elapsedTimeMillis());
         }
         return booking;
     }
 
-    public void create(AppUser usr, List<Booking> records) {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
+    private void validate(Booking booking) {
 
-        for (Booking booking : records) {
-            if (booking.getCreatedAt() == null) {
-                booking.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
-            }
-        }
-        bookingDAO.insert(records);
-        timer.stop();
-
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Created {} Booking record(s) successfully. Elapsed time(ms): {}", records.size(), timer.elapsedTimeMillis());
-        }
     }
 
     public Booking modify(AppUser usr, Booking booking) {
@@ -90,20 +78,6 @@ public class BookingBO {
             LOGGER.info("Booking record modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
         return existing;
-    }
-
-    public List<Booking> viewAll(AppUser usr, QueryParams params) {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        SearchCriteria search = SearchCriteria.from(params);
-        List<Booking> rows = bookingDAO.query(search);
-
-        timer.stop();
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched {} expanded booking record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
-        }
-        return rows;
     }
 
     public Booking view(AppUser usr, Long id) {
@@ -135,8 +109,39 @@ public class BookingBO {
         timer.stop();
 
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Deleted Booking. Id: {}. Elapsed time(ms): {}", id, timer.elapsedTimeMillis());
+            LOGGER.info("Deleted Booking Id: {}. Elapsed time(ms): {}", id, timer.elapsedTimeMillis());
         }
         return booking;
+    }
+
+    public void create(AppUser usr, List<Booking> records) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        for (Booking booking : records) {
+            if (booking.getCreatedAt() == null) {
+                booking.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+            }
+        }
+        bookingDAO.insert(records);
+        timer.stop();
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Created {} Booking record(s) successfully. Elapsed time(ms): {}", records.size(), timer.elapsedTimeMillis());
+        }
+    }
+
+    public List<Booking> viewAll(AppUser usr, QueryParams params) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        SearchCriteria search = SearchCriteria.from(params);
+        List<Booking> rows = bookingDAO.query(search);
+
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched {} expanded booking record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
+        }
+        return rows;
     }
 }

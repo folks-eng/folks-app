@@ -1,15 +1,7 @@
 package com.folks.app.model;
 
-import jakarta.persistence.CheckConstraint;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.NamedNativeQueries;
-import jakarta.persistence.NamedNativeQuery;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -40,6 +32,7 @@ public class Booking implements Serializable, Cloneable {
     };
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "booking_id", nullable = false, updatable = false, precision = 64)
     private Long bookingId;
 

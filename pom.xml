@@ -18,7 +18,7 @@
         <dependency>
             <groupId>org.javalabs.jpa</groupId>
             <artifactId>jpa-lite</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>

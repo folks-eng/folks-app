@@ -51,16 +51,9 @@ public class UserHandler extends AbstractHandler {
     public void create(RoutingContext ctx) {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            User user ;
-            try {
-                user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
-                user = userBO.create(user(ctx), user);
-
-                return user;
-            }
-            catch(RuntimeException ex) {
-                throw new DataValidationException(ex.getMessage());
-            }
+            User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
+            user = userBO.create(user(ctx), user);
+            return user;
         }).onComplete(result -> {
             if (result.succeeded()) {
                 sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
@@ -70,7 +63,7 @@ public class UserHandler extends AbstractHandler {
             }
         });
     }
-    
+
     /**
      * View a specific resource by it's id.
      * 

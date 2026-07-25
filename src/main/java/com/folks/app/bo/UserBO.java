@@ -41,7 +41,10 @@ public class UserBO {
         if (user.getCreatedAt() == null) {
             user.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
         }
-        //To move
+        if (user.getRole() == null) {
+            System.out.println("Role set to CUSTOMER");
+            user.setRole(User.Role.CUSTOMER);
+        }
         if (user.getStatus() == null) {
             System.out.println("Status set to ACTIVE");
             user.setStatus(User.Status.ACTIVE);
@@ -62,29 +65,37 @@ public class UserBO {
         String optionalContact = user.getPhone1();
         String email = user.getEmail();
         User.Status status = user.getStatus();
+        User.Role role = user.getRole();
 
         if (status != null ) {
             String statusStr = status.name();
-            System.out.println("Status in validate " +status.name());
+            //System.out.println("Status in validate " +status.name());
             List<String> validStatusList = Arrays.asList("ACTIVE", "INACTIVE", "BLOCKED");
             if (!validStatusList.contains(statusStr))
                 throw new DataValidationException("Status entered is invalid.");
         }
+        if (role != null ) {
+            String roleStr = role.name();
+            //System.out.println("Status in validate " +status.name());
+            List<String> validRoleList = Arrays.asList("CUSTOMER", "PROFESSIONAL", "ADMIN");
+            if (!validRoleList.contains(roleStr))
+                throw new DataValidationException("Role entered is invalid.");
+        }
         if (mandatoryContact == null || mandatoryContact.trim().isEmpty()) {
-            throw new IllegalArgumentException("Mobile number is required.");
+            throw new DataValidationException("Mobile number is required.");
         }
         if (!Constants.MOBILENUM_PATTERN.matcher(mandatoryContact).matches()) {
-            throw new IllegalArgumentException("Mobile number invalid." + mandatoryContact);
+            throw new DataValidationException("Mobile number invalid." + mandatoryContact);
         }
         if (optionalContact != null && !optionalContact.trim().isEmpty()) {
             if (!Constants.MOBILENUM_PATTERN.matcher(optionalContact).matches())
-                throw new IllegalArgumentException("Mobile number invalid." + optionalContact);
+                throw new DataValidationException("Mobile number invalid." + optionalContact);
         }
         if (email == null || email.trim().isEmpty()) {
-            throw new IllegalArgumentException("Email is required.");
+            throw new DataValidationException("Email is required.");
         }
         else {
-            //TBD : verify by sending mail
+            //TBD : verify email by sending mail
         }
     }
 
@@ -148,7 +159,7 @@ public class UserBO {
         timer.stop();
 
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Deleted User. Id: {}. Elapsed time(ms): {}", id, timer.elapsedTimeMillis());
+            LOGGER.info("Deleted User with Id: {}. Elapsed time(ms): {}", id, timer.elapsedTimeMillis());
         }
         return user;
     }

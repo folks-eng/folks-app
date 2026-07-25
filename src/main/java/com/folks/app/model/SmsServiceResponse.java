@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 public class SmsServiceResponse implements Serializable, Cloneable {
 
-    private String statusCode;
+    private String httpStatusCode;
 
     private String errorCode;
 
@@ -18,12 +18,12 @@ public class SmsServiceResponse implements Serializable, Cloneable {
 
     public SmsServiceResponse() {}
 
-    public String getStatusCode() {
-        return statusCode;
+    public String getHttpStatusCode() {
+        return httpStatusCode;
     }
 
-    public void setStatusCode(String statusCode) {
-        this.statusCode = statusCode;
+    public void setHttpStatusCode(String httpStatusCode) {
+        this.httpStatusCode = httpStatusCode;
     }
 
     public String getErrorCode() {

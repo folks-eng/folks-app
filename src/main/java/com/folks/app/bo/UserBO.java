@@ -1,6 +1,5 @@
 package com.folks.app.bo;
 
-import com.folks.app.exception.DataValidationException;
 import com.folks.app.util.Constants;
 import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
@@ -72,27 +71,27 @@ public class UserBO {
             //System.out.println("Status in validate " +status.name());
             List<String> validStatusList = Arrays.asList("ACTIVE", "INACTIVE", "BLOCKED");
             if (!validStatusList.contains(statusStr))
-                throw new DataValidationException("Status entered is invalid.");
+                throw new IllegalArgumentException("Status entered is invalid.");
         }
         if (role != null ) {
             String roleStr = role.name();
             //System.out.println("Status in validate " +status.name());
             List<String> validRoleList = Arrays.asList("CUSTOMER", "PROFESSIONAL", "ADMIN");
             if (!validRoleList.contains(roleStr))
-                throw new DataValidationException("Role entered is invalid.");
+                throw new IllegalArgumentException("Role entered is invalid.");
         }
         if (mandatoryContact == null || mandatoryContact.trim().isEmpty()) {
-            throw new DataValidationException("Mobile number is required.");
+            throw new IllegalArgumentException("Mobile number is required.");
         }
         if (!Constants.MOBILENUM_PATTERN.matcher(mandatoryContact).matches()) {
-            throw new DataValidationException("Mobile number invalid." + mandatoryContact);
+            throw new IllegalArgumentException("Mobile number invalid." );
         }
         if (optionalContact != null && !optionalContact.trim().isEmpty()) {
             if (!Constants.MOBILENUM_PATTERN.matcher(optionalContact).matches())
-                throw new DataValidationException("Mobile number invalid." + optionalContact);
+                throw new IllegalArgumentException("Mobile number invalid.");
         }
         if (email == null || email.trim().isEmpty()) {
-            throw new DataValidationException("Email is required.");
+            throw new IllegalArgumentException("Email is required.");
         }
         else {
             //TBD : verify email by sending mail

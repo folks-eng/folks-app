@@ -1,7 +1,6 @@
 package com.folks.app.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.folks.app.exception.DataValidationException;
 import org.javalabs.decl.util.MapperUtil;
 import org.javalabs.decl.vertx.config.model.ServerMessage;
 import com.folks.app.bo.UserBO;
@@ -51,9 +50,14 @@ public class UserHandler extends AbstractHandler {
     public void create(RoutingContext ctx) {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
-            user = userBO.create(user(ctx), user);
-            return user;
+            try {
+                User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
+                user = userBO.create(user(ctx), user);
+                return user;
+            }
+            catch(RuntimeException ex){
+                throw new IllegalArgumentException(ex.getMessage());
+            }
         }).onComplete(result -> {
             if (result.succeeded()) {
                 sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());

@@ -5,21 +5,21 @@ import java.util.Objects;
 
 
 /**
- * This class has the OTP and related info for User Registration.
+ * This class has the OTP and related info for User signup via mobile or email.
  *
  * @author schan280
  */
-public class RegistrationInfo implements Serializable, Cloneable {
+public class SignupInfo implements Serializable, Cloneable {
 
     private String mobileNum;
 
     private String otp;
 
-    //private long createdTime;
+    private long createdTime;
 
-    //private boolean used/existing;
+    private String email;
 
-    public RegistrationInfo() {}
+    public SignupInfo() {}
 
     public String getMobileNum() {
         return mobileNum;
@@ -37,13 +37,21 @@ public class RegistrationInfo implements Serializable, Cloneable {
         return this.otp;
     }
 
-//    public long getCreatedTime() {
-//        return createdTime;
-//    }
-//
-//    public void setCreatedTime(long time) {
-//        this.createdTime = time;
-//    }
+    public long getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(long time) {
+        this.createdTime = time;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     @Override
     public int hashCode() {

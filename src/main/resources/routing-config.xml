@@ -3,22 +3,13 @@
     <package name="com.folks.app.handler"/>
     <api version="1.0" basePath="/api/v1" produce="application/vnd.ex+json.v1" consume="application/json"/>
     <resource-mapping name="error" path="/*" failure="true" resource="org.javalabs.decl.vertx.container.handler.HttpErrorHandler"/>
-    <resource-mapping name="AuthToken" path="/mgmt/login" resource="com.folks.app.handler.AuthenticationHandler" schema="com.folks.app.auth.AuthToken">
+
+    <resource-mapping name="AuthToken" path="/auth" resource="com.folks.app.handler.AuthenticationHandler" schema="com.folks.app.model.SignupInfo">
+        <mapping uri="/generate" method="POST" api="generateSignupInfo"/>
+        <mapping uri="/verify" method="POST" api="verifySignupInfo"/>
         <mapping uri="" method="POST" api="authenticate"/>
     </resource-mapping>
-    <resource-mapping name="Payment" path="/payments" resource="com.folks.app.handler.PaymentHandler" schema="com.folks.app.model.Payment">
-        <mapping uri="" method="POST" api="create"/>
-        <mapping uri="/$batch" method="POST" api="batchCreate"/>
-        <mapping uri="/:id" method="PUT" api="modify"/>
-        <mapping uri="/:id" method="GET" api="view"/>
-        <mapping uri="/:id" method="DELETE" api="remove"/>
-        <mapping uri="" method="GET" api="viewAll"/>
-    </resource-mapping>
-    <resource-mapping name="UserLogin" path="/user/registration" resource="com.folks.app.handler.RegistrationHandler" schema="com.folks.app.model.RegistrationInfo">
-        <mapping uri="/verify" method="POST" api="verifyUser"/>
-        <mapping uri="" method="POST" api="registerUser"/>
-    </resource-mapping>
-    <resource-mapping name="User" path="/users" resource="com.folks.app.handler.UserHandler" schema="com.folks.app.model.User">
+    <resource-mapping name="User" path="/user" resource="com.folks.app.handler.UserHandler" schema="com.folks.app.model.User">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -67,6 +58,14 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
     <resource-mapping name="Booking" path="/bookings" resource="com.folks.app.handler.BookingHandler" schema="com.folks.app.model.Booking">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    <resource-mapping name="Payment" path="/payments" resource="com.folks.app.handler.PaymentHandler" schema="com.folks.app.model.Payment">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>

@@ -1,7 +1,10 @@
 package com.folks.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
@@ -9,7 +12,7 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 
@@ -28,16 +31,17 @@ import java.util.Objects;
 public class Address implements Serializable, Cloneable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "address_id", nullable = false, updatable = false, precision = 64)
     private Long addressId;
 
     @Column(name = "user_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger userId;
+    private Long userId;
 
     @Column(name = "address_line1", nullable = false, updatable = true, length = 255)
     private String addressLine1;
 
-    @Column(name = "address_line2", nullable = false, updatable = true, length = 255)
+    @Column(name = "address_line2", nullable = true, updatable = true, length = 255)
     private String addressLine2;
 
     @Column(name = "city", nullable = false, updatable = true, length = 64)
@@ -58,6 +62,9 @@ public class Address implements Serializable, Cloneable {
     @Column(name = "is_default", nullable = false, updatable = true, precision = 16)
     private Short isDefault;
 
+    @Column(name = "created_at", nullable = false, updatable = true)
+    private Timestamp createdAt;
+
     public Address() {}
 
     public void setAddressId(Long addressId) {
@@ -68,11 +75,13 @@ public class Address implements Serializable, Cloneable {
         return this.addressId;
     }
 
-    public void setUserId(BigInteger userId) {
+    @JsonIgnore
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public BigInteger getUserId() {
+    @JsonIgnore
+    public Long getUserId() {
         return this.userId;
     }
 
@@ -138,6 +147,14 @@ public class Address implements Serializable, Cloneable {
 
     public Short getIsDefault() {
         return this.isDefault;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 
     public static class AddressPK {

@@ -28,8 +28,8 @@ import java.util.Objects;
 public class Wallet implements Serializable, Cloneable {
 
     @Id
-    @Column(name = "wallet_id", nullable = false, updatable = false, precision = 64)
-    private Long walletId;
+    @Column(name = "wallet_id", nullable = false, updatable = false, length = 36)
+    private String walletId;
 
     @Column(name = "user_id", nullable = false, updatable = true, precision = 64)
     private BigInteger userId;
@@ -39,11 +39,11 @@ public class Wallet implements Serializable, Cloneable {
 
     public Wallet() {}
 
-    public void setWalletId(Long walletId) {
+    public void setWalletId(String walletId) {
         this.walletId = walletId;
     }
 
-    public Long getWalletId() {
+    public String getWalletId() {
         return this.walletId;
     }
 
@@ -65,19 +65,19 @@ public class Wallet implements Serializable, Cloneable {
 
     public static class WalletPK {
 
-        private Long walletId;
+        private String walletId;
 
         public WalletPK() {}
 
-        public WalletPK(Long walletId) {
+        public WalletPK(String walletId) {
             this.walletId = walletId;
         }
 
-        public void setWalletId(Long walletId) {
+        public void setWalletId(String walletId) {
             this.walletId = walletId;
         }
 
-        public Long getWalletId() {
+        public String getWalletId() {
             return this.walletId;
         }
 

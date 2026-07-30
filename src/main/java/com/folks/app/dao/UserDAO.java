@@ -68,6 +68,16 @@ public interface UserDAO {
     User find(User.UserPK pk);
     
     /**
+     * Retrieve the entry from the database, as identified by the secondary id.
+     * If no matching record is found in the DB, then this api will return null.
+     * 
+     * @param   externalId    External id of the record to be fetched
+     * @return  User
+     */
+    @NotSupported
+    User select(String externalId);
+    
+    /**
      * Query all the entries from the underlying db.
      * This is an extension of the {@link #query(SearchCriteria)} method, just that this method
      * will return all the attributes associated with the record.

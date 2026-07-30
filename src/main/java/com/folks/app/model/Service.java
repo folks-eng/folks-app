@@ -2,6 +2,8 @@ package com.folks.app.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
@@ -9,7 +11,6 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Objects;
 
 
@@ -28,11 +29,12 @@ import java.util.Objects;
 public class Service implements Serializable, Cloneable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "service_id", nullable = false, updatable = false, precision = 64)
     private Long serviceId;
 
     @Column(name = "category_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger categoryId;
+    private Long categoryId;
 
     @Column(name = "name", nullable = false, updatable = true, length = 128)
     private String name;
@@ -56,11 +58,11 @@ public class Service implements Serializable, Cloneable {
         return this.serviceId;
     }
 
-    public void setCategoryId(BigInteger categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
     }
 
-    public BigInteger getCategoryId() {
+    public Long getCategoryId() {
         return this.categoryId;
     }
 

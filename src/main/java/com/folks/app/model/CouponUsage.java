@@ -2,6 +2,8 @@ package com.folks.app.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
@@ -28,52 +30,53 @@ import java.util.Objects;
 public class CouponUsage implements Serializable, Cloneable {
 
     @Id
-    @Column(name = "id", nullable = false, updatable = false, precision = 64)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "usage_id", nullable = false, updatable = false, precision = 64)
+    private Long usageId;
 
     @Column(name = "coupon_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger couponId;
+    private Long couponId;
 
     @Column(name = "user_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger userId;
+    private Long userId;
 
-    @Column(name = "booking_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger bookingId;
+    @Column(name = "booking_id", nullable = false, updatable = true, length = 36)
+    private String bookingId;
 
     @Column(name = "used_at", nullable = false, updatable = true)
     private Timestamp usedAt;
 
     public CouponUsage() {}
 
-    public void setId(Long id) {
-        this.id = id;
+    public Long getUsageId() {
+        return usageId;
     }
 
-    public Long getId() {
-        return this.id;
+    public void setUsageId(Long usageId) {
+        this.usageId = usageId;
     }
 
-    public void setCouponId(BigInteger couponId) {
+    public void setCouponId(Long couponId) {
         this.couponId = couponId;
     }
 
-    public BigInteger getCouponId() {
+    public Long getCouponId() {
         return this.couponId;
     }
 
-    public void setUserId(BigInteger userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public BigInteger getUserId() {
+    public Long getUserId() {
         return this.userId;
     }
 
-    public void setBookingId(BigInteger bookingId) {
+    public void setBookingId(String bookingId) {
         this.bookingId = bookingId;
     }
 
-    public BigInteger getBookingId() {
+    public String getBookingId() {
         return this.bookingId;
     }
 

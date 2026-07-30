@@ -106,7 +106,7 @@ public class BookingBO {
         return rows;
     }
 
-    public Booking view(AppUser usr, Long id) {
+    public Booking view(AppUser usr, String id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -121,7 +121,7 @@ public class BookingBO {
         return booking;
     }
 
-    public Booking remove(AppUser usr, Long id) {
+    public Booking remove(AppUser usr, String id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

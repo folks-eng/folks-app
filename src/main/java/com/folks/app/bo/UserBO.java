@@ -10,6 +10,7 @@ import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,10 @@ public class UserBO {
     public User create(AppUser usr, User user) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
+        
+        user.setExternalId(UUID.randomUUID().toString());
+        user.setRole(User.Role.CUSTOMER);
+        user.setStatus(User.Status.ACTIVE);
         
         if (user.getCreatedAt() == null) {
             user.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));

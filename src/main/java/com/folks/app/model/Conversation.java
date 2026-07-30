@@ -2,13 +2,14 @@ package com.folks.app.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -28,11 +29,12 @@ import java.util.Objects;
 public class Conversation implements Serializable, Cloneable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "conversation_id", nullable = false, updatable = false, precision = 64)
     private Long conversationId;
 
-    @Column(name = "booking_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger bookingId;
+    @Column(name = "booking_id", nullable = false, updatable = true, length = 36)
+    private String bookingId;
 
     @Column(name = "created_at", nullable = false, updatable = true)
     private Timestamp createdAt;
@@ -47,11 +49,11 @@ public class Conversation implements Serializable, Cloneable {
         return this.conversationId;
     }
 
-    public void setBookingId(BigInteger bookingId) {
+    public void setBookingId(String bookingId) {
         this.bookingId = bookingId;
     }
 
-    public BigInteger getBookingId() {
+    public String getBookingId() {
         return this.bookingId;
     }
 

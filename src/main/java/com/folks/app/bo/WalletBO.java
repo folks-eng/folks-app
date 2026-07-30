@@ -1,6 +1,5 @@
 package com.folks.app.bo;
 
-import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
@@ -8,7 +7,6 @@ import com.folks.app.dao.WalletDAO;
 import com.folks.app.model.Wallet;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
-import java.sql.Timestamp;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +92,7 @@ public class WalletBO {
         return rows;
     }
 
-    public Wallet view(AppUser usr, Long id) {
+    public Wallet view(AppUser usr, String id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -109,7 +107,7 @@ public class WalletBO {
         return wallet;
     }
 
-    public Wallet remove(AppUser usr, Long id) {
+    public Wallet remove(AppUser usr, String id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

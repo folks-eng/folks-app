@@ -12,7 +12,6 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -37,11 +36,11 @@ public class WalletTransaction implements Serializable, Cloneable {
     };
 
     @Id
-    @Column(name = "txn_id", nullable = false, updatable = false, precision = 64)
-    private Long txnId;
+    @Column(name = "txn_id", nullable = false, updatable = false, length = 64)
+    private String txnId;
 
-    @Column(name = "wallet_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger walletId;
+    @Column(name = "wallet_id", nullable = false, updatable = true, length = 36)
+    private String walletId;
 
     @Column(name = "amount", nullable = false, updatable = true, precision = 10, scale = 2)
     private BigDecimal amount;
@@ -55,19 +54,19 @@ public class WalletTransaction implements Serializable, Cloneable {
 
     public WalletTransaction() {}
 
-    public void setTxnId(Long txnId) {
+    public void setTxnId(String txnId) {
         this.txnId = txnId;
     }
 
-    public Long getTxnId() {
+    public String getTxnId() {
         return this.txnId;
     }
 
-    public void setWalletId(BigInteger walletId) {
+    public void setWalletId(String walletId) {
         this.walletId = walletId;
     }
 
-    public BigInteger getWalletId() {
+    public String getWalletId() {
         return this.walletId;
     }
 
@@ -97,19 +96,19 @@ public class WalletTransaction implements Serializable, Cloneable {
 
     public static class WalletTransactionPK {
 
-        private Long txnId;
+        private String txnId;
 
         public WalletTransactionPK() {}
 
-        public WalletTransactionPK(Long txnId) {
+        public WalletTransactionPK(String txnId) {
             this.txnId = txnId;
         }
 
-        public void setTxnId(Long txnId) {
+        public void setTxnId(String txnId) {
             this.txnId = txnId;
         }
 
-        public Long getTxnId() {
+        public String getTxnId() {
             return this.txnId;
         }
 

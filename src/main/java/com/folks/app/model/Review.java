@@ -2,13 +2,14 @@ package com.folks.app.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -28,17 +29,18 @@ import java.util.Objects;
 public class Review implements Serializable, Cloneable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id", nullable = false, updatable = false, precision = 64)
     private Long reviewId;
 
     @Column(name = "booking_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger bookingId;
+    private Long bookingId;
 
     @Column(name = "customer_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger customerId;
+    private Long customerId;
 
     @Column(name = "professional_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger professionalId;
+    private Long professionalId;
 
     @Column(name = "rating", nullable = true, updatable = true, precision = 32)
     private Integer rating;
@@ -59,27 +61,27 @@ public class Review implements Serializable, Cloneable {
         return this.reviewId;
     }
 
-    public void setBookingId(BigInteger bookingId) {
+    public void setBookingId(Long bookingId) {
         this.bookingId = bookingId;
     }
 
-    public BigInteger getBookingId() {
+    public Long getBookingId() {
         return this.bookingId;
     }
 
-    public void setCustomerId(BigInteger customerId) {
+    public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
 
-    public BigInteger getCustomerId() {
+    public Long getCustomerId() {
         return this.customerId;
     }
 
-    public void setProfessionalId(BigInteger professionalId) {
+    public void setProfessionalId(Long professionalId) {
         this.professionalId = professionalId;
     }
 
-    public BigInteger getProfessionalId() {
+    public Long getProfessionalId() {
         return this.professionalId;
     }
 

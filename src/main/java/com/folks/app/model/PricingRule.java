@@ -2,6 +2,8 @@ package com.folks.app.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
@@ -9,7 +11,6 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -29,11 +30,12 @@ import java.util.Objects;
 public class PricingRule implements Serializable, Cloneable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "rule_id", nullable = false, updatable = false, precision = 64)
     private Long ruleId;
 
     @Column(name = "service_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger serviceId;
+    private Long serviceId;
 
     @Column(name = "city", nullable = false, updatable = true, length = 100)
     private String city;
@@ -57,11 +59,11 @@ public class PricingRule implements Serializable, Cloneable {
         return this.ruleId;
     }
 
-    public void setServiceId(BigInteger serviceId) {
+    public void setServiceId(Long serviceId) {
         this.serviceId = serviceId;
     }
 
-    public BigInteger getServiceId() {
+    public Long getServiceId() {
         return this.serviceId;
     }
 

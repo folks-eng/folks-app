@@ -1,7 +1,10 @@
 package com.folks.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
@@ -9,7 +12,6 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Objects;
 
 
@@ -28,11 +30,12 @@ import java.util.Objects;
 public class Professional implements Serializable, Cloneable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "professional_id", nullable = false, updatable = false, precision = 64)
     private Long professionalId;
 
     @Column(name = "user_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger userId;
+    private Long userId;
 
     @Column(name = "bio", nullable = true, updatable = true, length = 1000000000)
     private String bio;
@@ -56,11 +59,13 @@ public class Professional implements Serializable, Cloneable {
         return this.professionalId;
     }
 
-    public void setUserId(BigInteger userId) {
+    @JsonIgnore
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public BigInteger getUserId() {
+    @JsonIgnore
+    public Long getUserId() {
         return this.userId;
     }
 

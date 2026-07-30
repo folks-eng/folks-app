@@ -2,13 +2,14 @@ package com.folks.app.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -28,11 +29,12 @@ import java.util.Objects;
 public class JobStatus implements Serializable, Cloneable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "log_id", nullable = false, updatable = false, precision = 64)
     private Long logId;
 
     @Column(name = "booking_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger bookingId;
+    private Long bookingId;
 
     @Column(name = "status", nullable = false, updatable = true, length = 32)
     private String status;
@@ -41,7 +43,7 @@ public class JobStatus implements Serializable, Cloneable {
     private Timestamp updatedAt;
 
     @Column(name = "updated_by", nullable = true, updatable = true, precision = 64)
-    private BigInteger updatedBy;
+    private Long updatedBy;
 
     public JobStatus() {}
 
@@ -53,11 +55,11 @@ public class JobStatus implements Serializable, Cloneable {
         return this.logId;
     }
 
-    public void setBookingId(BigInteger bookingId) {
+    public void setBookingId(Long bookingId) {
         this.bookingId = bookingId;
     }
 
-    public BigInteger getBookingId() {
+    public Long getBookingId() {
         return this.bookingId;
     }
 
@@ -77,11 +79,11 @@ public class JobStatus implements Serializable, Cloneable {
         return this.updatedAt;
     }
 
-    public void setUpdatedBy(BigInteger updatedBy) {
+    public void setUpdatedBy(Long updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public BigInteger getUpdatedBy() {
+    public Long getUpdatedBy() {
         return this.updatedBy;
     }
 

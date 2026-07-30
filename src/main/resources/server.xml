@@ -33,7 +33,7 @@
     </cross-origin>
     
     <keystore-config>
-        <store-name>server.pkcs</store-name>
+        <store-name>folks.pkcs</store-name>
         <store-password>secret</store-password>
     </keystore-config>
     

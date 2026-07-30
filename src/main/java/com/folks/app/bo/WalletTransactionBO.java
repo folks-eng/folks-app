@@ -102,7 +102,7 @@ public class WalletTransactionBO {
         return rows;
     }
 
-    public WalletTransaction view(AppUser usr, Long id) {
+    public WalletTransaction view(AppUser usr, String id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -117,7 +117,7 @@ public class WalletTransactionBO {
         return walletTransaction;
     }
 
-    public WalletTransaction remove(AppUser usr, Long id) {
+    public WalletTransaction remove(AppUser usr, String id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

@@ -166,12 +166,4 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="PanInfo" path="/panInfos" resource="com.folks.app.handler.PanInfoHandler" schema="com.folks.app.model.PanInfo">
-        <mapping uri="" method="POST" api="create"/>
-        <mapping uri="/$batch" method="POST" api="batchCreate"/>
-        <mapping uri="/:id" method="PUT" api="modify"/>
-        <mapping uri="/:id" method="GET" api="view"/>
-        <mapping uri="/:id" method="DELETE" api="remove"/>
-        <mapping uri="" method="GET" api="viewAll"/>
-    </resource-mapping>
 </routing-config>

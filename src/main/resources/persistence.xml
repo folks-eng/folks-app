@@ -23,7 +23,6 @@
         <class>com.folks.app.model.WalletTransaction</class>
         <class>com.folks.app.model.Coupon</class>
         <class>com.folks.app.model.CouponUsage</class>
-        <class>com.folks.app.model.PanInfo</class>
         <shared-cache-mode>NONE</shared-cache-mode>
         <properties>
             <property name="jpa-lite.entity.package" value="com.folks.app.model"/>

@@ -2,13 +2,14 @@ package com.folks.app.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -28,11 +29,12 @@ import java.util.Objects;
 public class AuditLog implements Serializable, Cloneable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "log_id", nullable = false, updatable = false, precision = 64)
     private Long logId;
 
     @Column(name = "user_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger userId;
+    private Long userId;
 
     @Column(name = "action", nullable = false, updatable = true, length = 255)
     private String action;
@@ -41,7 +43,7 @@ public class AuditLog implements Serializable, Cloneable {
     private String entityType;
 
     @Column(name = "entity_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger entityId;
+    private Long entityId;
 
     @Column(name = "created_at", nullable = false, updatable = true)
     private Timestamp createdAt;
@@ -56,11 +58,11 @@ public class AuditLog implements Serializable, Cloneable {
         return this.logId;
     }
 
-    public void setUserId(BigInteger userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public BigInteger getUserId() {
+    public Long getUserId() {
         return this.userId;
     }
 
@@ -80,11 +82,11 @@ public class AuditLog implements Serializable, Cloneable {
         return this.entityType;
     }
 
-    public void setEntityId(BigInteger entityId) {
+    public void setEntityId(Long entityId) {
         this.entityId = entityId;
     }
 
-    public BigInteger getEntityId() {
+    public Long getEntityId() {
         return this.entityId;
     }
 

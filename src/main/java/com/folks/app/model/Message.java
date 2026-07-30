@@ -2,13 +2,14 @@ package com.folks.app.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -28,14 +29,15 @@ import java.util.Objects;
 public class Message implements Serializable, Cloneable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "message_id", nullable = false, updatable = false, precision = 64)
     private Long messageId;
 
     @Column(name = "conversation_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger conversationId;
+    private Long conversationId;
 
     @Column(name = "sender_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger senderId;
+    private Long senderId;
 
     @Column(name = "message_text", nullable = true, updatable = true, length = 1000000000)
     private String messageText;
@@ -53,19 +55,19 @@ public class Message implements Serializable, Cloneable {
         return this.messageId;
     }
 
-    public void setConversationId(BigInteger conversationId) {
+    public void setConversationId(Long conversationId) {
         this.conversationId = conversationId;
     }
 
-    public BigInteger getConversationId() {
+    public Long getConversationId() {
         return this.conversationId;
     }
 
-    public void setSenderId(BigInteger senderId) {
+    public void setSenderId(Long senderId) {
         this.senderId = senderId;
     }
 
-    public BigInteger getSenderId() {
+    public Long getSenderId() {
         return this.senderId;
     }
 

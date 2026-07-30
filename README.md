@@ -58,6 +58,54 @@ Serving HTTP on 127.0.0.1 port 8000 (http://127.0.0.1:8000/) ...
 
 Open the url `http://127.0.0.1:8000/` in your favourite browser and you will see the api documentation.
 
+## Keystore Handling
+
+### Generate Keystore
+
+```
+keytool -genkeypair \
+    -alias RS256 \
+    -keyalg RSA \
+    -sigalg SHA384withRSA \
+    -keysize 2048 \
+    -validity 365 \
+    -keystore folks.pkcs \
+    -storetype PKCS12 \
+    -storepass secret \
+    -keypass secret \
+    -dname "CN=Folks App, OU=Development, O=Zetachron Technologies LLP, L=Kolkata, S=West Bengal, C=IN"
+
+```
+
+**Note:** The alias name must be one of "RS256", "RS384", "RS512", "ES256K", "ES256", "ES384", "ES512".
+
+### View the Keystore
+
+```
+keytool  -list -v -keystore folks.pkcs -storepass secret
+
+```
+
+### Extract the Public Key to .pem File
+
+```
+keytool -exportcert -rfc \
+    -alias fks_dev \
+    -keystore folks.pkcs \
+    -file folks_pub.pem \
+    -storepass secret 
+
+```
+
+### Extract the Private Key to .pem File
+
+```
+openssl pkcs12 -in folks.pkcs -nodes -nocerts -out folks_prv.pem 
+Enter Import Password:
+
+
+```
+
 ## Test the service
 
 The service is just a simple REST service. It uses an in-memory map to store the data.

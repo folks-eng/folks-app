@@ -1,6 +1,5 @@
 package com.folks.app.bo;
 
-import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
@@ -8,7 +7,6 @@ import com.folks.app.dao.CouponUsageDAO;
 import com.folks.app.model.CouponUsage;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
-import java.sql.Timestamp;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,9 +61,9 @@ public class CouponUsageBO {
         timer.start();
 
         // First fetch the entry, to see if this already exists.
-        CouponUsage existing = couponUsageDAO.find(new CouponUsage.CouponUsagePK(couponUsage.getId()));
+        CouponUsage existing = couponUsageDAO.find(new CouponUsage.CouponUsagePK(couponUsage.getUsageId()));
         if (existing == null) {
-            throw new IllegalArgumentException("No couponUsage found for identifier: " + couponUsage.getId());
+            throw new IllegalArgumentException("No couponUsage found for identifier: " + couponUsage.getUsageId());
         }
         // Update attributes of existing record
         existing.setCouponId(couponUsage.getCouponId());

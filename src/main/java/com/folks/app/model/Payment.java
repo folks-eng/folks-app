@@ -5,6 +5,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
@@ -46,11 +48,12 @@ public class Payment implements Serializable, Cloneable {
     };
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id", nullable = false, updatable = false, precision = 64)
     private Long paymentId;
 
-    @Column(name = "booking_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger bookingId;
+    @Column(name = "booking_id", nullable = false, updatable = false, length = 36)
+    private String bookingId;
 
     @Column(name = "amount", nullable = false, updatable = true, precision = 10, scale = 2)
     private BigDecimal amount;
@@ -79,11 +82,11 @@ public class Payment implements Serializable, Cloneable {
         return this.paymentId;
     }
 
-    public void setBookingId(BigInteger bookingId) {
+    public void setBookingId(String bookingId) {
         this.bookingId = bookingId;
     }
 
-    public BigInteger getBookingId() {
+    public String getBookingId() {
         return this.bookingId;
     }
 

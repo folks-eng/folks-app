@@ -1,15 +1,16 @@
 package com.folks.app.bo;
 
-import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
 import com.folks.app.dao.AddressDAO;
+import com.folks.app.dao.UserDAO;
 import com.folks.app.model.Address;
+import com.folks.app.model.User;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
-import java.sql.Timestamp;
 import java.util.List;
+import org.javalabs.jpa.JdbcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,12 +23,14 @@ public class AddressBO {
     private static final Logger LOGGER = LoggerFactory.getLogger(AddressBO.class);
     
     private final AddressDAO addressDAO;
+    private final UserDAO userDAO;
 
     public AddressBO() {
         this.addressDAO = DAOProxy.get(AddressDAO.class);
+        this.userDAO = DAOProxy.get(UserDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized Handler: {}. AddressDAO: {}", getClass().getSimpleName(), addressDAO);
+            LOGGER.debug("Initialized Handler: {}. AddressDAO: {}. UserDAO: {}", getClass().getSimpleName(), addressDAO, userDAO);
         }
     }
 
@@ -35,14 +38,25 @@ public class AddressBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         
-        
-        addressDAO.insert(address);
-        timer.stop();
+        try {
+            // Get the user id.
+            String externalId = usr.principal().id();
+            User user = userDAO.select(externalId);
 
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Address created successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+            address.setUserId(user.getUserId());
+
+            addressDAO.insert(address);
+            timer.stop();
+
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Address created successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+            }
+            return address;
         }
-        return address;
+        catch (JdbcException e) {
+            LOGGER.error("Error creating address data for user " + usr.principal().id(), e);
+            throw e;
+        }
     }
 
     public void create(AppUser usr, List<Address> records) {

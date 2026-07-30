@@ -5,13 +5,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -37,11 +38,12 @@ public class Document implements Serializable, Cloneable {
     };
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "document_id", nullable = false, updatable = false, precision = 64)
     private Long documentId;
 
     @Column(name = "user_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger userId;
+    private Long userId;
 
     @Column(name = "document_type", nullable = false, updatable = true, length = 50)
     private String documentType;
@@ -66,11 +68,11 @@ public class Document implements Serializable, Cloneable {
         return this.documentId;
     }
 
-    public void setUserId(BigInteger userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public BigInteger getUserId() {
+    public Long getUserId() {
         return this.userId;
     }
 

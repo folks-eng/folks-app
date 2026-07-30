@@ -103,7 +103,7 @@ public class BookingHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             Booking booking = MapperUtil.decode(ctx.body().buffer().getBytes(), Booking.class);
-            booking.setBookingId(Long.valueOf(id));
+            booking.setBookingId(id);
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class BookingHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Booking booking = bookingBO.view(user(ctx), Long.valueOf(id));
+            Booking booking = bookingBO.view(user(ctx), id);
 
             return booking;
             
@@ -193,7 +193,7 @@ public class BookingHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Booking booking = bookingBO.remove(user(ctx), Long.valueOf(id));
+            Booking booking = bookingBO.remove(user(ctx), id);
 
 
             ServerMessage msg = new ServerMessage();

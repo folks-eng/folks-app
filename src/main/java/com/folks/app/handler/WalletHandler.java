@@ -103,7 +103,7 @@ public class WalletHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             Wallet wallet = MapperUtil.decode(ctx.body().buffer().getBytes(), Wallet.class);
-            wallet.setWalletId(Long.valueOf(id));
+            wallet.setWalletId(id);
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class WalletHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Wallet wallet = walletBO.view(user(ctx), Long.valueOf(id));
+            Wallet wallet = walletBO.view(user(ctx), id);
 
             return wallet;
             
@@ -193,7 +193,7 @@ public class WalletHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Wallet wallet = walletBO.remove(user(ctx), Long.valueOf(id));
+            Wallet wallet = walletBO.remove(user(ctx), id);
 
 
             ServerMessage msg = new ServerMessage();

@@ -9,6 +9,7 @@ import jakarta.persistence.TypedQuery;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.javalabs.jpa.util.QueryHints;
 
 /**
  * Concrete DAO class to handle database operations related.
@@ -54,6 +55,14 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public User find(User.UserPK pk) {
         return em.find(User.class, pk);
+    }
+
+    @Override
+    public User select(String externalId) {
+        return em.createNamedQuery("User.selectByExtId", User.class)
+            .setParameter(1, externalId)
+            .setHint(QueryHints.ALLOW_NATIVE_QUERY, Boolean.TRUE)
+            .getSingleResult();
     }
 
     @Override

@@ -2,13 +2,14 @@ package com.folks.app.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -29,11 +30,12 @@ import java.util.Objects;
 public class Availability implements Serializable, Cloneable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "availability_id", nullable = false, updatable = false, precision = 64)
     private Long availabilityId;
 
     @Column(name = "professional_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger professionalId;
+    private Long professionalId;
 
     @Column(name = "date", nullable = false, updatable = true)
     private Date date;
@@ -57,11 +59,11 @@ public class Availability implements Serializable, Cloneable {
         return this.availabilityId;
     }
 
-    public void setProfessionalId(BigInteger professionalId) {
+    public void setProfessionalId(Long professionalId) {
         this.professionalId = professionalId;
     }
 
-    public BigInteger getProfessionalId() {
+    public Long getProfessionalId() {
         return this.professionalId;
     }
 

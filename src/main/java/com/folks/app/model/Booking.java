@@ -12,7 +12,6 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -40,20 +39,20 @@ public class Booking implements Serializable, Cloneable {
     };
 
     @Id
-    @Column(name = "booking_id", nullable = false, updatable = false, precision = 64)
-    private Long bookingId;
+    @Column(name = "booking_id", nullable = false, updatable = false, precision = 36)
+    private String bookingId;
 
     @Column(name = "customer_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger customerId;
+    private Long customerId;
 
     @Column(name = "professional_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger professionalId;
+    private Long professionalId;
 
     @Column(name = "service_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger serviceId;
+    private Long serviceId;
 
     @Column(name = "address_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger addressId;
+    private Long addressId;
 
     @Column(name = "scheduled_at", nullable = false, updatable = true)
     private Timestamp scheduledAt;
@@ -68,45 +67,48 @@ public class Booking implements Serializable, Cloneable {
     @Column(name = "created_at", nullable = false, updatable = true)
     private Timestamp createdAt;
 
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
+
     public Booking() {}
 
-    public void setBookingId(Long bookingId) {
+    public void setBookingId(String bookingId) {
         this.bookingId = bookingId;
     }
 
-    public Long getBookingId() {
+    public String getBookingId() {
         return this.bookingId;
     }
 
-    public void setCustomerId(BigInteger customerId) {
+    public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
 
-    public BigInteger getCustomerId() {
+    public Long getCustomerId() {
         return this.customerId;
     }
 
-    public void setProfessionalId(BigInteger professionalId) {
+    public void setProfessionalId(Long professionalId) {
         this.professionalId = professionalId;
     }
 
-    public BigInteger getProfessionalId() {
+    public Long getProfessionalId() {
         return this.professionalId;
     }
 
-    public void setServiceId(BigInteger serviceId) {
+    public void setServiceId(Long serviceId) {
         this.serviceId = serviceId;
     }
 
-    public BigInteger getServiceId() {
+    public Long getServiceId() {
         return this.serviceId;
     }
 
-    public void setAddressId(BigInteger addressId) {
+    public void setAddressId(Long addressId) {
         this.addressId = addressId;
     }
 
-    public BigInteger getAddressId() {
+    public Long getAddressId() {
         return this.addressId;
     }
 
@@ -142,21 +144,29 @@ public class Booking implements Serializable, Cloneable {
         return this.createdAt;
     }
 
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public static class BookingPK {
 
-        private Long bookingId;
+        private String bookingId;
 
         public BookingPK() {}
 
-        public BookingPK(Long bookingId) {
+        public BookingPK(String bookingId) {
             this.bookingId = bookingId;
         }
 
-        public void setBookingId(Long bookingId) {
+        public void setBookingId(String bookingId) {
             this.bookingId = bookingId;
         }
 
-        public Long getBookingId() {
+        public String getBookingId() {
             return this.bookingId;
         }
 

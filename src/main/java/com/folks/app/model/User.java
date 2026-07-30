@@ -1,10 +1,13 @@
 package com.folks.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CheckConstraint;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
@@ -25,7 +28,8 @@ import java.util.Objects;
 @Table(name = "fks_users")
 @IdClass(User.UserPK.class)
 @NamedNativeQueries({
-    @NamedNativeQuery(name = "User.selectAll", query = "SELECT * FROM fks_users")
+    @NamedNativeQuery(name = "User.selectAll", query = "SELECT * FROM fks_users"),
+    @NamedNativeQuery(name = "User.selectByExtId", query = "SELECT * FROM fks_users WHERE external_id = ?")
 })
 public class User implements Serializable, Cloneable {
 
@@ -42,8 +46,12 @@ public class User implements Serializable, Cloneable {
     };
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false, updatable = false, precision = 64)
     private Long userId;
+
+    @Column(name = "external_id", nullable = false, updatable = false, length = 96)
+    private String externalId;
 
     @Column(name = "full_name", nullable = false, updatable = true, length = 96)
     private String fullName;
@@ -57,14 +65,14 @@ public class User implements Serializable, Cloneable {
     @Column(name = "phone2", nullable = true, updatable = true, length = 20)
     private String phone2;
 
-    @Column(name = "password_hash", nullable = false, updatable = true, length = 1000000000)
+    @Column(name = "password_hash", nullable = true, updatable = true, length = 1000000000)
     private String passwordHash;
 
-    @Column(name = "role", nullable = true, updatable = true, check = @CheckConstraint(constraint = "role IN ('CUSTOMER', 'PROFESSIONAL', 'ADMIN')"))
+    @Column(name = "role", nullable = false, updatable = true, check = @CheckConstraint(constraint = "role IN ('CUSTOMER', 'PROFESSIONAL', 'ADMIN')"))
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "status", nullable = true, updatable = true, check = @CheckConstraint(constraint = "status IN ('ACTIVE', 'INACTIVE', 'BLOCKED')"))
+    @Column(name = "status", nullable = false, updatable = true, check = @CheckConstraint(constraint = "status IN ('ACTIVE', 'INACTIVE', 'BLOCKED')"))
     @Enumerated(EnumType.STRING)
     private Status status;
 
@@ -76,12 +84,22 @@ public class User implements Serializable, Cloneable {
 
     public User() {}
 
+    @JsonIgnore
     public void setUserId(Long userId) {
         this.userId = userId;
     }
 
+    @JsonIgnore
     public Long getUserId() {
         return this.userId;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 
     public void setFullName(String fullName) {

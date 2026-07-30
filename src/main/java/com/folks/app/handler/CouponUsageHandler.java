@@ -103,7 +103,7 @@ public class CouponUsageHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             CouponUsage couponUsage = MapperUtil.decode(ctx.body().buffer().getBytes(), CouponUsage.class);
-            couponUsage.setId(Long.valueOf(id));
+            couponUsage.setUsageId(Long.valueOf(id));
 
 
             // First fetch the entry, to see if this already exists.

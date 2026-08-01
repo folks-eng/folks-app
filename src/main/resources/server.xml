@@ -42,7 +42,7 @@
     <security-constraint>
         <auth-handler>org.javalabs.decl.vertx.container.handler.AuthorizationHandler</auth-handler>
         <jwt-opts>
-            <issuer>folks-app</issuer>
+            <issuer>folks</issuer>
         </jwt-opts>
         
         <!-- 
@@ -54,6 +54,7 @@
             <url-patterns>
                 <!-- Adding CTX_ROOT will prepend the value from the context-root tag -->
                 <url-pattern>{CTX_ROOT}/mgmt/</url-pattern>
+                <url-pattern>{CTX_ROOT}/users/</url-pattern>
             </url-patterns>
         </auth-constraint>
     </security-constraint>

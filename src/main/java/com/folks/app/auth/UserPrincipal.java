@@ -1,5 +1,7 @@
 package com.folks.app.auth;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,14 @@ public class UserPrincipal implements Principal {
         this.name = (String) map.get("name");
         this.email = (String) map.get("email");
         this.priv = (String) map.get("priv");
-        this.sub = Collections.unmodifiableList((List) map.get("sub"));
+        
+        Object sl = map.get("sub");
+        if (sl instanceof Collection) {
+            this.sub = Collections.unmodifiableList((List) sl);
+        }
+        else {
+            this.sub = Arrays.asList((String)sl);
+        }
     }
 
     @Override

@@ -94,7 +94,7 @@ public class CouponUsageBO {
         return rows;
     }
 
-    public CouponUsage view(AppUser usr, Long id) {
+    public CouponUsage view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -109,7 +109,7 @@ public class CouponUsageBO {
         return couponUsage;
     }
 
-    public CouponUsage remove(AppUser usr, Long id) {
+    public CouponUsage remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

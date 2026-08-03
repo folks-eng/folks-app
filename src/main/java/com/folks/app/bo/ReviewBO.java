@@ -104,7 +104,7 @@ public class ReviewBO {
         return rows;
     }
 
-    public Review view(AppUser usr, Long id) {
+    public Review view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -119,7 +119,7 @@ public class ReviewBO {
         return review;
     }
 
-    public Review remove(AppUser usr, Long id) {
+    public Review remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

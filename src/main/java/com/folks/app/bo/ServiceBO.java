@@ -97,7 +97,7 @@ public class ServiceBO {
         return rows;
     }
 
-    public Service view(AppUser usr, Long id) {
+    public Service view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -112,7 +112,7 @@ public class ServiceBO {
         return service;
     }
 
-    public Service remove(AppUser usr, Long id) {
+    public Service remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

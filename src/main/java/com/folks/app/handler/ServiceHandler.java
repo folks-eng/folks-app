@@ -103,7 +103,7 @@ public class ServiceHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             Service service = MapperUtil.decode(ctx.body().buffer().getBytes(), Service.class);
-            service.setServiceId(Long.valueOf(id));
+            service.setServiceId(Integer.valueOf(id));
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class ServiceHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Service service = serviceBO.view(user(ctx), Long.valueOf(id));
+            Service service = serviceBO.view(user(ctx), Integer.valueOf(id));
 
             return service;
             
@@ -193,7 +193,7 @@ public class ServiceHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Service service = serviceBO.remove(user(ctx), Long.valueOf(id));
+            Service service = serviceBO.remove(user(ctx), Integer.valueOf(id));
 
 
             ServerMessage msg = new ServerMessage();

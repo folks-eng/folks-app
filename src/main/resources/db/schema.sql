@@ -1,284 +1,222 @@
 -- Run the below script to generate the tables --
--- h2-script.sh -url jdbc:h2:tcp://localhost:9092/~/testdb -user test -password test123 -script /Users/schan280/Projects/folks-app/src/main/resources/db/schema.sql --
+-- h2-script.sh -url jdbc:h2:tcp://localhost:9092/~/testdb -user test -password test123 -script /Users/schan280/temp/folks-app/src/main/resources/db/schema.sql --
 
 -- Table Script --
 
-CREATE TABLE fks_payments (
-    payment_id       BIGINT          NOT NULL,
-    booking_id       BIGINT          NOT NULL,
-    amount           NUMERIC(20, 6)  NOT NULL,
-    payment_method   VARCHAR(255)    CHECK (payment_method IN ('CARD', 'UPI', 'WALLET', 'COD')),
-    payment_status   VARCHAR(255)    CHECK (payment_status IN ('INITIATED', 'SUCCESS', 'FAILED', 'REFUNDED')),
-    transaction_ref  VARCHAR(128)    NOT NULL,
-    paid_at          TIMESTAMP       NOT NULL
-);
+-- 1. Users (Customers + Service Professionals + Admins)
 
 CREATE TABLE fks_users (
-    user_id        BIGINT        NOT NULL,
-    full_name      VARCHAR(96)   NOT NULL,
-    email          VARCHAR(128)  NOT NULL,
-    phone1         VARCHAR(20)   NOT NULL,
-    phone2         VARCHAR(20)   ,
-    password_hash  TEXT          NOT NULL,
-    role           VARCHAR(255)  CHECK (role IN ('CUSTOMER', 'PROFESSIONAL', 'ADMIN')),
-    status         VARCHAR(255)  CHECK (status IN ('ACTIVE', 'INACTIVE', 'BLOCKED')),
-    created_at     TIMESTAMP     NOT NULL,
-    updated_at     TIMESTAMP     
+    user_id             INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    external_id         VARCHAR(36)     NOT NULL,
+    full_name           VARCHAR(96)     NOT NULL,
+    email               VARCHAR(128)    NOT NULL,
+    phone1              VARCHAR(20)     NOT NULL,
+    phone2              VARCHAR(20)     ,
+    password_hash       TEXT            ,
+    role                VARCHAR(16)     NOT NULL CHECK (role IN ('CUSTOMER', 'PROFESSIONAL', 'ADMIN')),
+    status              VARCHAR(16)     NOT NULL CHECK (status IN ('ACTIVE', 'INACTIVE', 'BLOCKED')),
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
+
+-- Address
 
 CREATE TABLE fks_addresses (
-    address_id     BIGINT          NOT NULL,
-    user_id        BIGINT          NOT NULL,
-    address_line1  VARCHAR(255)    NOT NULL,
-    address_line2  VARCHAR(255)    NOT NULL,
-    city           VARCHAR(64)     NOT NULL,
-    state          VARCHAR(64)     NOT NULL,
-    pincode        VARCHAR(20)     NOT NULL,
-    latitude       NUMERIC(20, 6)  ,
-    longitude      NUMERIC(20, 6)  ,
-    is_default     INT             NOT NULL
+    address_id          INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    user_id             INT             NOT NULL,
+    address_line1       VARCHAR(128)    NOT NULL,
+    address_line2       VARCHAR(128)    ,
+    city                VARCHAR(64)     NOT NULL,
+    state               VARCHAR(64)     NOT NULL,
+    pincode             VARCHAR(20)     NOT NULL,
+    latitude            NUMERIC(20, 6)  ,
+    longitude           NUMERIC(20, 6)  ,
+    is_default          SMALLINT        NOT NULL
 );
 
+-- 2. Service Catalog - Categories & Services
+
 CREATE TABLE fks_categories (
-    category_id  BIGINT        NOT NULL,
-    name         VARCHAR(128)  NOT NULL,
-    parent_id    BIGINT        
+    category_id         INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    name                VARCHAR(128)    NOT NULL,
+    parent_id           INT        
 );
 
 CREATE TABLE fks_services (
-    service_id        BIGINT          NOT NULL,
-    category_id       BIGINT          NOT NULL,
-    name              VARCHAR(128)    NOT NULL,
-    description       TEXT            ,
-    base_price        NUMERIC(20, 6)  NOT NULL,
-    duration_minutes  INT             
+    service_id          INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    category_id         INT             NOT NULL,
+    name                VARCHAR(128)    NOT NULL,
+    description         TEXT            ,
+    base_price          NUMERIC(7, 2)   NOT NULL,
+    duration_minutes    SMALLINT             
 );
+
+-- Professional Profiles
 
 CREATE TABLE fks_professionals (
-    professional_id   BIGINT          NOT NULL,
-    user_id           BIGINT          NOT NULL,
-    bio               TEXT            ,
-    experience_years  INT             NOT NULL,
-    rating_avg        NUMERIC(20, 6)  ,
-    is_verified       INT             NOT NULL
+    professional_id     INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    user_id             INT             NOT NULL,
+    bio                 TEXT            ,
+    experience_years    SMALLINT        NOT NULL,
+    rating_avg          NUMERIC(3, 2)   ,
+    is_verified         SMALLINT        NOT NULL
 );
+
+-- Professional Skills
 
 CREATE TABLE fks_professional_services (
-    id               BIGINT          NOT NULL,
-    professional_id  BIGINT          NOT NULL,
-    service_id       BIGINT          NOT NULL,
-    price            NUMERIC(20, 6)  NOT NULL,
-    is_active        INT             NOT NULL
+    id                  INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    professional_id     INT             NOT NULL,
+    service_id          INT             NOT NULL,
+    price               NUMERIC(7, 2)   NOT NULL,
+    is_active           SMALLINT        NOT NULL
 );
+
+-- 3. Booking & Scheduling
+
+-- Booking
 
 CREATE TABLE fks_bookings (
-    booking_id       BIGINT          NOT NULL,
-    customer_id      BIGINT          NOT NULL,
-    professional_id  BIGINT          NOT NULL,
-    service_id       BIGINT          NOT NULL,
-    address_id       BIGINT          NOT NULL,
-    scheduled_at     TIMESTAMP       NOT NULL,
-    status           VARCHAR(255)    CHECK (status IN ('PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')),
-    total_amount     NUMERIC(20, 6)  NOT NULL,
-    created_at       TIMESTAMP       NOT NULL
+    booking_id          VARCHAR(36)     NOT NULL,
+    customer_id         INT             NOT NULL,
+    professional_id     INT             NOT NULL,
+    service_id          INT             NOT NULL,
+    address_id          INT             NOT NULL,
+    scheduled_at        TIMESTAMP       NOT NULL,
+    status              VARCHAR(255)    CHECK (status IN ('PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')),
+    total_amount        NUMERIC(20, 6)  NOT NULL,
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP       
 );
+
+-- Time Slots / Availability
 
 CREATE TABLE fks_availability (
-    availability_id  BIGINT     NOT NULL,
-    professional_id  BIGINT     NOT NULL,
-    date             DATE       NOT NULL,
-    start_time       TIMESTAMP  ,
-    end_time         TIMESTAMP  ,
-    is_booked        INT        NOT NULL
+    availability_id     INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    professional_id     INT             NOT NULL,
+    date                DATE            NOT NULL,
+    start_time          TIMESTAMP       ,
+    end_time            TIMESTAMP       ,
+    is_booked           SMALLINT        NOT NULL
 );
 
-CREATE TABLE fks_reviews (
-    review_id        BIGINT     NOT NULL,
-    booking_id       BIGINT     NOT NULL,
-    customer_id      BIGINT     NOT NULL,
-    professional_id  BIGINT     NOT NULL,
-    rating           INT        ,
-    comment          TEXT       ,
-    created_at       TIMESTAMP  NOT NULL
+-- 4. Payments & Pricing
+
+-- Payments
+
+CREATE TABLE fks_payments (
+    payment_id          INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    booking_id          VARCHAR(36)     NOT NULL,
+    amount              NUMERIC(7, 2)   NOT NULL,
+    payment_method      VARCHAR(16)     CHECK (payment_method IN ('CARD', 'UPI', 'WALLET', 'COD')),
+    payment_status      VARCHAR(16)     CHECK (payment_status IN ('INITIATED', 'SUCCESS', 'FAILED', 'REFUNDED')),
+    transaction_ref     VARCHAR(128)    NOT NULL,
+    paid_at             TIMESTAMP       NOT NULL
 );
 
-CREATE TABLE fks_conversations (
-    conversation_id  BIGINT     NOT NULL,
-    booking_id       BIGINT     NOT NULL,
-    created_at       TIMESTAMP  NOT NULL
-);
-
-CREATE TABLE fks_messages (
-    message_id       BIGINT     NOT NULL,
-    conversation_id  BIGINT     NOT NULL,
-    sender_id        BIGINT     NOT NULL,
-    message_text     TEXT       ,
-    sent_at          TIMESTAMP  NOT NULL
-);
-
-CREATE TABLE fks_job_status (
-    log_id      BIGINT       NOT NULL,
-    booking_id  BIGINT       NOT NULL,
-    status      VARCHAR(32)  NOT NULL,
-    updated_at  TIMESTAMP    ,
-    updated_by  BIGINT       
-);
-
-CREATE TABLE fks_documents (
-    document_id          BIGINT        NOT NULL,
-    user_id              BIGINT        NOT NULL,
-    document_type        VARCHAR(50)   NOT NULL,
-    document_url         TEXT          ,
-    verification_status  VARCHAR(255)  CHECK (verification_status IN ('PENDING', 'APPROVED', 'REJECTED')),
-    uploaded_at          TIMESTAMP     
-);
-
-CREATE TABLE fks_audit_logs (
-    log_id       BIGINT        NOT NULL,
-    user_id      BIGINT        NOT NULL,
-    action       VARCHAR(255)  NOT NULL,
-    entity_type  VARCHAR(50)   NOT NULL,
-    entity_id    BIGINT        NOT NULL,
-    created_at   TIMESTAMP     NOT NULL
-);
-
-CREATE TABLE fks_pricing_rules (
-    rule_id     BIGINT          NOT NULL,
-    service_id  BIGINT          NOT NULL,
-    city        VARCHAR(100)    NOT NULL,
-    multiplier  NUMERIC(20, 6)  NOT NULL,
-    start_time  TIMESTAMP       NOT NULL,
-    end_time    TIMESTAMP       NOT NULL
-);
-
-CREATE TABLE fks_wallets (
-    wallet_id  BIGINT          NOT NULL,
-    user_id    BIGINT          NOT NULL,
-    balance    NUMERIC(20, 6)  
-);
-
-CREATE TABLE fks_wallet_transactions (
-    txn_id      BIGINT          NOT NULL,
-    wallet_id   BIGINT          NOT NULL,
-    amount      NUMERIC(20, 6)  NOT NULL,
-    type        VARCHAR(255)    CHECK (type IN ('CREDIT', 'DEBIT')),
-    created_at  TIMESTAMP       NOT NULL
-);
+-- Coupons & Discounts
 
 CREATE TABLE fks_coupons (
-    coupon_id       BIGINT          NOT NULL,
-    code            VARCHAR(50)     NOT NULL,
-    discount_type   VARCHAR(255)    CHECK (discount_type IN ('PERCENT', 'FLAT')),
-    discount_value  NUMERIC(20, 6)  ,
-    max_discount    NUMERIC(20, 6)  ,
-    expiry_date     DATE            NOT NULL,
-    usage_limit     INT             
+    coupon_id           INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    code                VARCHAR(50)     NOT NULL,
+    discount_type       VARCHAR(16)     NOT NULL,
+    discount_value      NUMERIC(7, 2)   ,
+    max_discount        NUMERIC(7, 2)   ,
+    expiry_date         DATE            NOT NULL,
+    usage_limit         SMALLINT
 );
 
 CREATE TABLE fks_coupon_usage (
-    id          BIGINT     NOT NULL,
-    coupon_id   BIGINT     NOT NULL,
-    user_id     BIGINT     NOT NULL,
-    booking_id  BIGINT     NOT NULL,
-    used_at     TIMESTAMP  NOT NULL
+    usage_id            INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    coupon_id           INT             NOT NULL,
+    user_id             INT             NOT NULL,
+    booking_id          VARCHAR(36)     NOT NULL,
+    used_at             TIMESTAMP       NOT NULL
 );
 
-CREATE TABLE pan_info (
-    pan_hash            VARCHAR(32)  NOT NULL,
-    pan_ref_id          VARCHAR(64)  NOT NULL,
-    status              VARCHAR(16)  NOT NULL,
-    created_date        TIMESTAMP    NOT NULL,
-    last_accessed_date  TIMESTAMP    ,
-    access_count        BIGINT       NOT NULL
+-- 5. Ratings & Reviews
+
+CREATE TABLE fks_reviews (
+    review_id           INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    booking_id          VARCHAR(36)     NOT NULL,
+    customer_id         INT             NOT NULL,
+    professional_id     INT             NOT NULL,
+    rating              SMALLINT        ,
+    comment             TEXT            ,
+    created_at          TIMESTAMP       NOT NULL
 );
 
--- Primary Key Constraint --
+-- 6. Communication
 
-ALTER TABLE fks_payments
-ADD CONSTRAINT fks_payments_pk
-PRIMARY KEY (payment_id);
+CREATE TABLE fks_conversations (
+    conversation_id     INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    booking_id          VARCHAR(36)     NOT NULL,
+    created_at          TIMESTAMP       NOT NULL
+);
 
-ALTER TABLE fks_users
-ADD CONSTRAINT fks_users_pk
-PRIMARY KEY (user_id);
+CREATE TABLE fks_messages (
+    message_id          INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    conversation_id     INT             NOT NULL,
+    sender_id           INT             NOT NULL,
+    message_text        TEXT            ,
+    sent_at             TIMESTAMP       NOT NULL
+);
 
-ALTER TABLE fks_addresses
-ADD CONSTRAINT fks_addresses_pk
-PRIMARY KEY (address_id);
+-- 7. Operations & Logistics
 
-ALTER TABLE fks_categories
-ADD CONSTRAINT fks_categories_pk
-PRIMARY KEY (category_id);
+CREATE TABLE fks_job_status (
+    log_id              INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    booking_id          VARCHAR(36)     NOT NULL,
+    status              VARCHAR(32)     NOT NULL,
+    updated_at          TIMESTAMP       ,
+    updated_by          INT       
+);
 
-ALTER TABLE fks_services
-ADD CONSTRAINT fks_services_pk
-PRIMARY KEY (service_id);
+-- 8. Admin & Compliance
 
-ALTER TABLE fks_professionals
-ADD CONSTRAINT fks_professionals_pk
-PRIMARY KEY (professional_id);
+-- Documents (KYC, Verification)CREATE TABLE fks_documents (
+    document_id         INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    user_id             INT             NOT NULL,
+    document_type       VARCHAR(50)     NOT NULL,
+    document_url        TEXT            ,
+    verification_status VARCHAR(16)     CHECK (verification_status IN ('PENDING', 'APPROVED', 'REJECTED')),
+    uploaded_at         TIMESTAMP     
+);
 
-ALTER TABLE fks_professional_services
-ADD CONSTRAINT fks_professional_services_pk
-PRIMARY KEY (id);
+-- 9. Surge Pricing
 
-ALTER TABLE fks_bookings
-ADD CONSTRAINT fks_bookings_pk
-PRIMARY KEY (booking_id);
+CREATE TABLE fks_pricing_rules (
+    rule_id             INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    service_id          INT             NOT NULL,
+    city                VARCHAR(100)    NOT NULL,
+    multiplier          NUMERIC(7, 2)   NOT NULL,
+    start_time          TIMESTAMP       NOT NULL,
+    end_time            TIMESTAMP       NOT NULL
+);
 
-ALTER TABLE fks_availability
-ADD CONSTRAINT fks_availability_pk
-PRIMARY KEY (availability_id);
+-- 10. Wallet Systems
 
-ALTER TABLE fks_reviews
-ADD CONSTRAINT fks_reviews_pk
-PRIMARY KEY (review_id);
+CREATE TABLE fks_wallets (
+    wallet_id           VARCHAR(36)     NOT NULL,
+    user_id             INT             NOT NULL,
+    balance             NUMERIC(7, 2)  
+);
 
-ALTER TABLE fks_conversations
-ADD CONSTRAINT fks_conversations_pk
-PRIMARY KEY (conversation_id);
+CREATE TABLE fks_wallet_transactions (
+    txn_id              VARCHAR(64)     NOT NULL,
+    wallet_id           VARCHAR(36)     NOT NULL,
+    amount              NUMERIC(7, 2)   NOT NULL,
+    type                VARCHAR(16)     CHECK (type IN ('CREDIT', 'DEBIT')),
+    created_at          TIMESTAMP       NOT NULL
+);
 
-ALTER TABLE fks_messages
-ADD CONSTRAINT fks_messages_pk
-PRIMARY KEY (message_id);
+-- 11. Analytics / Audit
 
-ALTER TABLE fks_job_status
-ADD CONSTRAINT fks_job_status_pk
-PRIMARY KEY (log_id);
-
-ALTER TABLE fks_documents
-ADD CONSTRAINT fks_documents_pk
-PRIMARY KEY (document_id);
-
-ALTER TABLE fks_audit_logs
-ADD CONSTRAINT fks_audit_logs_pk
-PRIMARY KEY (log_id);
-
-ALTER TABLE fks_pricing_rules
-ADD CONSTRAINT fks_pricing_rules_pk
-PRIMARY KEY (rule_id);
-
-ALTER TABLE fks_wallets
-ADD CONSTRAINT fks_wallets_pk
-PRIMARY KEY (wallet_id);
-
-ALTER TABLE fks_wallet_transactions
-ADD CONSTRAINT fks_wallet_transactions_pk
-PRIMARY KEY (txn_id);
-
-ALTER TABLE fks_coupons
-ADD CONSTRAINT fks_coupons_pk
-PRIMARY KEY (coupon_id);
-
-ALTER TABLE fks_coupon_usage
-ADD CONSTRAINT fks_coupon_usage_pk
-PRIMARY KEY (id);
-
-ALTER TABLE pan_info
-ADD CONSTRAINT pan_info_pk
-PRIMARY KEY (pan_hash);
-
--- Foreign Key Constraint --
-
--- Indexes --
-
+CREATE TABLE fks_audit_logs (
+    log_id              INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
+    user_id             INT             NOT NULL,
+    action              VARCHAR(64)     NOT NULL,
+    entity_type         VARCHAR(50)     NOT NULL,
+    entity_id           INT             NOT NULL,
+    created_at          TIMESTAMP       NOT NULL
+);

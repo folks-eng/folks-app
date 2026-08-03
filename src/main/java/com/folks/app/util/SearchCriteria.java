@@ -20,7 +20,7 @@ public interface SearchCriteria {
      * Return a map of search key parameters.
      * @return Map
      */
-    Map<String, List<String>> params();
+    Map<String, List<Object>> params();
     
     /**
      * Indicate if historical data needs to be fetched.

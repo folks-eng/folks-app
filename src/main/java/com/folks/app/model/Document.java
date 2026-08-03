@@ -20,7 +20,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -39,11 +39,11 @@ public class Document implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "document_id", nullable = false, updatable = false, precision = 64)
-    private Long documentId;
+    @Column(name = "document_id", nullable = false, updatable = false, precision = 32)
+    private Integer documentId;
 
-    @Column(name = "user_id", nullable = false, updatable = true, precision = 64)
-    private Long userId;
+    @Column(name = "user_id", nullable = false, updatable = true, precision = 32)
+    private Integer userId;
 
     @Column(name = "document_type", nullable = false, updatable = true, length = 50)
     private String documentType;
@@ -60,19 +60,19 @@ public class Document implements Serializable, Cloneable {
 
     public Document() {}
 
-    public void setDocumentId(Long documentId) {
+    public void setDocumentId(Integer documentId) {
         this.documentId = documentId;
     }
 
-    public Long getDocumentId() {
+    public Integer getDocumentId() {
         return this.documentId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return this.userId;
     }
 
@@ -110,19 +110,19 @@ public class Document implements Serializable, Cloneable {
 
     public static class DocumentPK {
 
-        private Long documentId;
+        private Integer documentId;
 
         public DocumentPK() {}
 
-        public DocumentPK(Long documentId) {
+        public DocumentPK(Integer documentId) {
             this.documentId = documentId;
         }
 
-        public void setDocumentId(Long documentId) {
+        public void setDocumentId(Integer documentId) {
             this.documentId = documentId;
         }
 
-        public Long getDocumentId() {
+        public Integer getDocumentId() {
             return this.documentId;
         }
 

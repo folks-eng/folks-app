@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -30,11 +30,11 @@ public class JobStatus implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "log_id", nullable = false, updatable = false, precision = 64)
-    private Long logId;
+    @Column(name = "log_id", nullable = false, updatable = false, precision = 32)
+    private Integer logId;
 
-    @Column(name = "booking_id", nullable = false, updatable = true, precision = 64)
-    private Long bookingId;
+    @Column(name = "booking_id", nullable = false, updatable = true, length = 36)
+    private String bookingId;
 
     @Column(name = "status", nullable = false, updatable = true, length = 32)
     private String status;
@@ -42,24 +42,24 @@ public class JobStatus implements Serializable, Cloneable {
     @Column(name = "updated_at", nullable = true, updatable = true)
     private Timestamp updatedAt;
 
-    @Column(name = "updated_by", nullable = true, updatable = true, precision = 64)
-    private Long updatedBy;
+    @Column(name = "updated_by", nullable = true, updatable = true, precision = 32)
+    private Integer updatedBy;
 
     public JobStatus() {}
 
-    public void setLogId(Long logId) {
+    public void setLogId(Integer logId) {
         this.logId = logId;
     }
 
-    public Long getLogId() {
+    public Integer getLogId() {
         return this.logId;
     }
 
-    public void setBookingId(Long bookingId) {
+    public void setBookingId(String bookingId) {
         this.bookingId = bookingId;
     }
 
-    public Long getBookingId() {
+    public String getBookingId() {
         return this.bookingId;
     }
 
@@ -79,29 +79,29 @@ public class JobStatus implements Serializable, Cloneable {
         return this.updatedAt;
     }
 
-    public void setUpdatedBy(Long updatedBy) {
+    public void setUpdatedBy(Integer updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public Long getUpdatedBy() {
+    public Integer getUpdatedBy() {
         return this.updatedBy;
     }
 
     public static class JobStatusPK {
 
-        private Long logId;
+        private Integer logId;
 
         public JobStatusPK() {}
 
-        public JobStatusPK(Long logId) {
+        public JobStatusPK(Integer logId) {
             this.logId = logId;
         }
 
-        public void setLogId(Long logId) {
+        public void setLogId(Integer logId) {
             this.logId = logId;
         }
 
-        public Long getLogId() {
+        public Integer getLogId() {
             return this.logId;
         }
 

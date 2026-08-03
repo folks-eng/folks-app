@@ -18,7 +18,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -31,11 +31,11 @@ public class Availability implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "availability_id", nullable = false, updatable = false, precision = 64)
-    private Long availabilityId;
+    @Column(name = "availability_id", nullable = false, updatable = false, precision = 32)
+    private Integer availabilityId;
 
-    @Column(name = "professional_id", nullable = false, updatable = true, precision = 64)
-    private Long professionalId;
+    @Column(name = "professional_id", nullable = false, updatable = true, precision = 32)
+    private Integer professionalId;
 
     @Column(name = "date", nullable = false, updatable = true)
     private Date date;
@@ -51,19 +51,19 @@ public class Availability implements Serializable, Cloneable {
 
     public Availability() {}
 
-    public void setAvailabilityId(Long availabilityId) {
+    public void setAvailabilityId(Integer availabilityId) {
         this.availabilityId = availabilityId;
     }
 
-    public Long getAvailabilityId() {
+    public Integer getAvailabilityId() {
         return this.availabilityId;
     }
 
-    public void setProfessionalId(Long professionalId) {
+    public void setProfessionalId(Integer professionalId) {
         this.professionalId = professionalId;
     }
 
-    public Long getProfessionalId() {
+    public Integer getProfessionalId() {
         return this.professionalId;
     }
 
@@ -101,19 +101,19 @@ public class Availability implements Serializable, Cloneable {
 
     public static class AvailabilityPK {
 
-        private Long availabilityId;
+        private Integer availabilityId;
 
         public AvailabilityPK() {}
 
-        public AvailabilityPK(Long availabilityId) {
+        public AvailabilityPK(Integer availabilityId) {
             this.availabilityId = availabilityId;
         }
 
-        public void setAvailabilityId(Long availabilityId) {
+        public void setAvailabilityId(Integer availabilityId) {
             this.availabilityId = availabilityId;
         }
 
-        public Long getAvailabilityId() {
+        public Integer getAvailabilityId() {
             return this.availabilityId;
         }
 

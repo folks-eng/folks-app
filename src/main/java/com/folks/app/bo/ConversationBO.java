@@ -100,7 +100,7 @@ public class ConversationBO {
         return rows;
     }
 
-    public Conversation view(AppUser usr, Long id) {
+    public Conversation view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -115,7 +115,7 @@ public class ConversationBO {
         return conversation;
     }
 
-    public Conversation remove(AppUser usr, Long id) {
+    public Conversation remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

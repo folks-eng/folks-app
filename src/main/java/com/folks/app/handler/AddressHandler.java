@@ -103,7 +103,7 @@ public class AddressHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             Address address = MapperUtil.decode(ctx.body().buffer().getBytes(), Address.class);
-            address.setAddressId(Long.valueOf(id));
+            address.setAddressId(Integer.valueOf(id));
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class AddressHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Address address = addressBO.view(user(ctx), Long.valueOf(id));
+            Address address = addressBO.view(user(ctx), Integer.valueOf(id));
 
             return address;
             
@@ -193,7 +193,7 @@ public class AddressHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Address address = addressBO.remove(user(ctx), Long.valueOf(id));
+            Address address = addressBO.remove(user(ctx), Integer.valueOf(id));
 
 
             ServerMessage msg = new ServerMessage();

@@ -22,7 +22,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="Address" path="/addresss" resource="com.folks.app.handler.AddressHandler" schema="com.folks.app.model.Address">
+    <resource-mapping name="Address" path="/addresses" resource="com.folks.app.handler.AddressHandler" schema="com.folks.app.model.Address">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -30,7 +30,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="Category" path="/categorys" resource="com.folks.app.handler.CategoryHandler" schema="com.folks.app.model.Category">
+    <resource-mapping name="Category" path="/categories" resource="com.folks.app.handler.CategoryHandler" schema="com.folks.app.model.Category">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -70,7 +70,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="Availability" path="/availabilitys" resource="com.folks.app.handler.AvailabilityHandler" schema="com.folks.app.model.Availability">
+    <resource-mapping name="Availability" path="/availabilities" resource="com.folks.app.handler.AvailabilityHandler" schema="com.folks.app.model.Availability">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -102,7 +102,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="JobStatus" path="/jobStatuss" resource="com.folks.app.handler.JobStatusHandler" schema="com.folks.app.model.JobStatus">
+    <resource-mapping name="JobStatus" path="/jobStatus" resource="com.folks.app.handler.JobStatusHandler" schema="com.folks.app.model.JobStatus">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -158,7 +158,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="CouponUsage" path="/couponUsages" resource="com.folks.app.handler.CouponUsageHandler" schema="com.folks.app.model.CouponUsage">
+    <resource-mapping name="CouponUsage" path="/couponUsage" resource="com.folks.app.handler.CouponUsageHandler" schema="com.folks.app.model.CouponUsage">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>

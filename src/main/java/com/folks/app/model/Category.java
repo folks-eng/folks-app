@@ -16,7 +16,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -29,22 +29,22 @@ public class Category implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "category_id", nullable = false, updatable = false, precision = 64)
-    private Long categoryId;
+    @Column(name = "category_id", nullable = false, updatable = false, precision = 32)
+    private Integer categoryId;
 
     @Column(name = "name", nullable = false, updatable = true, length = 128)
     private String name;
 
-    @Column(name = "parent_id", nullable = true, updatable = true, precision = 64)
-    private Long parentId;
+    @Column(name = "parent_id", nullable = true, updatable = true, precision = 32)
+    private Integer parentId;
 
     public Category() {}
 
-    public void setCategoryId(Long categoryId) {
+    public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
     }
 
-    public Long getCategoryId() {
+    public Integer getCategoryId() {
         return this.categoryId;
     }
 
@@ -56,29 +56,29 @@ public class Category implements Serializable, Cloneable {
         return this.name;
     }
 
-    public void setParentId(Long parentId) {
+    public void setParentId(Integer parentId) {
         this.parentId = parentId;
     }
 
-    public Long getParentId() {
+    public Integer getParentId() {
         return this.parentId;
     }
 
     public static class CategoryPK {
 
-        private Long categoryId;
+        private Integer categoryId;
 
         public CategoryPK() {}
 
-        public CategoryPK(Long categoryId) {
+        public CategoryPK(Integer categoryId) {
             this.categoryId = categoryId;
         }
 
-        public void setCategoryId(Long categoryId) {
+        public void setCategoryId(Integer categoryId) {
             this.categoryId = categoryId;
         }
 
-        public Long getCategoryId() {
+        public Integer getCategoryId() {
             return this.categoryId;
         }
 

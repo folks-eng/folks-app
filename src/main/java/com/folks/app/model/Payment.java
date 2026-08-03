@@ -14,7 +14,6 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -22,7 +21,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -49,13 +48,13 @@ public class Payment implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "payment_id", nullable = false, updatable = false, precision = 64)
-    private Long paymentId;
+    @Column(name = "payment_id", nullable = false, updatable = false, precision = 32)
+    private Integer paymentId;
 
-    @Column(name = "booking_id", nullable = false, updatable = false, length = 36)
+    @Column(name = "booking_id", nullable = false, updatable = true, length = 36)
     private String bookingId;
 
-    @Column(name = "amount", nullable = false, updatable = true, precision = 10, scale = 2)
+    @Column(name = "amount", nullable = false, updatable = true, precision = 7, scale = 2)
     private BigDecimal amount;
 
     @Column(name = "payment_method", nullable = true, updatable = true, check = @CheckConstraint(constraint = "payment_method IN ('CARD', 'UPI', 'WALLET', 'COD')"))
@@ -74,11 +73,11 @@ public class Payment implements Serializable, Cloneable {
 
     public Payment() {}
 
-    public void setPaymentId(Long paymentId) {
+    public void setPaymentId(Integer paymentId) {
         this.paymentId = paymentId;
     }
 
-    public Long getPaymentId() {
+    public Integer getPaymentId() {
         return this.paymentId;
     }
 
@@ -132,19 +131,19 @@ public class Payment implements Serializable, Cloneable {
 
     public static class PaymentPK {
 
-        private Long paymentId;
+        private Integer paymentId;
 
         public PaymentPK() {}
 
-        public PaymentPK(Long paymentId) {
+        public PaymentPK(Integer paymentId) {
             this.paymentId = paymentId;
         }
 
-        public void setPaymentId(Long paymentId) {
+        public void setPaymentId(Integer paymentId) {
             this.paymentId = paymentId;
         }
 
-        public Long getPaymentId() {
+        public Integer getPaymentId() {
             return this.paymentId;
         }
 

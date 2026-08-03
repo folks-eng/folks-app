@@ -103,7 +103,7 @@ public class AvailabilityHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             Availability availability = MapperUtil.decode(ctx.body().buffer().getBytes(), Availability.class);
-            availability.setAvailabilityId(Long.valueOf(id));
+            availability.setAvailabilityId(Integer.valueOf(id));
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class AvailabilityHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Availability availability = availabilityBO.view(user(ctx), Long.valueOf(id));
+            Availability availability = availabilityBO.view(user(ctx), Integer.valueOf(id));
 
             return availability;
             
@@ -193,7 +193,7 @@ public class AvailabilityHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Availability availability = availabilityBO.remove(user(ctx), Long.valueOf(id));
+            Availability availability = availabilityBO.remove(user(ctx), Integer.valueOf(id));
 
 
             ServerMessage msg = new ServerMessage();

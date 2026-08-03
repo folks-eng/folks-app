@@ -103,7 +103,7 @@ public class ReviewHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             Review review = MapperUtil.decode(ctx.body().buffer().getBytes(), Review.class);
-            review.setReviewId(Long.valueOf(id));
+            review.setReviewId(Integer.valueOf(id));
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class ReviewHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Review review = reviewBO.view(user(ctx), Long.valueOf(id));
+            Review review = reviewBO.view(user(ctx), Integer.valueOf(id));
 
             return review;
             
@@ -193,7 +193,7 @@ public class ReviewHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Review review = reviewBO.remove(user(ctx), Long.valueOf(id));
+            Review review = reviewBO.remove(user(ctx), Integer.valueOf(id));
 
 
             ServerMessage msg = new ServerMessage();

@@ -103,7 +103,7 @@ public class UserHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
-            user.setUserId(Long.valueOf(id));
+            user.setUserId(Integer.valueOf(id));
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class UserHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            User user = userBO.view(user(ctx), Long.valueOf(id));
+            User user = userBO.view(user(ctx), Integer.valueOf(id));
 
             return user;
             
@@ -193,7 +193,7 @@ public class UserHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            User user = userBO.remove(user(ctx), Long.valueOf(id));
+            User user = userBO.remove(user(ctx), Integer.valueOf(id));
 
 
             ServerMessage msg = new ServerMessage();

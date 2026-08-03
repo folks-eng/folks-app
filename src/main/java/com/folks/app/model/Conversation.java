@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -30,8 +30,8 @@ public class Conversation implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "conversation_id", nullable = false, updatable = false, precision = 64)
-    private Long conversationId;
+    @Column(name = "conversation_id", nullable = false, updatable = false, precision = 32)
+    private Integer conversationId;
 
     @Column(name = "booking_id", nullable = false, updatable = true, length = 36)
     private String bookingId;
@@ -41,11 +41,11 @@ public class Conversation implements Serializable, Cloneable {
 
     public Conversation() {}
 
-    public void setConversationId(Long conversationId) {
+    public void setConversationId(Integer conversationId) {
         this.conversationId = conversationId;
     }
 
-    public Long getConversationId() {
+    public Integer getConversationId() {
         return this.conversationId;
     }
 
@@ -67,19 +67,19 @@ public class Conversation implements Serializable, Cloneable {
 
     public static class ConversationPK {
 
-        private Long conversationId;
+        private Integer conversationId;
 
         public ConversationPK() {}
 
-        public ConversationPK(Long conversationId) {
+        public ConversationPK(Integer conversationId) {
             this.conversationId = conversationId;
         }
 
-        public void setConversationId(Long conversationId) {
+        public void setConversationId(Integer conversationId) {
             this.conversationId = conversationId;
         }
 
-        public Long getConversationId() {
+        public Integer getConversationId() {
             return this.conversationId;
         }
 

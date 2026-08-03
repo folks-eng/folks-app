@@ -9,14 +9,13 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Objects;
 
 
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -31,10 +30,10 @@ public class Wallet implements Serializable, Cloneable {
     @Column(name = "wallet_id", nullable = false, updatable = false, length = 36)
     private String walletId;
 
-    @Column(name = "user_id", nullable = false, updatable = true, precision = 64)
-    private BigInteger userId;
+    @Column(name = "user_id", nullable = false, updatable = true, precision = 32)
+    private Integer userId;
 
-    @Column(name = "balance", nullable = true, updatable = true, precision = 10, scale = 2)
+    @Column(name = "balance", nullable = true, updatable = true, precision = 7, scale = 2)
     private BigDecimal balance;
 
     public Wallet() {}
@@ -47,11 +46,11 @@ public class Wallet implements Serializable, Cloneable {
         return this.walletId;
     }
 
-    public void setUserId(BigInteger userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public BigInteger getUserId() {
+    public Integer getUserId() {
         return this.userId;
     }
 

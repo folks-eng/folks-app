@@ -103,7 +103,7 @@ public class AuditLogHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             AuditLog auditLog = MapperUtil.decode(ctx.body().buffer().getBytes(), AuditLog.class);
-            auditLog.setLogId(Long.valueOf(id));
+            auditLog.setLogId(Integer.valueOf(id));
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class AuditLogHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            AuditLog auditLog = auditLogBO.view(user(ctx), Long.valueOf(id));
+            AuditLog auditLog = auditLogBO.view(user(ctx), Integer.valueOf(id));
 
             return auditLog;
             
@@ -193,7 +193,7 @@ public class AuditLogHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            AuditLog auditLog = auditLogBO.remove(user(ctx), Long.valueOf(id));
+            AuditLog auditLog = auditLogBO.remove(user(ctx), Integer.valueOf(id));
 
 
             ServerMessage msg = new ServerMessage();

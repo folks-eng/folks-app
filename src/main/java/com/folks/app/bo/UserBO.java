@@ -111,7 +111,7 @@ public class UserBO {
         return rows;
     }
 
-    public User view(AppUser usr, Long id) {
+    public User view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -126,7 +126,7 @@ public class UserBO {
         return user;
     }
 
-    public User remove(AppUser usr, Long id) {
+    public User remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

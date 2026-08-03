@@ -10,7 +10,6 @@ import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -18,7 +17,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -31,14 +30,14 @@ public class CouponUsage implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "usage_id", nullable = false, updatable = false, precision = 64)
-    private Long usageId;
+    @Column(name = "usage_id", nullable = false, updatable = false, precision = 32)
+    private Integer usageId;
 
-    @Column(name = "coupon_id", nullable = false, updatable = true, precision = 64)
-    private Long couponId;
+    @Column(name = "coupon_id", nullable = false, updatable = true, precision = 32)
+    private Integer couponId;
 
-    @Column(name = "user_id", nullable = false, updatable = true, precision = 64)
-    private Long userId;
+    @Column(name = "user_id", nullable = false, updatable = true, precision = 32)
+    private Integer userId;
 
     @Column(name = "booking_id", nullable = false, updatable = true, length = 36)
     private String bookingId;
@@ -48,27 +47,27 @@ public class CouponUsage implements Serializable, Cloneable {
 
     public CouponUsage() {}
 
-    public Long getUsageId() {
-        return usageId;
-    }
-
-    public void setUsageId(Long usageId) {
+    public void setUsageId(Integer usageId) {
         this.usageId = usageId;
     }
 
-    public void setCouponId(Long couponId) {
+    public Integer getUsageId() {
+        return this.usageId;
+    }
+
+    public void setCouponId(Integer couponId) {
         this.couponId = couponId;
     }
 
-    public Long getCouponId() {
+    public Integer getCouponId() {
         return this.couponId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return this.userId;
     }
 
@@ -90,26 +89,26 @@ public class CouponUsage implements Serializable, Cloneable {
 
     public static class CouponUsagePK {
 
-        private Long id;
+        private Integer usageId;
 
         public CouponUsagePK() {}
 
-        public CouponUsagePK(Long id) {
-            this.id = id;
+        public CouponUsagePK(Integer usageId) {
+            this.usageId = usageId;
         }
 
-        public void setId(Long id) {
-            this.id = id;
+        public void setUsageId(Integer usageId) {
+            this.usageId = usageId;
         }
 
-        public Long getId() {
-            return this.id;
+        public Integer getUsageId() {
+            return this.usageId;
         }
 
         @Override
         public int hashCode() {
             int hash = 7;
-            hash = 71 * hash + Objects.hashCode(this.id);
+            hash = 71 * hash + Objects.hashCode(this.usageId);
             return hash;
         }
 
@@ -125,7 +124,7 @@ public class CouponUsage implements Serializable, Cloneable {
                 return false;
             }
             final CouponUsagePK other = (CouponUsagePK)obj;
-            if (! Objects.equals(this.id, other.id)) {
+            if (! Objects.equals(this.usageId, other.usageId)) {
                 return false;
             }
             return true;

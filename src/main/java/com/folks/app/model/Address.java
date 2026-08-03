@@ -1,6 +1,5 @@
 package com.folks.app.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,14 +11,13 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Objects;
 
 
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -32,16 +30,16 @@ public class Address implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "address_id", nullable = false, updatable = false, precision = 64)
-    private Long addressId;
+    @Column(name = "address_id", nullable = false, updatable = false, precision = 32)
+    private Integer addressId;
 
-    @Column(name = "user_id", nullable = false, updatable = true, precision = 64)
-    private Long userId;
+    @Column(name = "user_id", nullable = false, updatable = true, precision = 32)
+    private Integer userId;
 
-    @Column(name = "address_line1", nullable = false, updatable = true, length = 255)
+    @Column(name = "address_line1", nullable = false, updatable = true, length = 128)
     private String addressLine1;
 
-    @Column(name = "address_line2", nullable = true, updatable = true, length = 255)
+    @Column(name = "address_line2", nullable = true, updatable = true, length = 128)
     private String addressLine2;
 
     @Column(name = "city", nullable = false, updatable = true, length = 64)
@@ -50,38 +48,33 @@ public class Address implements Serializable, Cloneable {
     @Column(name = "state", nullable = false, updatable = true, length = 64)
     private String state;
 
-    @Column(name = "pincode", nullable = false, updatable = true, length = 20)
-    private String pincode;
+    @Column(name = "pincode", nullable = false, updatable = true, precision = 16)
+    private Integer pincode;
 
-    @Column(name = "latitude", nullable = true, updatable = true, precision = 10, scale = 7)
+    @Column(name = "latitude", nullable = true, updatable = true, precision = 20, scale = 6)
     private BigDecimal latitude;
 
-    @Column(name = "longitude", nullable = true, updatable = true, precision = 10, scale = 7)
+    @Column(name = "longitude", nullable = true, updatable = true, precision = 20, scale = 6)
     private BigDecimal longitude;
 
     @Column(name = "is_default", nullable = false, updatable = true, precision = 16)
     private Short isDefault;
 
-    @Column(name = "created_at", nullable = false, updatable = true)
-    private Timestamp createdAt;
-
     public Address() {}
 
-    public void setAddressId(Long addressId) {
+    public void setAddressId(Integer addressId) {
         this.addressId = addressId;
     }
 
-    public Long getAddressId() {
+    public Integer getAddressId() {
         return this.addressId;
     }
 
-    @JsonIgnore
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    @JsonIgnore
-    public Long getUserId() {
+    public Integer getUserId() {
         return this.userId;
     }
 
@@ -117,11 +110,11 @@ public class Address implements Serializable, Cloneable {
         return this.state;
     }
 
-    public void setPincode(String pincode) {
+    public void setPincode(Integer pincode) {
         this.pincode = pincode;
     }
 
-    public String getPincode() {
+    public Integer getPincode() {
         return this.pincode;
     }
 
@@ -149,29 +142,21 @@ public class Address implements Serializable, Cloneable {
         return this.isDefault;
     }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public static class AddressPK {
 
-        private Long addressId;
+        private Integer addressId;
 
         public AddressPK() {}
 
-        public AddressPK(Long addressId) {
+        public AddressPK(Integer addressId) {
             this.addressId = addressId;
         }
 
-        public void setAddressId(Long addressId) {
+        public void setAddressId(Integer addressId) {
             this.addressId = addressId;
         }
 
-        public Long getAddressId() {
+        public Integer getAddressId() {
             return this.addressId;
         }
 

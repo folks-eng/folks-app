@@ -97,7 +97,7 @@ public class PricingRuleBO {
         return rows;
     }
 
-    public PricingRule view(AppUser usr, Long id) {
+    public PricingRule view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -112,7 +112,7 @@ public class PricingRuleBO {
         return pricingRule;
     }
 
-    public PricingRule remove(AppUser usr, Long id) {
+    public PricingRule remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

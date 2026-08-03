@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -30,39 +30,39 @@ public class AuditLog implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "log_id", nullable = false, updatable = false, precision = 64)
-    private Long logId;
+    @Column(name = "log_id", nullable = false, updatable = false, precision = 32)
+    private Integer logId;
 
-    @Column(name = "user_id", nullable = false, updatable = true, precision = 64)
-    private Long userId;
+    @Column(name = "user_id", nullable = false, updatable = true, precision = 32)
+    private Integer userId;
 
-    @Column(name = "action", nullable = false, updatable = true, length = 255)
+    @Column(name = "action", nullable = false, updatable = true, length = 64)
     private String action;
 
     @Column(name = "entity_type", nullable = false, updatable = true, length = 50)
     private String entityType;
 
-    @Column(name = "entity_id", nullable = false, updatable = true, precision = 64)
-    private Long entityId;
+    @Column(name = "entity_id", nullable = false, updatable = true, precision = 32)
+    private Integer entityId;
 
     @Column(name = "created_at", nullable = false, updatable = true)
     private Timestamp createdAt;
 
     public AuditLog() {}
 
-    public void setLogId(Long logId) {
+    public void setLogId(Integer logId) {
         this.logId = logId;
     }
 
-    public Long getLogId() {
+    public Integer getLogId() {
         return this.logId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return this.userId;
     }
 
@@ -82,11 +82,11 @@ public class AuditLog implements Serializable, Cloneable {
         return this.entityType;
     }
 
-    public void setEntityId(Long entityId) {
+    public void setEntityId(Integer entityId) {
         this.entityId = entityId;
     }
 
-    public Long getEntityId() {
+    public Integer getEntityId() {
         return this.entityId;
     }
 
@@ -100,19 +100,19 @@ public class AuditLog implements Serializable, Cloneable {
 
     public static class AuditLogPK {
 
-        private Long logId;
+        private Integer logId;
 
         public AuditLogPK() {}
 
-        public AuditLogPK(Long logId) {
+        public AuditLogPK(Integer logId) {
             this.logId = logId;
         }
 
-        public void setLogId(Long logId) {
+        public void setLogId(Integer logId) {
             this.logId = logId;
         }
 
-        public Long getLogId() {
+        public Integer getLogId() {
             return this.logId;
         }
 

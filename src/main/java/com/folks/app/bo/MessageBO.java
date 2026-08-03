@@ -96,7 +96,7 @@ public class MessageBO {
         return rows;
     }
 
-    public Message view(AppUser usr, Long id) {
+    public Message view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -111,7 +111,7 @@ public class MessageBO {
         return message;
     }
 
-    public Message remove(AppUser usr, Long id) {
+    public Message remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

@@ -97,7 +97,7 @@ public class DocumentBO {
         return rows;
     }
 
-    public Document view(AppUser usr, Long id) {
+    public Document view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -112,7 +112,7 @@ public class DocumentBO {
         return document;
     }
 
-    public Document remove(AppUser usr, Long id) {
+    public Document remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

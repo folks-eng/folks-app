@@ -94,7 +94,7 @@ public class CategoryBO {
         return rows;
     }
 
-    public Category view(AppUser usr, Long id) {
+    public Category view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -109,7 +109,7 @@ public class CategoryBO {
         return category;
     }
 
-    public Category remove(AppUser usr, Long id) {
+    public Category remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

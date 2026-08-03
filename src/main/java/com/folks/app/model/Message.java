@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -30,14 +30,14 @@ public class Message implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "message_id", nullable = false, updatable = false, precision = 64)
-    private Long messageId;
+    @Column(name = "message_id", nullable = false, updatable = false, precision = 32)
+    private Integer messageId;
 
-    @Column(name = "conversation_id", nullable = false, updatable = true, precision = 64)
-    private Long conversationId;
+    @Column(name = "conversation_id", nullable = false, updatable = true, precision = 32)
+    private Integer conversationId;
 
-    @Column(name = "sender_id", nullable = false, updatable = true, precision = 64)
-    private Long senderId;
+    @Column(name = "sender_id", nullable = false, updatable = true, precision = 32)
+    private Integer senderId;
 
     @Column(name = "message_text", nullable = true, updatable = true, length = 1000000000)
     private String messageText;
@@ -47,27 +47,27 @@ public class Message implements Serializable, Cloneable {
 
     public Message() {}
 
-    public void setMessageId(Long messageId) {
+    public void setMessageId(Integer messageId) {
         this.messageId = messageId;
     }
 
-    public Long getMessageId() {
+    public Integer getMessageId() {
         return this.messageId;
     }
 
-    public void setConversationId(Long conversationId) {
+    public void setConversationId(Integer conversationId) {
         this.conversationId = conversationId;
     }
 
-    public Long getConversationId() {
+    public Integer getConversationId() {
         return this.conversationId;
     }
 
-    public void setSenderId(Long senderId) {
+    public void setSenderId(Integer senderId) {
         this.senderId = senderId;
     }
 
-    public Long getSenderId() {
+    public Integer getSenderId() {
         return this.senderId;
     }
 
@@ -89,19 +89,19 @@ public class Message implements Serializable, Cloneable {
 
     public static class MessagePK {
 
-        private Long messageId;
+        private Integer messageId;
 
         public MessagePK() {}
 
-        public MessagePK(Long messageId) {
+        public MessagePK(Integer messageId) {
             this.messageId = messageId;
         }
 
-        public void setMessageId(Long messageId) {
+        public void setMessageId(Integer messageId) {
             this.messageId = messageId;
         }
 
-        public Long getMessageId() {
+        public Integer getMessageId() {
             return this.messageId;
         }
 

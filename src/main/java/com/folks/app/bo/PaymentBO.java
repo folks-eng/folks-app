@@ -98,7 +98,7 @@ public class PaymentBO {
         return rows;
     }
 
-    public Payment view(AppUser usr, Long id) {
+    public Payment view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -113,7 +113,7 @@ public class PaymentBO {
         return payment;
     }
 
-    public Payment remove(AppUser usr, Long id) {
+    public Payment remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

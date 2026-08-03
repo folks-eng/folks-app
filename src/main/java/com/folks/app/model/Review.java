@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -30,20 +30,20 @@ public class Review implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "review_id", nullable = false, updatable = false, precision = 64)
-    private Long reviewId;
+    @Column(name = "review_id", nullable = false, updatable = false, precision = 32)
+    private Integer reviewId;
 
-    @Column(name = "booking_id", nullable = false, updatable = true, precision = 64)
-    private Long bookingId;
+    @Column(name = "booking_id", nullable = false, updatable = true, length = 36)
+    private String bookingId;
 
-    @Column(name = "customer_id", nullable = false, updatable = true, precision = 64)
-    private Long customerId;
+    @Column(name = "customer_id", nullable = false, updatable = true, precision = 32)
+    private Integer customerId;
 
-    @Column(name = "professional_id", nullable = false, updatable = true, precision = 64)
-    private Long professionalId;
+    @Column(name = "professional_id", nullable = false, updatable = true, precision = 32)
+    private Integer professionalId;
 
-    @Column(name = "rating", nullable = true, updatable = true, precision = 32)
-    private Integer rating;
+    @Column(name = "rating", nullable = true, updatable = true, precision = 16)
+    private Short rating;
 
     @Column(name = "comment", nullable = true, updatable = true, length = 1000000000)
     private String comment;
@@ -53,43 +53,43 @@ public class Review implements Serializable, Cloneable {
 
     public Review() {}
 
-    public void setReviewId(Long reviewId) {
+    public void setReviewId(Integer reviewId) {
         this.reviewId = reviewId;
     }
 
-    public Long getReviewId() {
+    public Integer getReviewId() {
         return this.reviewId;
     }
 
-    public void setBookingId(Long bookingId) {
+    public void setBookingId(String bookingId) {
         this.bookingId = bookingId;
     }
 
-    public Long getBookingId() {
+    public String getBookingId() {
         return this.bookingId;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(Integer customerId) {
         this.customerId = customerId;
     }
 
-    public Long getCustomerId() {
+    public Integer getCustomerId() {
         return this.customerId;
     }
 
-    public void setProfessionalId(Long professionalId) {
+    public void setProfessionalId(Integer professionalId) {
         this.professionalId = professionalId;
     }
 
-    public Long getProfessionalId() {
+    public Integer getProfessionalId() {
         return this.professionalId;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(Short rating) {
         this.rating = rating;
     }
 
-    public Integer getRating() {
+    public Short getRating() {
         return this.rating;
     }
 
@@ -111,19 +111,19 @@ public class Review implements Serializable, Cloneable {
 
     public static class ReviewPK {
 
-        private Long reviewId;
+        private Integer reviewId;
 
         public ReviewPK() {}
 
-        public ReviewPK(Long reviewId) {
+        public ReviewPK(Integer reviewId) {
             this.reviewId = reviewId;
         }
 
-        public void setReviewId(Long reviewId) {
+        public void setReviewId(Integer reviewId) {
             this.reviewId = reviewId;
         }
 
-        public Long getReviewId() {
+        public Integer getReviewId() {
             return this.reviewId;
         }
 

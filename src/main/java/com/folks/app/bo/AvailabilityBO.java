@@ -97,7 +97,7 @@ public class AvailabilityBO {
         return rows;
     }
 
-    public Availability view(AppUser usr, Long id) {
+    public Availability view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -112,7 +112,7 @@ public class AvailabilityBO {
         return availability;
     }
 
-    public Availability remove(AppUser usr, Long id) {
+    public Availability remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

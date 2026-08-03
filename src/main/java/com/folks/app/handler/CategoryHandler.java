@@ -103,7 +103,7 @@ public class CategoryHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             Category category = MapperUtil.decode(ctx.body().buffer().getBytes(), Category.class);
-            category.setCategoryId(Long.valueOf(id));
+            category.setCategoryId(Integer.valueOf(id));
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class CategoryHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Category category = categoryBO.view(user(ctx), Long.valueOf(id));
+            Category category = categoryBO.view(user(ctx), Integer.valueOf(id));
 
             return category;
             
@@ -193,7 +193,7 @@ public class CategoryHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Category category = categoryBO.remove(user(ctx), Long.valueOf(id));
+            Category category = categoryBO.remove(user(ctx), Integer.valueOf(id));
 
 
             ServerMessage msg = new ServerMessage();

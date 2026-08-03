@@ -103,7 +103,7 @@ public class AuditLogBO {
         return rows;
     }
 
-    public AuditLog view(AppUser usr, Long id) {
+    public AuditLog view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -118,7 +118,7 @@ public class AuditLogBO {
         return auditLog;
     }
 
-    public AuditLog remove(AppUser usr, Long id) {
+    public AuditLog remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

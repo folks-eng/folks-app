@@ -103,7 +103,7 @@ public class CouponUsageHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             CouponUsage couponUsage = MapperUtil.decode(ctx.body().buffer().getBytes(), CouponUsage.class);
-            couponUsage.setUsageId(Long.valueOf(id));
+            couponUsage.setUsageId(Integer.valueOf(id));
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class CouponUsageHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            CouponUsage couponUsage = couponUsageBO.view(user(ctx), Long.valueOf(id));
+            CouponUsage couponUsage = couponUsageBO.view(user(ctx), Integer.valueOf(id));
 
             return couponUsage;
             
@@ -193,7 +193,7 @@ public class CouponUsageHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            CouponUsage couponUsage = couponUsageBO.remove(user(ctx), Long.valueOf(id));
+            CouponUsage couponUsage = couponUsageBO.remove(user(ctx), Integer.valueOf(id));
 
 
             ServerMessage msg = new ServerMessage();

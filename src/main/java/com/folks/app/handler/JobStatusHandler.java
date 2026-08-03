@@ -103,7 +103,7 @@ public class JobStatusHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             JobStatus jobStatus = MapperUtil.decode(ctx.body().buffer().getBytes(), JobStatus.class);
-            jobStatus.setLogId(Long.valueOf(id));
+            jobStatus.setLogId(Integer.valueOf(id));
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class JobStatusHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            JobStatus jobStatus = jobStatusBO.view(user(ctx), Long.valueOf(id));
+            JobStatus jobStatus = jobStatusBO.view(user(ctx), Integer.valueOf(id));
 
             return jobStatus;
             
@@ -193,7 +193,7 @@ public class JobStatusHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            JobStatus jobStatus = jobStatusBO.remove(user(ctx), Long.valueOf(id));
+            JobStatus jobStatus = jobStatusBO.remove(user(ctx), Integer.valueOf(id));
 
 
             ServerMessage msg = new ServerMessage();

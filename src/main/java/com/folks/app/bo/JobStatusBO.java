@@ -95,7 +95,7 @@ public class JobStatusBO {
         return rows;
     }
 
-    public JobStatus view(AppUser usr, Long id) {
+    public JobStatus view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -110,7 +110,7 @@ public class JobStatusBO {
         return jobStatus;
     }
 
-    public JobStatus remove(AppUser usr, Long id) {
+    public JobStatus remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

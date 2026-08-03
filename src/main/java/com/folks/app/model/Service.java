@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -30,11 +30,11 @@ public class Service implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "service_id", nullable = false, updatable = false, precision = 64)
-    private Long serviceId;
+    @Column(name = "service_id", nullable = false, updatable = false, precision = 32)
+    private Integer serviceId;
 
-    @Column(name = "category_id", nullable = false, updatable = true, precision = 64)
-    private Long categoryId;
+    @Column(name = "category_id", nullable = false, updatable = true, precision = 32)
+    private Integer categoryId;
 
     @Column(name = "name", nullable = false, updatable = true, length = 128)
     private String name;
@@ -42,27 +42,27 @@ public class Service implements Serializable, Cloneable {
     @Column(name = "description", nullable = true, updatable = true, length = 1000000000)
     private String description;
 
-    @Column(name = "base_price", nullable = false, updatable = true, precision = 10, scale = 2)
+    @Column(name = "base_price", nullable = false, updatable = true, precision = 7, scale = 2)
     private BigDecimal basePrice;
 
-    @Column(name = "duration_minutes", nullable = true, updatable = true, precision = 32)
-    private Integer durationMinutes;
+    @Column(name = "duration_minutes", nullable = true, updatable = true, precision = 16)
+    private Short durationMinutes;
 
     public Service() {}
 
-    public void setServiceId(Long serviceId) {
+    public void setServiceId(Integer serviceId) {
         this.serviceId = serviceId;
     }
 
-    public Long getServiceId() {
+    public Integer getServiceId() {
         return this.serviceId;
     }
 
-    public void setCategoryId(Long categoryId) {
+    public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
     }
 
-    public Long getCategoryId() {
+    public Integer getCategoryId() {
         return this.categoryId;
     }
 
@@ -90,29 +90,29 @@ public class Service implements Serializable, Cloneable {
         return this.basePrice;
     }
 
-    public void setDurationMinutes(Integer durationMinutes) {
+    public void setDurationMinutes(Short durationMinutes) {
         this.durationMinutes = durationMinutes;
     }
 
-    public Integer getDurationMinutes() {
+    public Short getDurationMinutes() {
         return this.durationMinutes;
     }
 
     public static class ServicePK {
 
-        private Long serviceId;
+        private Integer serviceId;
 
         public ServicePK() {}
 
-        public ServicePK(Long serviceId) {
+        public ServicePK(Integer serviceId) {
             this.serviceId = serviceId;
         }
 
-        public void setServiceId(Long serviceId) {
+        public void setServiceId(Integer serviceId) {
             this.serviceId = serviceId;
         }
 
-        public Long getServiceId() {
+        public Integer getServiceId() {
             return this.serviceId;
         }
 

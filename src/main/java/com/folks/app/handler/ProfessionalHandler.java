@@ -103,7 +103,7 @@ public class ProfessionalHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             Professional professional = MapperUtil.decode(ctx.body().buffer().getBytes(), Professional.class);
-            professional.setProfessionalId(Long.valueOf(id));
+            professional.setProfessionalId(Integer.valueOf(id));
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class ProfessionalHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Professional professional = professionalBO.view(user(ctx), Long.valueOf(id));
+            Professional professional = professionalBO.view(user(ctx), Integer.valueOf(id));
 
             return professional;
             
@@ -193,7 +193,7 @@ public class ProfessionalHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Professional professional = professionalBO.remove(user(ctx), Long.valueOf(id));
+            Professional professional = professionalBO.remove(user(ctx), Integer.valueOf(id));
 
 
             ServerMessage msg = new ServerMessage();

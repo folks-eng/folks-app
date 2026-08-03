@@ -1,6 +1,5 @@
 package com.folks.app.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +17,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -31,17 +30,17 @@ public class Professional implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "professional_id", nullable = false, updatable = false, precision = 64)
-    private Long professionalId;
+    @Column(name = "professional_id", nullable = false, updatable = false, precision = 32)
+    private Integer professionalId;
 
-    @Column(name = "user_id", nullable = false, updatable = true, precision = 64)
-    private Long userId;
+    @Column(name = "user_id", nullable = false, updatable = true, precision = 32)
+    private Integer userId;
 
     @Column(name = "bio", nullable = true, updatable = true, length = 1000000000)
     private String bio;
 
-    @Column(name = "experience_years", nullable = false, updatable = true, precision = 32)
-    private Integer experienceYears;
+    @Column(name = "experience_years", nullable = false, updatable = true, precision = 16)
+    private Short experienceYears;
 
     @Column(name = "rating_avg", nullable = true, updatable = true, precision = 3, scale = 2)
     private BigDecimal ratingAvg;
@@ -51,21 +50,19 @@ public class Professional implements Serializable, Cloneable {
 
     public Professional() {}
 
-    public void setProfessionalId(Long professionalId) {
+    public void setProfessionalId(Integer professionalId) {
         this.professionalId = professionalId;
     }
 
-    public Long getProfessionalId() {
+    public Integer getProfessionalId() {
         return this.professionalId;
     }
 
-    @JsonIgnore
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    @JsonIgnore
-    public Long getUserId() {
+    public Integer getUserId() {
         return this.userId;
     }
 
@@ -77,11 +74,11 @@ public class Professional implements Serializable, Cloneable {
         return this.bio;
     }
 
-    public void setExperienceYears(Integer experienceYears) {
+    public void setExperienceYears(Short experienceYears) {
         this.experienceYears = experienceYears;
     }
 
-    public Integer getExperienceYears() {
+    public Short getExperienceYears() {
         return this.experienceYears;
     }
 
@@ -103,19 +100,19 @@ public class Professional implements Serializable, Cloneable {
 
     public static class ProfessionalPK {
 
-        private Long professionalId;
+        private Integer professionalId;
 
         public ProfessionalPK() {}
 
-        public ProfessionalPK(Long professionalId) {
+        public ProfessionalPK(Integer professionalId) {
             this.professionalId = professionalId;
         }
 
-        public void setProfessionalId(Long professionalId) {
+        public void setProfessionalId(Integer professionalId) {
             this.professionalId = professionalId;
         }
 
-        public Long getProfessionalId() {
+        public Integer getProfessionalId() {
             return this.professionalId;
         }
 

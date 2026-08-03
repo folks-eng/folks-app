@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -30,16 +30,16 @@ public class ProfessionalService implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, updatable = false, precision = 64)
-    private Long id;
+    @Column(name = "id", nullable = false, updatable = false, precision = 32)
+    private Integer id;
 
-    @Column(name = "professional_id", nullable = false, updatable = true, precision = 64)
-    private Long professionalId;
+    @Column(name = "professional_id", nullable = false, updatable = true, precision = 32)
+    private Integer professionalId;
 
-    @Column(name = "service_id", nullable = false, updatable = true, precision = 64)
-    private Long serviceId;
+    @Column(name = "service_id", nullable = false, updatable = true, precision = 32)
+    private Integer serviceId;
 
-    @Column(name = "price", nullable = false, updatable = true, precision = 10, scale = 2)
+    @Column(name = "price", nullable = false, updatable = true, precision = 7, scale = 2)
     private BigDecimal price;
 
     @Column(name = "is_active", nullable = false, updatable = true, precision = 16)
@@ -47,27 +47,27 @@ public class ProfessionalService implements Serializable, Cloneable {
 
     public ProfessionalService() {}
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return this.id;
     }
 
-    public void setProfessionalId(Long professionalId) {
+    public void setProfessionalId(Integer professionalId) {
         this.professionalId = professionalId;
     }
 
-    public Long getProfessionalId() {
+    public Integer getProfessionalId() {
         return this.professionalId;
     }
 
-    public void setServiceId(Long serviceId) {
+    public void setServiceId(Integer serviceId) {
         this.serviceId = serviceId;
     }
 
-    public Long getServiceId() {
+    public Integer getServiceId() {
         return this.serviceId;
     }
 
@@ -89,19 +89,19 @@ public class ProfessionalService implements Serializable, Cloneable {
 
     public static class ProfessionalServicePK {
 
-        private Long id;
+        private Integer id;
 
         public ProfessionalServicePK() {}
 
-        public ProfessionalServicePK(Long id) {
+        public ProfessionalServicePK(Integer id) {
             this.id = id;
         }
 
-        public void setId(Long id) {
+        public void setId(Integer id) {
             this.id = id;
         }
 
-        public Long getId() {
+        public Integer getId() {
             return this.id;
         }
 

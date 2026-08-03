@@ -103,7 +103,7 @@ public class PricingRuleHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             PricingRule pricingRule = MapperUtil.decode(ctx.body().buffer().getBytes(), PricingRule.class);
-            pricingRule.setRuleId(Long.valueOf(id));
+            pricingRule.setRuleId(Integer.valueOf(id));
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class PricingRuleHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            PricingRule pricingRule = pricingRuleBO.view(user(ctx), Long.valueOf(id));
+            PricingRule pricingRule = pricingRuleBO.view(user(ctx), Integer.valueOf(id));
 
             return pricingRule;
             
@@ -193,7 +193,7 @@ public class PricingRuleHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            PricingRule pricingRule = pricingRuleBO.remove(user(ctx), Long.valueOf(id));
+            PricingRule pricingRule = pricingRuleBO.remove(user(ctx), Integer.valueOf(id));
 
 
             ServerMessage msg = new ServerMessage();

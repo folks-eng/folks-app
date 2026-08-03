@@ -103,7 +103,7 @@ public class PaymentHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             Payment payment = MapperUtil.decode(ctx.body().buffer().getBytes(), Payment.class);
-            payment.setPaymentId(Long.valueOf(id));
+            payment.setPaymentId(Integer.valueOf(id));
 
 
             // First fetch the entry, to see if this already exists.
@@ -139,7 +139,7 @@ public class PaymentHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Payment payment = paymentBO.view(user(ctx), Long.valueOf(id));
+            Payment payment = paymentBO.view(user(ctx), Integer.valueOf(id));
 
             return payment;
             
@@ -193,7 +193,7 @@ public class PaymentHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Payment payment = paymentBO.remove(user(ctx), Long.valueOf(id));
+            Payment payment = paymentBO.remove(user(ctx), Integer.valueOf(id));
 
 
             ServerMessage msg = new ServerMessage();

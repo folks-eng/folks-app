@@ -1,5 +1,6 @@
 package com.folks.app.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,12 +17,49 @@ public class SearchCriteriaImpl implements SearchCriteria {
     private Integer offset = 0;
     private Integer limit = 100;
     
-    private Map<String, List<String>> params = new HashMap<>();
+    private Map<String, List<Object>> params = new HashMap<>();
     
     SearchCriteriaImpl() {}
     
     public SearchCriteriaImpl params(QueryParams params) {
-        this.params = params.entries();
+        Map<String, List<String>> tmp = params.entries();
+        
+        for (Map.Entry<String, List<String>> me : tmp.entrySet()) {
+            String name = me.getKey();
+            List<String> values = me.getValue();
+            
+            // Convert the name from camel case to snake case.
+            name = name.replaceAll("(?<!^)(?=[A-Z])", "_").toLowerCase();
+            
+            // Convert to appropriate data type.
+            if (! values.isEmpty()) {
+                if (values.get(0).matches("\\d+")) {
+                    List<Object> genValues = new ArrayList<>(values.size());
+                    for (String val : values) {
+                        genValues.add(Integer.valueOf(val));
+                    }
+                    this.params.put(name, genValues);
+                }
+                else if (values.get(0).equalsIgnoreCase("true") || values.get(0).equalsIgnoreCase("false")) {
+                    List<Object> genValues = new ArrayList<>(values.size());
+                    for (String val : values) {
+                        genValues.add(Boolean.valueOf(val));
+                    }
+                    this.params.put(name, genValues);
+                }
+                else if (values.get(0).matches("^[+-]?\\d*\\.\\d+$")) {
+                    List<Object> genValues = new ArrayList<>(values.size());
+                    for (String val : values) {
+                        genValues.add(Double.valueOf(val));
+                    }
+                    this.params.put(name, genValues);
+                }
+                else {
+                    this.params.put(name, new ArrayList<Object>(values));
+                }
+            }
+        }
+        
         this.offset = params.offset();
         this.limit = params.limit();
         
@@ -54,7 +92,7 @@ public class SearchCriteriaImpl implements SearchCriteria {
     }
 
     @Override
-    public Map<String, List<String>> params() {
+    public Map<String, List<Object>> params() {
         return params;
     }
 

@@ -63,9 +63,9 @@ public class AddressDAOImpl implements AddressDAO {
                 .from(TABLE);
 
         int idx = 0;
-        for (Map.Entry<String, List<String>> me : search.params().entrySet()) {
+        for (Map.Entry<String, List<Object>> me : search.params().entrySet()) {
             String col = me.getKey();
-            List<String> vals = me.getValue();
+            List<Object> vals = me.getValue();
             if (vals.isEmpty()) {
                 continue;
             }

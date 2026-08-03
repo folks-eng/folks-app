@@ -21,15 +21,14 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
 @Table(name = "fks_users")
 @IdClass(User.UserPK.class)
 @NamedNativeQueries({
-    @NamedNativeQuery(name = "User.selectAll", query = "SELECT * FROM fks_users"),
-    @NamedNativeQuery(name = "User.selectByExtId", query = "SELECT * FROM fks_users WHERE external_id = ?")
+    @NamedNativeQuery(name = "User.selectAll", query = "SELECT * FROM fks_users")
 })
 public class User implements Serializable, Cloneable {
 
@@ -47,10 +46,11 @@ public class User implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id", nullable = false, updatable = false, precision = 64)
-    private Long userId;
+    @Column(name = "user_id", nullable = false, updatable = false, precision = 32)
+    @JsonIgnore
+    private Integer userId;
 
-    @Column(name = "external_id", nullable = false, updatable = false, length = 96)
+    @Column(name = "external_id", nullable = false, updatable = true, length = 36)
     private String externalId;
 
     @Column(name = "full_name", nullable = false, updatable = true, length = 96)
@@ -66,6 +66,7 @@ public class User implements Serializable, Cloneable {
     private String phone2;
 
     @Column(name = "password_hash", nullable = true, updatable = true, length = 1000000000)
+    @JsonIgnore
     private String passwordHash;
 
     @Column(name = "role", nullable = false, updatable = true, check = @CheckConstraint(constraint = "role IN ('CUSTOMER', 'PROFESSIONAL', 'ADMIN')"))
@@ -84,22 +85,20 @@ public class User implements Serializable, Cloneable {
 
     public User() {}
 
-    @JsonIgnore
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    @JsonIgnore
-    public Long getUserId() {
+    public Integer getUserId() {
         return this.userId;
-    }
-
-    public String getExternalId() {
-        return externalId;
     }
 
     public void setExternalId(String externalId) {
         this.externalId = externalId;
+    }
+
+    public String getExternalId() {
+        return this.externalId;
     }
 
     public void setFullName(String fullName) {
@@ -176,19 +175,19 @@ public class User implements Serializable, Cloneable {
 
     public static class UserPK {
 
-        private Long userId;
+        private Integer userId;
 
         public UserPK() {}
 
-        public UserPK(Long userId) {
+        public UserPK(Integer userId) {
             this.userId = userId;
         }
 
-        public void setUserId(Long userId) {
+        public void setUserId(Integer userId) {
             this.userId = userId;
         }
 
-        public Long getUserId() {
+        public Integer getUserId() {
             return this.userId;
         }
 

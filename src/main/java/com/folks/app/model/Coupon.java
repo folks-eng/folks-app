@@ -1,10 +1,7 @@
 package com.folks.app.model;
 
-import jakarta.persistence.CheckConstraint;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,7 +18,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -32,42 +29,36 @@ import java.util.Objects;
 })
 public class Coupon implements Serializable, Cloneable {
 
-    public static enum Discounttype {
-        PERCENT,
-        FLAT;
-    };
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "coupon_id", nullable = false, updatable = false, precision = 64)
-    private Long couponId;
+    @Column(name = "coupon_id", nullable = false, updatable = false, precision = 32)
+    private Integer couponId;
 
     @Column(name = "code", nullable = false, updatable = true, length = 50)
     private String code;
 
-    @Column(name = "discount_type", nullable = true, updatable = true, check = @CheckConstraint(constraint = "discount_type IN ('PERCENT', 'FLAT')"))
-    @Enumerated(EnumType.STRING)
-    private Discounttype discountType;
+    @Column(name = "discount_type", nullable = false, updatable = true, length = 16)
+    private String discountType;
 
-    @Column(name = "discount_value", nullable = true, updatable = true, precision = 10, scale = 2)
+    @Column(name = "discount_value", nullable = true, updatable = true, precision = 7, scale = 2)
     private BigDecimal discountValue;
 
-    @Column(name = "max_discount", nullable = true, updatable = true, precision = 10, scale = 2)
+    @Column(name = "max_discount", nullable = true, updatable = true, precision = 7, scale = 2)
     private BigDecimal maxDiscount;
 
     @Column(name = "expiry_date", nullable = false, updatable = true)
     private Date expiryDate;
 
-    @Column(name = "usage_limit", nullable = true, updatable = true, precision = 32)
-    private Integer usageLimit;
+    @Column(name = "usage_limit", nullable = true, updatable = true, precision = 16)
+    private Short usageLimit;
 
     public Coupon() {}
 
-    public void setCouponId(Long couponId) {
+    public void setCouponId(Integer couponId) {
         this.couponId = couponId;
     }
 
-    public Long getCouponId() {
+    public Integer getCouponId() {
         return this.couponId;
     }
 
@@ -79,11 +70,11 @@ public class Coupon implements Serializable, Cloneable {
         return this.code;
     }
 
-    public void setDiscountType(Discounttype discountType) {
+    public void setDiscountType(String discountType) {
         this.discountType = discountType;
     }
 
-    public Discounttype getDiscountType() {
+    public String getDiscountType() {
         return this.discountType;
     }
 
@@ -111,29 +102,29 @@ public class Coupon implements Serializable, Cloneable {
         return this.expiryDate;
     }
 
-    public void setUsageLimit(Integer usageLimit) {
+    public void setUsageLimit(Short usageLimit) {
         this.usageLimit = usageLimit;
     }
 
-    public Integer getUsageLimit() {
+    public Short getUsageLimit() {
         return this.usageLimit;
     }
 
     public static class CouponPK {
 
-        private Long couponId;
+        private Integer couponId;
 
         public CouponPK() {}
 
-        public CouponPK(Long couponId) {
+        public CouponPK(Integer couponId) {
             this.couponId = couponId;
         }
 
-        public void setCouponId(Long couponId) {
+        public void setCouponId(Integer couponId) {
             this.couponId = couponId;
         }
 
-        public Long getCouponId() {
+        public Integer getCouponId() {
             return this.couponId;
         }
 

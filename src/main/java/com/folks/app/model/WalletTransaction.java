@@ -19,7 +19,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -42,7 +42,7 @@ public class WalletTransaction implements Serializable, Cloneable {
     @Column(name = "wallet_id", nullable = false, updatable = true, length = 36)
     private String walletId;
 
-    @Column(name = "amount", nullable = false, updatable = true, precision = 10, scale = 2)
+    @Column(name = "amount", nullable = false, updatable = true, precision = 7, scale = 2)
     private BigDecimal amount;
 
     @Column(name = "type", nullable = true, updatable = true, check = @CheckConstraint(constraint = "type IN ('CREDIT', 'DEBIT')"))

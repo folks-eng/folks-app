@@ -115,7 +115,7 @@ public class AddressBO {
         return rows;
     }
 
-    public Address view(AppUser usr, Long id) {
+    public Address view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -130,7 +130,7 @@ public class AddressBO {
         return address;
     }
 
-    public Address remove(AppUser usr, Long id) {
+    public Address remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

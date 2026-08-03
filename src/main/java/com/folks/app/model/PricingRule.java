@@ -18,7 +18,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -31,16 +31,16 @@ public class PricingRule implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "rule_id", nullable = false, updatable = false, precision = 64)
-    private Long ruleId;
+    @Column(name = "rule_id", nullable = false, updatable = false, precision = 32)
+    private Integer ruleId;
 
-    @Column(name = "service_id", nullable = false, updatable = true, precision = 64)
-    private Long serviceId;
+    @Column(name = "service_id", nullable = false, updatable = true, precision = 32)
+    private Integer serviceId;
 
     @Column(name = "city", nullable = false, updatable = true, length = 100)
     private String city;
 
-    @Column(name = "multiplier", nullable = false, updatable = true, precision = 5, scale = 2)
+    @Column(name = "multiplier", nullable = false, updatable = true, precision = 7, scale = 2)
     private BigDecimal multiplier;
 
     @Column(name = "start_time", nullable = false, updatable = true)
@@ -51,19 +51,19 @@ public class PricingRule implements Serializable, Cloneable {
 
     public PricingRule() {}
 
-    public void setRuleId(Long ruleId) {
+    public void setRuleId(Integer ruleId) {
         this.ruleId = ruleId;
     }
 
-    public Long getRuleId() {
+    public Integer getRuleId() {
         return this.ruleId;
     }
 
-    public void setServiceId(Long serviceId) {
+    public void setServiceId(Integer serviceId) {
         this.serviceId = serviceId;
     }
 
-    public Long getServiceId() {
+    public Integer getServiceId() {
         return this.serviceId;
     }
 
@@ -101,19 +101,19 @@ public class PricingRule implements Serializable, Cloneable {
 
     public static class PricingRulePK {
 
-        private Long ruleId;
+        private Integer ruleId;
 
         public PricingRulePK() {}
 
-        public PricingRulePK(Long ruleId) {
+        public PricingRulePK(Integer ruleId) {
             this.ruleId = ruleId;
         }
 
-        public void setRuleId(Long ruleId) {
+        public void setRuleId(Integer ruleId) {
             this.ruleId = ruleId;
         }
 
-        public Long getRuleId() {
+        public Integer getRuleId() {
             return this.ruleId;
         }
 

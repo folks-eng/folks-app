@@ -97,7 +97,7 @@ public class ProfessionalBO {
         return rows;
     }
 
-    public Professional view(AppUser usr, Long id) {
+    public Professional view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -112,7 +112,7 @@ public class ProfessionalBO {
         return professional;
     }
 
-    public Professional remove(AppUser usr, Long id) {
+    public Professional remove(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

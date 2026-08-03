@@ -19,7 +19,7 @@ import java.util.Objects;
 /**
  * This class is auto generated with jpa-lite framework.
  *
- * @author schan280
+ * @author Sudiptasish Chanda
  */
 
 @Entity
@@ -39,20 +39,20 @@ public class Booking implements Serializable, Cloneable {
     };
 
     @Id
-    @Column(name = "booking_id", nullable = false, updatable = false, precision = 36)
+    @Column(name = "booking_id", nullable = false, updatable = false, length = 36)
     private String bookingId;
 
-    @Column(name = "customer_id", nullable = false, updatable = true, precision = 64)
-    private Long customerId;
+    @Column(name = "customer_id", nullable = false, updatable = true, precision = 32)
+    private Integer customerId;
 
-    @Column(name = "professional_id", nullable = false, updatable = true, precision = 64)
-    private Long professionalId;
+    @Column(name = "professional_id", nullable = false, updatable = true, precision = 32)
+    private Integer professionalId;
 
-    @Column(name = "service_id", nullable = false, updatable = true, precision = 64)
-    private Long serviceId;
+    @Column(name = "service_id", nullable = false, updatable = true, precision = 32)
+    private Integer serviceId;
 
-    @Column(name = "address_id", nullable = false, updatable = true, precision = 64)
-    private Long addressId;
+    @Column(name = "address_id", nullable = false, updatable = true, precision = 32)
+    private Integer addressId;
 
     @Column(name = "scheduled_at", nullable = false, updatable = true)
     private Timestamp scheduledAt;
@@ -61,7 +61,7 @@ public class Booking implements Serializable, Cloneable {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Column(name = "total_amount", nullable = false, updatable = true, precision = 10, scale = 2)
+    @Column(name = "total_amount", nullable = false, updatable = true, precision = 20, scale = 6)
     private BigDecimal totalAmount;
 
     @Column(name = "created_at", nullable = false, updatable = true)
@@ -80,35 +80,35 @@ public class Booking implements Serializable, Cloneable {
         return this.bookingId;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(Integer customerId) {
         this.customerId = customerId;
     }
 
-    public Long getCustomerId() {
+    public Integer getCustomerId() {
         return this.customerId;
     }
 
-    public void setProfessionalId(Long professionalId) {
+    public void setProfessionalId(Integer professionalId) {
         this.professionalId = professionalId;
     }
 
-    public Long getProfessionalId() {
+    public Integer getProfessionalId() {
         return this.professionalId;
     }
 
-    public void setServiceId(Long serviceId) {
+    public void setServiceId(Integer serviceId) {
         this.serviceId = serviceId;
     }
 
-    public Long getServiceId() {
+    public Integer getServiceId() {
         return this.serviceId;
     }
 
-    public void setAddressId(Long addressId) {
+    public void setAddressId(Integer addressId) {
         this.addressId = addressId;
     }
 
-    public Long getAddressId() {
+    public Integer getAddressId() {
         return this.addressId;
     }
 
@@ -144,12 +144,12 @@ public class Booking implements Serializable, Cloneable {
         return this.createdAt;
     }
 
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return this.updatedAt;
     }
 
     public static class BookingPK {

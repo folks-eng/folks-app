@@ -1,6 +1,6 @@
-## {APP} Application
+## Folks Application
 
-This is a sample of a very basic application generated using declarative vert.x code generator tool.
+Folks backend server.
 
 It implements all the needed operations in order to handle various resource-specific operations and verify the integrity of the server response.
  
@@ -17,14 +17,49 @@ Java 17 or higher and Maven 3.x are required.
 * [Security concerns](#security-concerns)
 * [Configuration](#configuration)
 
-## Getting started 
+## Getting Started 
 
-This sample application provides a REST API using [Declarative Vert](https://github.com/sudiptasish/declarative-vertx), so it is very easy to make it work as standalone server.  
+This sample application provides a REST API using [Declarative Vert](https://github.com/javalabs-eng/declarative-vertx), so it is very easy to make it work as standalone server.  
 
-### Local deployment 
+### Checkout the Code.
 
-* Run `mvn clean install`, to build the executable jar
-* Run `java -jar target/{LOWER{APP}}-0.0.1-SNAPSHOT.jar`
+```
+git clone https://github.com/folks-eng/folks-app
+
+```
+
+### Compile the Code
+
+`folks-app` uses `maven` as build tool. Use the below command to compile the codebase. You need `JDK 17` or higher version to compile the code.
+
+```
+mvn clean install
+
+```
+
+### Version Upgrade
+
+To upgrade the module version in parent pom file as well as all child modules, issue the below command:
+
+```
+mvn versions:set -DnewVersion=YOUR_NEW_VERSION
+
+```
+
+### Local Deployment
+
+#### Pre-Requisite
+
+Folks backend requires `PostgreSQL` to be setup. Follow the [Folks DB](https://github.com/folks-eng/folks-db) to install `PostgreSQL` and setup folks schema.
+
+#### Start Folks Server
+
+Once database setup is complete, Run the `start.sh` file to bring up the folks backend server.
+
+```
+sh start.sh
+
+```
 
 The application should start and have an output similar to this: 
 
@@ -60,7 +95,262 @@ Open the url `http://127.0.0.1:8000/` in your favourite browser and you will see
 
 ## Keystore Handling
 
-### Generate Keystore
+`folks-app` maintain two different key store options:
+1. folks.pkcs - For jwt signing
+2. .pem keys and certs - For mTLS
+
+### Setup mTLS
+
+This is how the end-to-end communication would look like.
+
+```
+Browser
+    │ HTTPS
+    ▼
+Node.js        https://localhost:3000
+    │ mTLS
+    ▼
+Vert.x         https://localhost:8443
+
+```
+
+For local development, create:
+
+```
+certs/
+├── ca.key
+├── ca.crt
+├── folks-app.key
+├── folks-app.csr
+├── folks-app.crt
+├── folks-ui.key
+├── folks-ui.csr
+└── folks-ui.crt
+```
+
+The flow is:
+
+1. Create your own Certificate Authority (CA).
+1. Use the CA to sign the server certificate.
+1. Use the CA to sign the client certificate.
+1. Configure:
+    1. Vert.x with folks-app.key, folks-app.crt, and ca.crt
+    1. Node.js with folks-ui.key, folks-ui.crt, and ca.crt
+
+#### Step 1 - Create a CA
+
+```
+openssl genrsa -out ca_javalabs.key 4096
+```
+
+```
+openssl req -x509 \
+    -new \
+    -nodes \
+    -key ca_javalabs.key \
+    -sha256 \
+    -days 3650 \
+    -out ca_javalabs.crt \
+    -subj "/C=IN/ST=West Bengal/L=Kolkata/O=Javalabs/CN=Javalabs CA"
+```
+
+#### Step 2 - Create the Server Certificate
+
+**Generate private Key:**
+
+```
+openssl genrsa -out folks-app.key 2048
+```
+
+**Generate a certificate signing request (CSR):**
+
+```
+openssl req \
+    -new \
+    -key folks-app.key \
+    -out folks-app.csr \
+    -subj "/C=IN/ST=West Bengal/L=Kolkata/O=Folks/CN=Folks App"
+```
+
+**Create a file named server.ext:**
+
+```
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage=digitalSignature,keyEncipherment
+extendedKeyUsage=serverAuth
+subjectAltName=DNS:localhost,IP:127.0.0.1
+```
+
+While an `.ext` file may not be not mandatory, but they are highly recommended, especially for TLS and mTLS.
+The `.ext` files tell `OpenSSL` what type of certificate you are creating and what extensions should be embedded in the `X.509` certificate.
+
+Without an .ext file OpenSSL creates a certificate, but it may not contain important extensions such as:
+
+* Subject Alternative Name (SAN)
+* Extended Key Usage
+* Key Usage
+* Basic Constraints
+
+Modern TLS implementations rely on these extensions.
+
+Here are the attributes of server.ext file:
+
+* basicConstraints - `CA:FALSE`
+
+This says: This certificate cannot act as a Certificate Authority.
+Only the `ca_javalabs.crt` should have: `CA:FALSE`
+
+* keyUsage - `digitalSignature,keyEncipherment`
+
+This specifies what the key may be used for.
+For an HTTPS server, these usages are appropriate. Without them, some clients will reject the certificate.
+
+* extendedKeyUsage - `serverAuth`
+
+This is very important. It tells clients:
+
+This certificate is intended to authenticate a TLS server. If you accidentally use a client certificate as the server certificate, 
+many TLS stacks will reject it.
+
+* subjectAltName (SAN) - `DNS:localhost,IP:127.0.0.1`
+
+This is probably the most important extension.
+
+Older browsers used the Common Name (CN): `CN=localhost`
+Modern TLS clients ignore the CN and verify the hostname against the SAN extension instead.
+
+For example: 
+1. https://localhost:8443 requires: DNS:`localhost`
+
+1. https://127.0.0.1:8443 requires: `IP:127.0.0.1`
+
+If the SAN is missing, you'll typically see hostname verification failures.
+
+**Sign it:**
+
+```
+openssl x509 \
+    -req \
+    -in folks-app.csr \
+    -CA ca_javalabs.crt \
+    -CAkey ca_javalabs.key \
+    -CAcreateserial \
+    -out folks-app.crt \
+    -days 365 \
+    -sha256 \
+    -extfile server.ext
+```
+
+#### Step 3 - Create the Client Certificate
+
+**Generate the key:**
+
+```
+openssl genrsa -out folks-ui.key 2048
+```
+
+**Generate the CSR:**
+
+```
+openssl req \
+    -new \
+    -key folks-ui.key \
+    -out folks-ui.csr \
+    -subj "/C=IN/ST=West Bengal/L=Kolkata/O=Folks/CN=Folks UI"
+```
+
+**Create client.ext:**
+
+```
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage=digitalSignature,keyEncipherment
+extendedKeyUsage=clientAuth
+```
+
+**Sign it:**
+
+```
+openssl x509 \
+    -req \
+    -in folks-ui.csr \
+    -CA ca_javalabs.crt \
+    -CAkey ca_javalabs.key \
+    -CAcreateserial \
+    -out folks-ui.crt \
+    -days 365 \
+    -sha256 \
+    -extfile client.ext
+```
+
+#### Final Set of Files
+
+```
+certs/
+│
+├── ca.crt
+├── ca.key
+│
+├── server.key
+├── server.crt
+│
+├── client.key
+└── client.crt
+```
+
+There are other files that will be created.
+
+1. `.csr` — Certificate Signing Request
+
+This file contains:
+
+1. The public key.
+1. Information about the subject (Common Name, Organization, etc.).
+1. A digital signature created with the corresponding private key.
+
+It does **not** contain the private key.
+
+For example:
+`client.csr` contains a request like:
+
+```
+CN=folks-ui
+O=Folks
+C=IN
+Public Key=...
+```
+
+You send a CSR to a Certificate Authority (CA), and the CA verifies it and issues a certificate.
+
+The flow is:
+
+```
+client.key
+      │
+      ▼
+Generate CSR
+      │
+      ▼
+folks-ui.csr
+      │
+      ▼
+CA signs it
+      │
+      ▼
+folks-ui.crt
+```
+
+After you receive `folks-ui.crt`, you usually don't need the `.csr` anymore unless you want to reissue the certificate.
+
+2. `.srl` — Serial Number File
+
+This file stores the next certificate serial number that your CA will issue.
+
+
+
+
+### Generate Keystore for JWT Signing and Validation
 
 ```
 keytool -genkeypair \
@@ -73,7 +363,7 @@ keytool -genkeypair \
     -storetype PKCS12 \
     -storepass secret \
     -keypass secret \
-    -dname "CN=Folks App, OU=Development, O=Zetachron Technologies LLP, L=Kolkata, S=West Bengal, C=IN"
+    -dname "CN=Folks App, OU=Development, O=Javalabs, L=Kolkata, S=West Bengal, C=IN"
 
 ```
 
@@ -86,7 +376,9 @@ keytool  -list -v -keystore folks.pkcs -storepass secret
 
 ```
 
-### Extract the Public Key to .pem File
+### Additional Options
+
+#### Extract the Public Key to .pem File
 
 ```
 keytool -exportcert -rfc \
@@ -97,12 +389,11 @@ keytool -exportcert -rfc \
 
 ```
 
-### Extract the Private Key to .pem File
+#### Extract the Private Key to .pem File
 
 ```
 openssl pkcs12 -in folks.pkcs -nodes -nocerts -out folks_prv.pem 
 Enter Import Password:
-
 
 ```
 
@@ -153,38 +444,6 @@ curl -X DELETE\
      -H "Content-Type:application/json"\
      http://localhost:8080/api/v1/<resource_name>/{id}
 ```
-
-
-
-## What's included
-
-```
-|---com.lyra.sdk.server
-|   |-- ServerApplication.java
-|   |-- resource 
-|        |-- CreateResource.java
-|        |-- HealthResource.java
-|        |-- VerifyResultResource.java   
-|   |-- util
-|        |-- ServerConfiguration.java
-|---resources
-|   |-- application.properties
-```
-
-**ServerApplication.java**: is the entry point of the Spring Boot application.
-
-**Resource package**: contains all the Rest controllers that handle the Rest operations.
-
-**Util package**: contains a configuration implementation that reads data from environment variables if provided.  
-
-## Security concerns
-
-This sample uses a [basic auth](https://developer.mozilla.org/fr/docs/Web/HTTP/Authentication#Sch%C3%A9ma_d'authentification_basique_(Basic)) implementation in order to provide a simple way to secure the Rest API.
-
-See [Configuration](#security-configuration) section if you want to how to configure credentials.  
-
-Please note that this authentication requires an HTTP**S** connection in order to be really effective. Otherwise the credentials will 
-be sent in plain text.
  
 
 ## Configuration

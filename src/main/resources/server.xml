@@ -7,9 +7,12 @@
 -->
 <server-config>
     <server-opts>
-    	<ssl>false</ssl>
-	<port>8080</port>
+    	<port>8080</port>
+        <client-auth>REQUIRED</client-auth>
     </server-opts>
+    <tcp-opts>
+        <ssl>false</ssl>
+    </tcp-opts>
     
     <cross-origin>
         <allowed-headers>
@@ -33,9 +36,20 @@
     </cross-origin>
     
     <keystore-config>
+        <pem-key-config>
+            <key-path>cert/folks-app.key</key-path>
+            <cert-path>cert/folks-app.crt</cert-path>
+        </pem-key-config>
+        
         <store-name>folks.pkcs</store-name>
         <store-password>secret</store-password>
     </keystore-config>
+    
+    <truststore-config>
+        <pem-cert-config>
+            <cert-path>ca/ca_javalabs.crt</cert-path>
+        </pem-cert-config>
+    </truststore-config>
     
     <context-root>/api/v1</context-root>
     
@@ -54,7 +68,6 @@
             <url-patterns>
                 <!-- Adding CTX_ROOT will prepend the value from the context-root tag -->
                 <url-pattern>{CTX_ROOT}/mgmt/</url-pattern>
-                <url-pattern>{CTX_ROOT}/users/</url-pattern>
             </url-patterns>
         </auth-constraint>
     </security-constraint>

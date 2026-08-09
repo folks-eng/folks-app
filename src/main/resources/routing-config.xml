@@ -2,10 +2,18 @@
 <routing-config>
     <package name="com.folks.app.handler"/>
     <api version="1.0" basePath="/api/v1" produce="application/vnd.ex+json.v1" consume="application/json"/>
+    
+    
     <resource-mapping name="error" path="/*" failure="true" resource="org.javalabs.decl.vertx.container.handler.HttpErrorHandler"/>
-    <resource-mapping name="AuthToken" path="/mgmt/login" resource="com.folks.app.handler.AuthenticationHandler" schema="com.folks.app.auth.AuthToken">
-        <mapping uri="" method="POST" api="authenticate"/>
+    
+    <resource-mapping name="AuthToken"
+                      path="/mgmt/login"
+                      resource="com.folks.app.handler.AuthenticationHandler"
+                      schema="com.folks.app.auth.AuthToken">
+        
+        <mapping uri="" method="POST" api="authenticate" consume="application/x-www-form-urlencoded"/>
     </resource-mapping>
+    
     <resource-mapping name="Payment" path="/payments" resource="com.folks.app.handler.PaymentHandler" schema="com.folks.app.model.Payment">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>

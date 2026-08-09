@@ -99,6 +99,49 @@ Open the url `http://127.0.0.1:8000/` in your favourite browser and you will see
 1. folks.pkcs - For jwt signing
 2. .pem keys and certs - For mTLS
 
+### Setup Browser Certificate at node.js side
+
+#### Step 1 - Create a CSR and private key for the Node browser-facing server
+
+```
+openssl req -new -newkey rsa:2048 -nodes \
+  -keyout node-ext.key \
+  -out node-ext.csr \
+  -subj "/CN=www.folks.com"
+
+```
+
+#### Step 2 - Create SAN + serverAuth extensions
+
+```
+subjectAltName = DNS:node.example.internal,DNS:localhost,IP:127.0.0.1
+extendedKeyUsage = serverAuth
+keyUsage = digitalSignature, keyEncipherment
+
+```
+
+#### Step 3 - Sign with your CA
+
+```
+openssl x509 -req \
+  -in node-ext.csr \
+  -CA ca_javalabs.crt \
+  -CAkey ca_javalabs.key \
+  -CAcreateserial \
+  -out node-ext.crt \
+  -days 825 \
+  -sha256 \
+  -extfile node-ext.ext
+
+```
+
+#### Step 4 - Verify Certificate
+
+```
+openssl verify -CAfile ca_javalabs.crt node-ext.crt
+
+```
+
 ### Setup mTLS
 
 This is how the end-to-end communication would look like.

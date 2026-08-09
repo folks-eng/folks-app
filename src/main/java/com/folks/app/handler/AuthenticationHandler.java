@@ -1,11 +1,10 @@
 package com.folks.app.handler;
 
 import org.javalabs.decl.vertx.config.internal.ConfigStorage;
-import org.javalabs.decl.vertx.container.util.CookieUtil;
 import com.folks.app.auth.AuthToken;
 import com.folks.app.bo.AuthBO;
+import com.folks.app.model.AuthGrant;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.Cookie;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.JWTOptions;
 import io.vertx.ext.auth.KeyStoreOptions;
@@ -52,24 +51,27 @@ public class AuthenticationHandler extends AbstractHandler {
      * @param ctx 
      */
     public void authenticate(RoutingContext ctx) {
-        final String audience = ctx.request().headers().get("user-agent");
+        final String agent = ctx.request().headers().get("user-agent");
         final String credential = ctx.request().getHeader("Authorization");
         
         vertx().executeBlocking(() -> {
             // Add the claims.
-            Map<String, Object> claims = authBO.authenticate(credential, cs.jwtIssuer(), cs.jwtAudience());
+            AuthGrant grant = new AuthGrant();
+            grant.setGrantType(ctx.request().getParam("grant_type"));
+            grant.setScope(ctx.request().getParam("scope"));
+            
+            Map<String, Object> claims = authBO.authenticate(credential, grant, cs.jwtIssuer(), cs.jwtAudience());
             String jwt = authZ.generateToken(JsonObject.mapFrom(claims));
 
-            AuthToken token = AuthToken.from(claims);
-            token.setJwt(jwt);
+            AuthToken token = AuthToken.from(claims, cs.jwtExpiry());
+            token.setAccessToken(jwt);
                 
             return token;
             
         }).onComplete(result -> {
             if (result.succeeded()) {
-                Cookie cookie = CookieUtil.create((String) ((AuthToken)result.result()).getJwt());
-                ctx.response().addCookie(cookie);
-
+                // Cookie cookie = CookieUtil.create((String) ((AuthToken)result.result()).getAccess_token());
+                // ctx.response().addCookie(cookie);
                 sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
             }
             else {

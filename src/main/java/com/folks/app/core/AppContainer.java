@@ -1,11 +1,17 @@
 package com.folks.app.core;
 
+import com.folks.app.cache.impl.UserRoleCache;
 import org.javalabs.decl.vertx.container.VertxContainer;
 import com.folks.app.config.ApplicationConfiguration;
+import com.folks.app.model.User;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.javalabs.jpa.JdbcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,14 +46,17 @@ public class AppContainer extends VertxContainer {
             }
             
             // Initialize the database.
-            initDb();
+            EntityManagerFactory emf = initDb();
+            
+            // Load cache
+            loadCache(emf);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
     
-    private void initDb() {
+    private EntityManagerFactory initDb() {
         // System.setProperty("orm.config.file", "persistence.xml");
         
         Map<String, Object> props = ApplicationConfiguration.getInstance().get("db.config");
@@ -92,9 +101,36 @@ public class AppContainer extends VertxContainer {
             }
 
         }
-        Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, dbConfig);
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, dbConfig);
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Initialized jpa entity manager factory.");
+            LOGGER.info("Initialized jpa-lite entity manager factory.");
+        }
+        return emf;
+    }
+
+    private void loadCache(EntityManagerFactory emf) {
+        EntityManager em = null;
+        
+        try {
+            em = emf.createEntityManager();
+            List<User> adminUsers = em.createNamedQuery("User.selectByRole", User.class)
+                    .setParameter(1, User.Role.ADMIN)
+                    .getResultList();
+            
+            for (User user : adminUsers) {
+                UserRoleCache.getCache().add(user.getExternalId(), user);
+            }
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Loaded {} admin user(s)", adminUsers.size());
+            }
+        }
+        catch (JdbcException e) {
+            LOGGER.error("Error loading admin users", e);
+        }
+        finally {
+            if (em != null) {
+                em.close();
+            }
         }
     }
 }

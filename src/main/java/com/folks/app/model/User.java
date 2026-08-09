@@ -28,7 +28,8 @@ import java.util.Objects;
 @Table(name = "fks_users")
 @IdClass(User.UserPK.class)
 @NamedNativeQueries({
-    @NamedNativeQuery(name = "User.selectAll", query = "SELECT * FROM fks_users")
+    @NamedNativeQuery(name = "User.selectAll", query = "SELECT * FROM fks_users"),
+    @NamedNativeQuery(name = "User.selectByRole", query = "SELECT * FROM fks_users WHERE role = ?")
 })
 public class User implements Serializable, Cloneable {
 

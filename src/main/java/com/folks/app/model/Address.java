@@ -1,5 +1,6 @@
 package com.folks.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,16 +25,22 @@ import java.util.Objects;
 @Table(name = "fks_addresses")
 @IdClass(Address.AddressPK.class)
 @NamedNativeQueries({
-    @NamedNativeQuery(name = "Address.selectAll", query = "SELECT * FROM fks_addresses")
+    @NamedNativeQuery(name = "Address.selectAll"
+            , query = "SELECT b.*"
+                    + "  FROM fks_users a"
+                    + " INNER JOIN fks_addresses b ON (a.user_id = b.user_id)"
+                    + " WHERE a.external_id = ?")
 })
 public class Address implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "address_id", nullable = false, updatable = false, precision = 32)
+    @JsonIgnore
     private Integer addressId;
 
     @Column(name = "user_id", nullable = false, updatable = true, precision = 32)
+    @JsonIgnore
     private Integer userId;
 
     @Column(name = "address_line1", nullable = false, updatable = true, length = 128)

@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author schan280
  */
-public class UserBO {
+public class UserBO extends AbstractBO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(UserBO.class);
     
@@ -33,13 +33,17 @@ public class UserBO {
     }
 
     public User create(AppUser usr, User user) {
+        // Only adming has the privilege to create user.
+        ensureAdmin(usr);
+        validateScope(usr, "user:create");
+
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-        
+
         user.setExternalId(UUID.randomUUID().toString());
         user.setRole(User.Role.CUSTOMER);
         user.setStatus(User.Status.ACTIVE);
-        
+
         if (user.getCreatedAt() == null) {
             user.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
         }
@@ -53,7 +57,11 @@ public class UserBO {
         return user;
     }
 
-    public void create(AppUser usr, List<User> records) {
+    public void create(AppUser usr, List<User> records) throws IllegalAccessException {
+        // Only adming has the privilege to create user in bulk.
+        ensureAdmin(usr);
+        validateScope(usr, "user:create");
+
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -74,11 +82,12 @@ public class UserBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        // First fetch the entry, to see if this already exists.
-        User existing = userDAO.find(new User.UserPK(user.getUserId()));
-        if (existing == null) {
-            throw new IllegalArgumentException("No user found for identifier: " + user.getUserId());
-        }
+        // Only the logged in user is allowed to modify the user as identified by this id.
+        ensureAuthorized(usr, user.getExternalId());
+        
+        // Fetch the user entry.
+        User existing = fetchUser(usr);
+        
         // Update attributes of existing record
         existing.setFullName(user.getFullName());
         existing.setEmail(user.getEmail());
@@ -98,6 +107,10 @@ public class UserBO {
     }
 
     public List<User> viewAll(AppUser usr, QueryParams params) {
+        // Only adming has the privilege to view all users.
+        ensureAdmin(usr);
+        validateScope(usr, "user:query");
+
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -111,14 +124,16 @@ public class UserBO {
         return rows;
     }
 
-    public User view(AppUser usr, Integer id) {
+    public User view(AppUser usr, String id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        User user = userDAO.find(new User.UserPK(id));
-        if (user == null) {
-            throw new IllegalArgumentException("No User found for id: " + id);
-        }
+        // Only the logged in user is allowed to modify the user as identified by this id.
+        ensureAuthorized(usr, id);
+        
+        // Fetch the user entry.
+        User user = fetchUser(usr);
+        
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Fetched user details. Elapsed time(ms): {}", timer.elapsedTimeMillis());
@@ -126,16 +141,16 @@ public class UserBO {
         return user;
     }
 
-    public User remove(AppUser usr, Integer id) {
+    public User remove(AppUser usr, String id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        // First fetch the entry, to see if this already exists.
-        User user = userDAO.find(new User.UserPK(id));
-
-        if (user == null) {
-            throw new IllegalArgumentException("No user found for id: " + id);
-        }
+        // Only the logged in user is allowed to modify the user as identified by this id.
+        ensureAuthorized(usr, id);
+        
+        // Fetch the user entry.
+        User user = fetchUser(usr);
+        
         userDAO.delete(user);
         timer.stop();
 
@@ -143,5 +158,54 @@ public class UserBO {
             LOGGER.info("Deleted User. Id: {}. Elapsed time(ms): {}", id, timer.elapsedTimeMillis());
         }
         return user;
+    }
+    
+    /**
+     * Retrieves the user associated with the authenticated application user.
+     * 
+     * <p>
+     * The user's external identifier is obtained from the {@code sub} claim of the JWT principal and is used to
+     * query the user data store.
+     * 
+     * <p>
+     * The user may first be looked up from a distributed cache to avoid an * unnecessary database query.
+     * If the user is not available in the cache, the persistent data store is queried as a fallback.
+     *
+     * @param usr   The authenticated application user containing the JWT principal
+     * @return User The user associated with the external identifier
+     * 
+     * @throws IllegalArgumentException if no user exists for the external identifier
+     */
+    private User fetchUser(AppUser usr) {
+        // Query the user based on external_id.
+        // external_id will be part of jwt token as 'sub'.
+        String extId = usr.principal().sub();
+
+        User user = userDAO.select(extId);
+        if (user == null) {
+            throw new IllegalArgumentException("No User found for id: " + extId);
+        }
+        return user;
+    }
+    
+    /**
+     * Ensure the logged in user is authorized to perform certain operation.
+     * 
+     * <p>
+     * Ensure the external id present in the path parameter or in the payload matches with the {@code sub} 
+     * claim of the JWT principal.
+     * 
+     * @param usr   The authenticated application user containing the JWT principal
+     * @param extId The external id passed in the path parameter. 
+     */
+    private void ensureAuthorized(AppUser usr, String extId) {
+        try {
+            if (extId != null && ! usr.principal().sub().contains(extId)) {
+                throw new IllegalAccessException(UNAUTHORIZED_MSG);
+            }
+        }
+        catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

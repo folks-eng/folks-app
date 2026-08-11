@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author schan280
  */
-public class ConversationBO {
+public class ConversationBO extends AbstractBO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ConversationBO.class);
     

@@ -1,6 +1,5 @@
 package com.folks.app.bo;
 
-import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
@@ -8,7 +7,6 @@ import com.folks.app.dao.JobStatusDAO;
 import com.folks.app.model.JobStatus;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
-import java.sql.Timestamp;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author schan280
  */
-public class JobStatusBO {
+public class JobStatusBO extends AbstractBO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(JobStatusBO.class);
     

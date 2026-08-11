@@ -29,6 +29,7 @@ import java.util.Objects;
 @IdClass(User.UserPK.class)
 @NamedNativeQueries({
     @NamedNativeQuery(name = "User.selectAll", query = "SELECT * FROM fks_users"),
+    @NamedNativeQuery(name = "User.selectByExtId", query = "SELECT * FROM fks_users WHERE external_id = ?"),
     @NamedNativeQuery(name = "User.selectByRole", query = "SELECT * FROM fks_users WHERE role = ?")
 })
 public class User implements Serializable, Cloneable {
@@ -172,6 +173,10 @@ public class User implements Serializable, Cloneable {
 
     public Timestamp getUpdatedAt() {
         return this.updatedAt;
+    }
+    
+    public static boolean isAdmin(String role) {
+        return Role.ADMIN.name().toLowerCase().equals(role);
     }
 
     public static class UserPK {

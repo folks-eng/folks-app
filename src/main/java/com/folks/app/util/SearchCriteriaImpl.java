@@ -1,6 +1,7 @@
 package com.folks.app.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,10 @@ public class SearchCriteriaImpl implements SearchCriteria {
     SearchCriteriaImpl() {}
     
     public SearchCriteriaImpl params(QueryParams params) {
+        return params(params, null);
+    }
+    
+    public SearchCriteriaImpl params(QueryParams params, Integer userId) {
         Map<String, List<String>> tmp = params.entries();
         
         for (Map.Entry<String, List<String>> me : tmp.entrySet()) {
@@ -33,7 +38,7 @@ public class SearchCriteriaImpl implements SearchCriteria {
             
             // Convert to appropriate data type.
             if (! values.isEmpty()) {
-                if (values.get(0).matches("\\d+")) {
+                if (values.get(0).matches("\\d+") && ! name.equals("phone1")) {
                     List<Object> genValues = new ArrayList<>(values.size());
                     for (String val : values) {
                         genValues.add(Integer.valueOf(val));
@@ -58,6 +63,9 @@ public class SearchCriteriaImpl implements SearchCriteria {
                     this.params.put(name, new ArrayList<Object>(values));
                 }
             }
+        }
+        if (userId != null) {
+            this.params.put("user_id", Arrays.asList(userId));
         }
         
         this.offset = params.offset();

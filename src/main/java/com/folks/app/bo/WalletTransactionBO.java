@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author schan280
  */
-public class WalletTransactionBO {
+public class WalletTransactionBO extends AbstractBO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(WalletTransactionBO.class);
     

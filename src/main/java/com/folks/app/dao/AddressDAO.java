@@ -77,5 +77,14 @@ public interface AddressDAO {
      */
     @NotSupported
     List<Address> query(SearchCriteria search);
+    
+    /**
+     * Query the addresses for a given user as identified by the external id.
+     * 
+     * @param extUserId  Query criteria.
+     * @return List
+     */
+    @NotSupported
+    List<Address> queryByUser(String extUserId);
 }
 

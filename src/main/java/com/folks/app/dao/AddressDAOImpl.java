@@ -2,6 +2,7 @@ package com.folks.app.dao;
 
 import org.javalabs.jpa.query.Criteria;
 import com.folks.app.model.Address;
+import com.folks.app.model.User;
 import com.folks.app.util.SearchCriteria;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -9,6 +10,7 @@ import jakarta.persistence.TypedQuery;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.javalabs.jpa.util.QueryHints;
 
 /**
  * Concrete DAO class to handle database operations related.
@@ -106,6 +108,14 @@ public class AddressDAOImpl implements AddressDAO {
         
         List<Address> result = q.getResultList();
         return result;
+    }
+
+    @Override
+    public List<Address> queryByUser(String extUserId) {
+        return em.createNamedQuery("Address.selectAll", Address.class)
+            .setParameter(1, extUserId)
+            .setHint(QueryHints.ALLOW_NATIVE_QUERY, Boolean.TRUE)
+            .getResultList();
     }
     
 }

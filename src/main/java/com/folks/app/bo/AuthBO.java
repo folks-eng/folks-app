@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author schan280
  */
-public class AuthBO {
+public class AuthBO extends AbstractBO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthBO.class);
     
@@ -77,7 +78,8 @@ public class AuthBO {
         claims.put("sub", user.getExternalId());
         claims.put("iss", issuer);
         claims.put("aud", audience);
-        claims.put("client_id", user.getExternalId());
+        claims.put("jti", UUID.randomUUID().toString());
+        claims.put("priv", user.getRole().name().toLowerCase());
         
         if (grant.getScope() != null && grant.getScope().trim().length() > 0) {
             claims.put("scope", grant.getScope());

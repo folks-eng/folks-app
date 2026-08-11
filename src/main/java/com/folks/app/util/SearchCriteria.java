@@ -16,6 +16,13 @@ public interface SearchCriteria {
         return search;
     }
     
+    static SearchCriteria from(QueryParams params, Integer userId) {
+        SearchCriteriaImpl search = new SearchCriteriaImpl();
+        search.params(params, userId);
+        
+        return search;
+    }
+    
     /**
      * Return a map of search key parameters.
      * @return Map

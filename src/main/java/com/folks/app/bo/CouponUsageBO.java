@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author schan280
  */
-public class CouponUsageBO {
+public class CouponUsageBO extends AbstractBO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(CouponUsageBO.class);
     

@@ -84,10 +84,9 @@ public class UserBO extends AbstractBO {
 
         // Only the logged in user is allowed to modify the user as identified by this id.
         ensureAuthorized(usr, user.getExternalId());
-        
         // Fetch the user entry.
         User existing = fetchUser(usr);
-        
+
         // Update attributes of existing record
         existing.setFullName(user.getFullName());
         existing.setEmail(user.getEmail());
@@ -104,6 +103,55 @@ public class UserBO extends AbstractBO {
             LOGGER.info("User record modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
         return existing;
+    }
+
+    /**
+     * Retrieves the user associated with the authenticated application user.
+     *
+     * <p>
+     * The user's external identifier is obtained from the {@code sub} claim of the JWT principal and is used to
+     * query the user data store.
+     *
+     * <p>
+     * The user may first be looked up from a distributed cache to avoid an * unnecessary database query.
+     * If the user is not available in the cache, the persistent data store is queried as a fallback.
+     *
+     * @param usr   The authenticated application user containing the JWT principal
+     * @return User The user associated with the external identifier
+     *
+     * @throws IllegalArgumentException if no user exists for the external identifier
+     */
+    private User fetchUser(AppUser usr) {
+        // Query the user based on external_id.
+        // external_id will be part of jwt token as 'sub'.
+        String extId = usr.principal().sub();
+
+        User user = userDAO.select(extId);
+        if (user == null) {
+            throw new IllegalArgumentException("No User found for id: " + extId);
+        }
+        return user;
+    }
+
+    /**
+     * Ensure the logged in user is authorized to perform certain operation.
+     *
+     * <p>
+     * Ensure the external id present in the path parameter or in the payload matches with the {@code sub}
+     * claim of the JWT principal.
+     *
+     * @param usr   The authenticated application user containing the JWT principal
+     * @param extId The external id passed in the path parameter.
+     */
+    private void ensureAuthorized(AppUser usr, String extId) {
+        try {
+            if (extId != null && ! usr.principal().sub().contains(extId)) {
+                throw new IllegalAccessException(UNAUTHORIZED_MSG);
+            }
+        }
+        catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<User> viewAll(AppUser usr, QueryParams params) {
@@ -130,10 +178,9 @@ public class UserBO extends AbstractBO {
 
         // Only the logged in user is allowed to modify the user as identified by this id.
         ensureAuthorized(usr, id);
-        
         // Fetch the user entry.
         User user = fetchUser(usr);
-        
+
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Fetched user details. Elapsed time(ms): {}", timer.elapsedTimeMillis());
@@ -147,10 +194,9 @@ public class UserBO extends AbstractBO {
 
         // Only the logged in user is allowed to modify the user as identified by this id.
         ensureAuthorized(usr, id);
-        
         // Fetch the user entry.
         User user = fetchUser(usr);
-        
+
         userDAO.delete(user);
         timer.stop();
 
@@ -159,53 +205,45 @@ public class UserBO extends AbstractBO {
         }
         return user;
     }
-    
-    /**
-     * Retrieves the user associated with the authenticated application user.
-     * 
-     * <p>
-     * The user's external identifier is obtained from the {@code sub} claim of the JWT principal and is used to
-     * query the user data store.
-     * 
-     * <p>
-     * The user may first be looked up from a distributed cache to avoid an * unnecessary database query.
-     * If the user is not available in the cache, the persistent data store is queried as a fallback.
-     *
-     * @param usr   The authenticated application user containing the JWT principal
-     * @return User The user associated with the external identifier
-     * 
-     * @throws IllegalArgumentException if no user exists for the external identifier
-     */
-    private User fetchUser(AppUser usr) {
-        // Query the user based on external_id.
-        // external_id will be part of jwt token as 'sub'.
-        String extId = usr.principal().sub();
 
-        User user = userDAO.select(extId);
-        if (user == null) {
-            throw new IllegalArgumentException("No User found for id: " + extId);
+    public User patchUp(AppUser usr, User user) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        // First fetch the entry, to see if this already exists.
+        User existing = userDAO.find(new User.UserPK(user.getUserId()));
+        if (existing == null) {
+            throw new IllegalArgumentException("No user found for identifier: " + user.getUserId());
         }
-        return user;
-    }
-    
-    /**
-     * Ensure the logged in user is authorized to perform certain operation.
-     * 
-     * <p>
-     * Ensure the external id present in the path parameter or in the payload matches with the {@code sub} 
-     * claim of the JWT principal.
-     * 
-     * @param usr   The authenticated application user containing the JWT principal
-     * @param extId The external id passed in the path parameter. 
-     */
-    private void ensureAuthorized(AppUser usr, String extId) {
-        try {
-            if (extId != null && ! usr.principal().sub().contains(extId)) {
-                throw new IllegalAccessException(UNAUTHORIZED_MSG);
-            }
+        // Update only the attributes given in input
+        String attr = user.getFullName();
+        if(attr != null && !attr.trim().isEmpty())
+            existing.setFullName(attr);
+        attr = user.getEmail();
+        if(attr != null && !attr.trim().isEmpty())
+            existing.setEmail(attr);
+        attr = user.getPhone1();
+        if(attr != null && !attr.trim().isEmpty())
+            existing.setPhone1(attr);
+        attr = user.getPhone2();
+        if(attr != null && !attr.trim().isEmpty())
+            existing.setPhone2(attr);
+        attr = user.getPasswordHash();
+        if(attr != null && !attr.trim().isEmpty())
+            existing.setPasswordHash(attr);
+        attr = user.getRole().name();
+        if(attr != null && !attr.trim().isEmpty())
+            existing.setRole(user.getRole());
+        attr = user.getStatus().name();
+        if(attr != null && !attr.trim().isEmpty())
+            existing.setStatus(user.getStatus());
+
+        userDAO.update(existing);
+        timer.stop();
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("User record patched up successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
-        catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        return existing;
     }
 }

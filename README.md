@@ -101,7 +101,7 @@ Open the url `http://127.0.0.1:8000/` in your favourite browser and you will see
 
 ### Setup Browser Certificate at node.js side
 
-#### Step 1 - Create a CSR and private key for the Node browser-facing server
+#### Step 1 - Create a CSR and private key for the Node server facing browser 
 
 ```
 openssl req -new -newkey rsa:2048 -nodes \

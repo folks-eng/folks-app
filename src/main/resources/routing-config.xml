@@ -5,8 +5,9 @@
     
     <resource-mapping name="error" path="/*" failure="true" resource="org.javalabs.decl.vertx.container.handler.HttpErrorHandler"/>
     
-    <resource-mapping name="AuthToken" path="/mgmt/login" resource="com.folks.app.handler.AuthenticationHandler" schema="com.folks.app.auth.AuthToken">
-        <mapping uri="" method="POST" api="authenticate" consume="application/x-www-form-urlencoded"/>
+    <resource-mapping name="AuthToken" path="/mgmt" resource="com.folks.app.handler.AuthenticationHandler" schema="com.folks.app.auth.AuthToken">
+        <mapping uri="/login" method="POST" api="authenticate" consume="application/x-www-form-urlencoded"/>
+        <mapping uri="/token" method="POST" api="getToken" consume="application/x-www-form-urlencoded"/>
     </resource-mapping>
 
     <resource-mapping name="User" path="/users" resource="com.folks.app.handler.UserHandler" schema="com.folks.app.model.User">

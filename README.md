@@ -163,6 +163,7 @@ We will create a token with the scope `user:create`. Likewise, create a token wi
 
 ```
 curl -i \
+    -X POST \
     -u '9efbd3b3-a0a9-468a-8652-7f489adf6a45:7c6a180b36896a0a8c02787eeafb0e4c' \
     --cert /path/to/folks-app/src/main/resources/client_cert/folks-client.crt \
     --key /path/to/folks-app/src/main/resources/client_cert/folks-client.key \
@@ -261,8 +262,64 @@ After the user is created, a user token can be generated for operations such as 
 
 ### Step 3 - Generate a User Token (Non-Admin)
 
-> **TODO:** Add the documented flow for generating a non-admin user token.
+**Command:**
 
+```
+curl -i \
+    -X POST \
+    --cert /path/to/folks-app/src/main/resources/client_cert/folks-client.crt \
+    --key ~/Projects/folks-app/src/main/resources/client_cert/folks-client.key \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d 'phone1=1-029837467382' \
+    https://localhost:9443/api/v1/mgmt/token
+
+```
+
+**Response:**
+
+```
+{
+  "token_type" : "Bearer",
+  "access_token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIyMzRiODQ5MS1jYzVlLTRiZTEtODJhYy1iYThhYzM1ZmY2ZDgiLCJhdWQiOm51bGwsImlzcyI6ImZvbGtzIiwianRpIjoiODY2OWMxMTgtMjQ0OC00ZTJlLWI0MTktODM2MWZhNzNkYzU2IiwiaWF0IjoxNzg2NzkzODk1LCJleHAiOjE3ODY3OTc0OTV9.JrWo1XnaMyuqxhIxc-teHRyhTdKN0McflbdgXOSfCtIxpDdwnGkIAIFGf-usmC86rpgZj3sdgHfqMngDh_o0HWZAPLNiALPdQofJlHUM_drGdEl6L7J3eV6Sl-e4nh9KeTLBkcx3IxRkIflMMv6Q4k3AD0FKWbTJy-olkP5jj7e7uA4Kncb4l6KeqeVswiXwfYCEvZWozKsLl5rc2rzRFDZMjAKGl1UoCZ9VRvZwl43BwZQuncecHqptFZRDZtRfqc5j5SPxUsIZfrfvuCuZ95Tx_DrNfWLwP1rXrHIRJlb_gwbTnaudBQOkLyLOYz7O79g_Sv6EmrqP2Q3LJOQ4TA",
+  "scope" : null,
+  "expires_in" : 3600,
+  "refresh_token" : null
+}
+
+```
+
+Now Socretes will use this user access_token for any subsequent operation, e.g., View Profile, Make Booking, View Booking, Check Wallet, etc.
+
+### Step 4 - View Own Profile
+
+**Command:**
+
+```
+curl -i \
+    --cert /path/to/folks-app/src/main/resources/client_cert/folks-client.crt \
+    --key ~/Projects/folks-app/src/main/resources/client_cert/folks-client.key \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer {user_access_token}
+    https://localhost:9443/api/v1/users/234b8491-cc5e-4be1-82ac-ba8ac35ff6d8
+
+```
+
+**Response:**
+
+```
+{
+  "externalId" : "234b8491-cc5e-4be1-82ac-ba8ac35ff6d8",
+  "fullName" : "Socretes",
+  "email" : "socretes@javalabs.org",
+  "phone1" : "1-029837467382",
+  "phone2" : null,
+  "role" : "CUSTOMER",
+  "status" : "ACTIVE",
+  "createdAt" : 1786786731348,
+  "updatedAt" : null
+}
+
+```
 
 
 ## Keystore Handling

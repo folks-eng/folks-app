@@ -79,4 +79,43 @@ public class AuthenticationHandler extends AbstractHandler {
             }
         });
     }
+    
+    
+    
+    /**
+     * API to create a user (non-admin) token.
+     * @param ctx 
+     */
+    public void getToken(RoutingContext ctx) {
+        final String agent = ctx.request().headers().get("user-agent");
+        final String credential = ctx.request().getHeader("Authorization");
+        
+        vertx().executeBlocking(() -> {
+            // Add the claims.
+            String type = "phone1";
+            String input = ctx.request().getParam(type);
+            if (input == null) {
+                type = "email";
+                input = ctx.request().getParam(type);
+            }
+            
+            Map<String, Object> claims = authBO.authenticate(credential, type, input, cs.jwtIssuer(), cs.jwtAudience());
+            String jwt = authZ.generateToken(JsonObject.mapFrom(claims));
+
+            AuthToken token = AuthToken.from(claims, cs.jwtExpiry());
+            token.setAccessToken(jwt);
+                
+            return token;
+            
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                // Cookie cookie = CookieUtil.create((String) ((AuthToken)result.result()).getAccess_token());
+                // ctx.response().addCookie(cookie);
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
 }

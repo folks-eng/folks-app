@@ -2,13 +2,19 @@ package com.folks.app.bo;
 
 import com.folks.app.cache.impl.UserRoleCache;
 import com.folks.app.config.ApplicationConfiguration;
+import com.folks.app.dao.UserDAO;
 import com.folks.app.model.AuthGrant;
 import com.folks.app.model.User;
+import com.folks.app.util.QueryParams;
+import com.folks.app.util.SearchCriteria;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.javalabs.decl.util.StopWatch;
+import org.javalabs.jpa.DAOProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +47,16 @@ public class AuthBO extends AbstractBO {
     //              username and password directly into the client app.
     private final String GRANT_PASSWORD = "password";
     
+    private final UserDAO userDAO;
+    
+    public AuthBO() {
+        this.userDAO = DAOProxy.get(UserDAO.class);
+        
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initialized AuthBO: {}. UserDAO: {}", getClass().getSimpleName(), userDAO);
+        }
+    }
+
     /**
      * This method will be invoked when node.js server requests for a short-lived token to perform certain admin tasks.
      * 
@@ -109,6 +125,55 @@ public class AuthBO extends AbstractBO {
         // else {
         //     throw new IllegalAccessException("Invalid login credentials");
         // }
+    }
+    
+    /**
+     * This method will be invoked when you want to generate a user token based on phone number or mobile.
+     * 
+     * @param credential    The client_id and client_secret.
+     * @param type
+     * @param input
+     * @param issuer        The issuer that should issue this token
+     * @param audience      The audience this token is meant for, e.g., node.js server (which is acting as a client here)
+     * 
+     * @return
+     * @throws IllegalAccessException 
+     */
+    public Map<String, Object> authenticate(String credential
+            , String type
+            , String input
+            , String issuer
+            , String audience) throws IllegalAccessException {
+        
+        if (input == null) {
+            throw new IllegalAccessException("No value specified for " + type);
+        }
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        Map<String, List<String>> params = new HashMap<>();
+        params.put(type, Arrays.asList(input));
+            
+        SearchCriteria search = SearchCriteria.from(new QueryParams(params));
+        List<User> rows = userDAO.query(search);
+        
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched {} expanded user record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
+        }
+        if (rows.isEmpty()) {
+            throw new IllegalArgumentException("No user found with " + type + " as " + input);
+        }
+        // User found. Procedd with token generation ...
+        User user = rows.get(0);
+        
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", user.getExternalId());
+        claims.put("iss", issuer);
+        claims.put("aud", audience);
+        claims.put("jti", UUID.randomUUID().toString());
+        
+        return claims;
     }
     
     public String[] extract(String credential) {

@@ -48,10 +48,14 @@ public class UserHandler extends AbstractHandler {
     public void create(RoutingContext ctx) {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
-            user = userBO.create(user(ctx), user);
-            
-            return user;
+            try {
+                User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
+                user = userBO.create(user(ctx), user);
+                return user;
+            }
+            catch(RuntimeException ex){
+                throw new IllegalArgumentException(ex.getMessage());
+            }
         }).onComplete(result -> {
             if (result.succeeded()) {
                 sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
@@ -135,7 +139,6 @@ public class UserHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             User user = userBO.view(user(ctx), id);
-
             return user;
             
         }).onComplete(result -> {

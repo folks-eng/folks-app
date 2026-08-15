@@ -251,7 +251,7 @@ After the user is created, a user token can be generated for operations such as 
 
 ### Set Up the Browser-Facing Certificate for Node.js
 
-#### Step 1 - Create a CSR and private key for the Node browser-facing server
+#### Step 1 - Create a CSR and private key for the Node server facing browser 
 
 ```
 openssl req -new -newkey rsa:2048 -nodes \

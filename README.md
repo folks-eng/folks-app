@@ -108,7 +108,6 @@ Open `http://127.0.0.1:8000/` in your browser to view the API documentation.
     </server-opts>
     <tcp-opts>
         <ssl>true</ssl>
-        <expiry>60</expiry>
     </tcp-opts>
     ...
     ...
@@ -118,9 +117,7 @@ Open `http://127.0.0.1:8000/` in your browser to view the API documentation.
 
 ```
 
-The `expiry` is in `minute`.
-
-`<client-auth>REQUIRED</client-auth>` requires clients, such as cURL or Postman, to present a valid client certificate. This enables mTLS between the client and `folks-app`.
+<client-auth>`REQUIRED`</client-auth> requires clients, such as cURL or Postman, to present a valid client certificate. This enables mTLS between the client and `folks-app`.
 
 ### Keys and Certificates
 
@@ -189,6 +186,31 @@ Response:
 
 The `expires_in` indicates the token expiry time in `seconds`.
 
+If you want to override the expiry time, add the `expiry` tag and specify the expiry time in `Minute`. For example, in the below configuration, the expiry is set to 1440 minute, i.e., 1 day.
+
+
+```
+    <security-constraint>
+        <auth-handler>org.javalabs.decl.vertx.container.handler.AuthorizationHandler</auth-handler>
+        <jwt-opts>
+            <issuer>folks</issuer>
+            <expiry>1440</expiry>
+        </jwt-opts>
+        
+        <!-- 
+            NO_AUTH is a special tag, which indicates no authentication will be
+            performed for the below set of url pattern(s).
+        -->
+        <auth-constraint>
+            <auth-type>NO_AUTH</auth-type>
+            <url-patterns>
+                <!-- Adding CTX_ROOT will prepend the value from the context-root tag -->
+                <url-pattern>{CTX_ROOT}/mgmt/</url-pattern>
+            </url-patterns>
+        </auth-constraint>
+    </security-constraint>
+
+```
 
 ### Step 2 - Create a User
 
@@ -209,8 +231,8 @@ The `expires_in` indicates the token expiry time in `seconds`.
 ```
 curl -i \
     -X POST \
-    --cert ~/Projects/folks-app/src/main/resources/client_cert/folks-client.crt \
-    --key ~/Projects/folks-app/src/main/resources/client_cert/folks-client.key \
+    --cert /path/to/folks-app/src/main/resources/client_cert/folks-client.crt \
+    --key /path/to/folks-app/src/main/resources/client_cert/folks-client.key \
     -H "Authorization: Bearer {access_token}" \
     -H "Content-Type:application/json" \
     --data-binary @./user.json \

@@ -32,7 +32,7 @@ public class UserBO extends AbstractBO {
         }
     }
 
-    public User create(AppUser usr, User user) {
+    public User create(AppUser usr, User user) throws IllegalAccessException {
         // Only adming has the privilege to create user.
         ensureAdmin(usr);
         validateScope(usr, "user:create");
@@ -78,7 +78,7 @@ public class UserBO extends AbstractBO {
         }
     }
 
-    public User modify(AppUser usr, User user) {
+    public User modify(AppUser usr, User user) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -96,8 +96,9 @@ public class UserBO extends AbstractBO {
         existing.setPasswordHash(user.getPasswordHash());
         existing.setRole(user.getRole());
         existing.setStatus(user.getStatus());
+        existing.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
 
-        userDAO.update(user);
+        userDAO.update(existing);
         timer.stop();
 
         if (LOGGER.isInfoEnabled()) {
@@ -106,7 +107,7 @@ public class UserBO extends AbstractBO {
         return existing;
     }
 
-    public List<User> viewAll(AppUser usr, QueryParams params) {
+    public List<User> viewAll(AppUser usr, QueryParams params) throws IllegalAccessException {
         // Only adming has the privilege to view all users.
         ensureAdmin(usr);
         validateScope(usr, "user:query");
@@ -124,7 +125,7 @@ public class UserBO extends AbstractBO {
         return rows;
     }
 
-    public User view(AppUser usr, String id) {
+    public User view(AppUser usr, String id) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -141,7 +142,7 @@ public class UserBO extends AbstractBO {
         return user;
     }
 
-    public User remove(AppUser usr, String id) {
+    public User remove(AppUser usr, String id) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -198,14 +199,9 @@ public class UserBO extends AbstractBO {
      * @param usr   The authenticated application user containing the JWT principal
      * @param extId The external id passed in the path parameter. 
      */
-    private void ensureAuthorized(AppUser usr, String extId) {
-        try {
-            if (extId != null && ! usr.principal().sub().contains(extId)) {
-                throw new IllegalAccessException(UNAUTHORIZED_MSG);
-            }
-        }
-        catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+    private void ensureAuthorized(AppUser usr, String extId) throws IllegalAccessException {
+        if (extId != null && ! usr.principal().sub().contains(extId)) {
+            throw new IllegalAccessException(UNAUTHORIZED_MSG);
         }
     }
 }

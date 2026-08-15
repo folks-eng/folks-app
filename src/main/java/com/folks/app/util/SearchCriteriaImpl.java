@@ -18,7 +18,7 @@ public class SearchCriteriaImpl implements SearchCriteria {
     private Integer offset = 0;
     private Integer limit = 100;
     
-    private Map<String, List<Object>> params = new HashMap<>();
+    private final Map<String, List<Object>> params = new HashMap<>();
     
     SearchCriteriaImpl() {}
     
@@ -28,6 +28,11 @@ public class SearchCriteriaImpl implements SearchCriteria {
     
     public SearchCriteriaImpl params(QueryParams params, Integer userId) {
         Map<String, List<String>> tmp = params.entries();
+        List<String> orders = tmp.remove("orderBy");
+        
+        if (orders != null) {
+            this.orderBy = orders.get(0);
+        }
         
         for (Map.Entry<String, List<String>> me : tmp.entrySet()) {
             String name = me.getKey();
@@ -38,7 +43,7 @@ public class SearchCriteriaImpl implements SearchCriteria {
             
             // Convert to appropriate data type.
             if (! values.isEmpty()) {
-                if (values.get(0).matches("\\d+") && ! name.equals("phone1")) {
+                if (values.get(0).matches("\\d+") && ! name.equals("phone1") && ! name.equals("phone2")) {
                     List<Object> genValues = new ArrayList<>(values.size());
                     for (String val : values) {
                         genValues.add(Integer.valueOf(val));

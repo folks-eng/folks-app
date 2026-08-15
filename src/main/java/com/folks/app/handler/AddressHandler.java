@@ -11,6 +11,7 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Example REST handler.
@@ -107,13 +108,8 @@ public class AddressHandler extends AbstractHandler {
 
 
             // First fetch the entry, to see if this already exists.
-            Address rs = addressBO.modify(user(ctx), address);
-
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_OK);
-            msg.setMessage("Address modified successfully");
-
-            return msg;
+            Address result = addressBO.modify(user(ctx), address);
+            return result;
             
         }).onComplete(result -> {
             if (result.succeeded()) {
@@ -165,7 +161,7 @@ public class AddressHandler extends AbstractHandler {
             List<Address> addresss = addressBO.viewAll(user(ctx), params);
             List<Object> rows = (List)addresss;
 
-            ItemList itemList = build(params, rows);
+            ItemList itemList = build(ctx.normalizedPath(), params, rows);
             return itemList;
             
         }).onComplete(result -> {
@@ -210,37 +206,5 @@ public class AddressHandler extends AbstractHandler {
                 ctx.fail(result.cause());
             }
         });
-    }
-    
-    private ItemList build(QueryParams params, List<Object> list) {
-        int total = list.size();
-        
-        // Build the item list.
-        String path = "/api/v1/addresss";
-        ItemList itemList = new ItemList(total, list, path);
-        
-        itemList.setHasMore(itemList.getTotal() > (params.offset() + params.limit()));
-        
-        String sep = "?";
-        int idx = 0;
-        
-        for (String key : params.keys()) {
-            String val = params.param(key);
-            if (! key.equals("offset") && ! key.equals("limit")) {
-                path += sep + key + "=" + val;
-                idx ++;
-
-                if (idx > 0) {
-                    sep = "&";
-                }
-            }
-        }
-        if (itemList.isHasMore()) {
-            itemList.setNextLink(path + sep + "offset=" + (params.offset() + params.limit()) + "&limit=" + params.limit());
-        }
-        if (params.offset() - params.limit() >= 0) {
-            itemList.setPreviousLink(path + sep + "offset=" + (params.offset() + params.limit()) + "&limit=" + params.limit());
-        }
-        return itemList;
     }
 }

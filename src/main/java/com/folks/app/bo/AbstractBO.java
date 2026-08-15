@@ -13,25 +13,15 @@ public abstract class AbstractBO {
     
     protected AbstractBO() {}
  
-    protected void ensureAdmin(AppUser usr) {
-        try {
-            if (! User.isAdmin(usr.principal().priv())) {
-                throw new IllegalAccessException(UNAUTHORIZED_MSG);
-            }
-        }
-        catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+    protected void ensureAdmin(AppUser usr) throws IllegalAccessException {
+        if (! User.isAdmin(usr.principal().priv())) {
+            throw new IllegalAccessException(UNAUTHORIZED_MSG);
         }
     }
     
-    protected void validateScope(AppUser usr, String scope) {
-        try {
-            if (! usr.principal().scopes().contains(scope)) {
-                throw new IllegalAccessException(UNAUTHORIZED_MSG);
-            }
-        }
-        catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+    protected void validateScope(AppUser usr, String scope) throws IllegalAccessException {
+        if (! usr.principal().scopes().contains(scope)) {
+            throw new IllegalAccessException(UNAUTHORIZED_MSG);
         }
     }
 }

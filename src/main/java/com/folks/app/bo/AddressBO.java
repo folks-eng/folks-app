@@ -9,7 +9,9 @@ import com.folks.app.model.Address;
 import com.folks.app.model.User;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
+import java.sql.Timestamp;
 import java.util.List;
+import org.javalabs.decl.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +42,13 @@ public class AddressBO extends AbstractBO {
         // Fetch the user from db and associate it with the address object.
         User user = fetchUser(usr);
         address.setUserId(user.getUserId());
+        
+        if (address.getCreatedAt() == null) {
+            address.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        }
+        if (address.getIsDefault() == null) {
+            address.setIsDefault((short)1);     // All addresses are set to default.
+        }
 
         addressDAO.insert(address);
         timer.stop();
@@ -50,7 +59,7 @@ public class AddressBO extends AbstractBO {
         return address;
     }
 
-    public void create(AppUser usr, List<Address> records) {
+    public void create(AppUser usr, List<Address> records) throws IllegalAccessException {
         // Only admin is allowed to create addresses in bulk.
         ensureAdmin(usr);
         
@@ -74,7 +83,7 @@ public class AddressBO extends AbstractBO {
         
         // First fetch the entry, to see if this already exists.
         Address existing = fetchAddress(address.getAddressId());
-        ensureAuthorized(address, user.getUserId());
+        ensureAuthorized(existing, user.getUserId());
         
         // Update attributes of existing record
         existing.setUserId(address.getUserId());
@@ -85,9 +94,10 @@ public class AddressBO extends AbstractBO {
         existing.setPincode(address.getPincode());
         existing.setLatitude(address.getLatitude());
         existing.setLongitude(address.getLongitude());
-        existing.setIsDefault(address.getIsDefault());
+        // existing.setIsDefault(address.getIsDefault());       // The UI is not sending it today.
+        existing.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
 
-        addressDAO.update(address);
+        addressDAO.update(existing);
         timer.stop();
 
         if (LOGGER.isInfoEnabled()) {
@@ -131,7 +141,7 @@ public class AddressBO extends AbstractBO {
         return address;
     }
 
-    public Address remove(AppUser usr, Integer id) {
+    public Address remove(AppUser usr, Integer id) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -210,15 +220,10 @@ public class AddressBO extends AbstractBO {
      * @param userId    The identifier of the user requesting the operation
      * @throws IllegalAccessException   If the address does not belong to the requesting user
      */
-    private void ensureAuthorized(Address address, Integer userId) {
-        try {
-            // Check if this address is associated with the user that has requested a change.
-            if (! userId.equals(address.getUserId())) {
-                throw new IllegalAccessException(UNAUTHORIZED_MSG);
-            }
-        }
-        catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+    private void ensureAuthorized(Address address, Integer userId) throws IllegalAccessException {
+        // Check if this address is associated with the user that has requested a change.
+        if (! userId.equals(address.getUserId())) {
+            throw new IllegalAccessException(UNAUTHORIZED_MSG);
         }
     }
 }

@@ -1,14 +1,14 @@
 ## Folks Application
 
-Folks backend server.
+Folks is a backend server application.
 
-It implements all the needed operations in order to handle various resource-specific operations and verify the integrity of the server response.
+It provides the operations required to manage application resources and verify the integrity of server responses.
  
 ## Requirements
 
 Java 17 or higher and Maven 3.x are required.
 
-## Table of contents
+## Table of Contents
 
 * [Getting started](#getting-started)
 * [Review Swagger Doc](#review-swagger-doc)
@@ -17,47 +17,47 @@ Java 17 or higher and Maven 3.x are required.
 * [Security concerns](#security-concerns)
 * [Configuration](#configuration)
 
-## Getting Started 
+## Getting Started
 
 This sample application provides a REST API using [Declarative Vert](https://github.com/javalabs-eng/declarative-vertx), so it is very easy to make it work as standalone server.  
 
-### Checkout the Code.
+### Check Out the Code
 
 ```
-git clone https://github.com/folks-eng/folks-app
+<prompt> git clone https://github.com/folks-eng/folks-app
 
 ```
 
 ### Compile the Code
 
-`folks-app` uses `maven` as build tool. Use the below command to compile the codebase. You need `JDK 17` or higher version to compile the code.
+`folks-app` uses Maven as its build tool. Use the following command to compile the codebase. JDK 17 or later is required.
 
 ```
-mvn clean install
+<prompt> mvn clean install
 
 ```
 
 ### Version Upgrade
 
-To upgrade the module version in parent pom file as well as all child modules, issue the below command:
+To update the module version in the parent POM and all child modules, run the following command:
 
 ```
-mvn versions:set -DnewVersion=YOUR_NEW_VERSION
+<prompt> mvn versions:set -DnewVersion=YOUR_NEW_VERSION
 
 ```
 
 ### Local Deployment
 
-#### Pre-Requisite
+#### Prerequisites
 
-Folks backend requires `PostgreSQL` to be setup. Follow the [Folks DB](https://github.com/folks-eng/folks-db) to install `PostgreSQL` and setup folks schema.
+The Folks backend requires PostgreSQL. Follow the [Folks DB](https://github.com/folks-eng/folks-db) instructions to install PostgreSQL and set up the Folks schema.
 
 #### Start Folks Server
 
-Once database setup is complete, Run the `start.sh` file to bring up the folks backend server.
+Once the database setup is complete, run `start.sh` to start the Folks backend server.
 
 ```
-sh start.sh
+<prompt> sh start.sh
 
 ```
 
@@ -71,35 +71,185 @@ The application should start and have an output similar to this:
     [main] INFO org.javalabs.decl.vertx.container.VertxContainer - Deployment of verticle app.processor is successful. Deployment Id: 04595511-d20a-43e2-abda-52c931c2d531
 
 
-By default the application run on 8080 port. Modify the port in the `server.xml` if you want to change this value.
+The server port is configured in `server.xml`. Update that configuration if you need to use a different port.
 
-## Review swagger doc
+## Review the Swagger Documentation
 
-The openapi.yaml file will be generated in
+The `openapi.yaml` file is generated in:
 
 ```
 docs/openapi.yaml
 ```
 
-To view the swagger doc, navigate to `/docs` directory and run the below command to start a simple http server
+To view the Swagger documentation, navigate to the `docs` directory and run the following command to start a simple HTTP server:
 ```
-python3 -m http.server -b 127.0.0.1
-```
-
-The server will be started, and you will see the below log:
-```
-Serving HTTP on 127.0.0.1 port 8000 (http://127.0.0.1:8000/) ...
+<prompt> python3 -m http.server -b 127.0.0.1
 ```
 
-Open the url `http://127.0.0.1:8000/` in your favourite browser and you will see the api documentation.
+The server starts and displays output similar to:
+```
+<prompt> Serving HTTP on 127.0.0.1 port 8000 (http://127.0.0.1:8000/) ...
+```
+
+Open `http://127.0.0.1:8000/` in your browser to view the API documentation.
+
+
+## SSL Configuration
+
+### Server Configuration
+
+`folks-app` is configured to start with SSL enabled. Refer to the following snippet from `server.xml`:
+
+```
+<server-config>
+    <server-opts>
+    	<port>9443</port>
+        <client-auth>REQUIRED</client-auth>
+    </server-opts>
+    <tcp-opts>
+        <ssl>true</ssl>
+        <expiry>60</expiry>
+    </tcp-opts>
+    ...
+    ...
+    ...
+
+</server-config>
+
+```
+
+The `expiry` is in `minute`.
+
+`<client-auth>REQUIRED</client-auth>` requires clients, such as cURL or Postman, to present a valid client certificate. This enables mTLS between the client and `folks-app`.
+
+### Keys and Certificates
+
+`folks-app` includes its server key, certificates, and CA certificate under `src/main/resources`.
+
+```
+src/main/resources
+      |
+       --- ca
+      |     |
+      |      --- ca_javalabs.key
+      |     |
+      |      --- ca_javalabs.crt
+      |
+       --- server_cert
+      |     |
+      |      --- folks-app.key
+      |     |
+      |      --- folks-app.crt
+      |
+       --- client_cert
+            |
+             --- folks-client.key
+            |
+             --- folks-client.crt
+
+```
+
+The `client_cert` directory is not used as the server identity. Its certificate and key are used by clients when establishing mTLS connections, including requests used to obtain authentication tokens.
+
+## Testing Folks Application
+
+Because `folks-app` requires SSL and mTLS, a client must present a valid client certificate when establishing a connection before making API calls.
+
+### Step 1 - Obtain an Admin Token
+
+An admin token is required for certain operations, for example:
+
+1. Creating a User         [ scope -> user:create ]
+2. Viewing All Users    [ scope -> user:query ]
+
+We will create a token with the scope `user:create`. Likewise, create a token with scope `user:query` if you want to view all users.
+
+```
+curl -i \
+    -u '9efbd3b3-a0a9-468a-8652-7f489adf6a45:7c6a180b36896a0a8c02787eeafb0e4c' \
+    --cert /path/to/folks-app/src/main/resources/client_cert/folks-client.crt \
+    --key /path/to/folks-app/src/main/resources/client_cert/folks-client.key \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d 'grant_type=client_credentials&scope=user%3Acreate' \
+    https://localhost:9443/api/v1/mgmt/login
+
+```
+
+Response:
+
+```
+{
+  "token_type" : "Bearer",
+  "access_token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5ZWZiZDNiMy1hMGE5LTQ2OGEtODY1Mi03ZjQ4OWFkZjZhNDUiLCJhdWQiOm51bGwsInNjb3BlIjoidXNlcjpjcmVhdGUiLCJpc3MiOiJmb2xrcyIsInByaXYiOiJhZG1pbiIsImp0aSI6ImM5YmVhNDQzLTJlOGEtNDNiNi1hMzY1LTBmN2FiYjdiMmRjZCIsImlhdCI6MTc4Njc4NjAwOCwiZXhwIjoxNzg2Nzg5NjA4fQ.Tej28BCxo3GG6KsabNW_Q82Q_o6h5a9XSefjXe0WBLVI4hIuA2-_dA2zNh1ae3mEkXlu1TAuVchdsfXMzC0gS_YTeQzINVoDikaUtWmz1XpEPP2CD2U3tCTdQ2XmQoRnn7a5XlERb-vLX3sHgVyhWMqXh6cRGPfxK84Fgkj2qy27gLjRM4auM3MVC_lUvWrrg009TybvBhm4C-SqenfjrVVm1qXY1C89aefYmXV2uvkpdjiniNxa2W0yuc2mKmrJW6j-i5gjZLC96fIKi4an2GZy6CxSf1jWgqt2pa1BGdAV8OqTc1vfTVOXcPy4YV3tlxncdm-gSf_R1hWM1rMfog",
+  "scope" : "user:create",
+  "expires_in" : 3600,
+  "refresh_token" : null
+}
+```
+
+The `expires_in` indicates the token expiry time in `seconds`.
+
+
+### Step 2 - Create a User
+
+**Payload:** `user.json`
+
+```
+{
+    "fullName": "Socretes",
+    "phone1" : "1-029837467382",
+    "email" : "socretes@javalabs.org"
+}
+
+
+```
+
+**Command:**
+
+```
+curl -i \
+    -X POST \
+    --cert ~/Projects/folks-app/src/main/resources/client_cert/folks-client.crt \
+    --key ~/Projects/folks-app/src/main/resources/client_cert/folks-client.key \
+    -H "Authorization: Bearer {access_token}" \
+    -H "Content-Type:application/json" \
+    --data-binary @./user.json \
+    https://localhost:9443/api/v1/users
+
+```
+
+**Response:**
+
+```
+{
+  "externalId" : "234b8491-cc5e-4be1-82ac-ba8ac35ff6d8",
+  "fullName" : "Socretes",
+  "email" : "socretes@javalabs.org",
+  "phone1" : "1-029837467382",
+  "phone2" : null,
+  "role" : "CUSTOMER",
+  "status" : "ACTIVE",
+  "createdAt" : 1786786731348,
+  "updatedAt" : null
+}
+
+```
+
+After the user is created, a user token can be generated for operations such as viewing the user profile and future bookings.
+
+### Step 3 - Generate a User Token (Non-Admin)
+
+> **TODO:** Add the documented flow for generating a non-admin user token.
+
+
 
 ## Keystore Handling
 
-`folks-app` maintain two different key store options:
-1. folks.pkcs - For jwt signing
-2. .pem keys and certs - For mTLS
+`folks-app` uses two types of key material:
+1. `folks.pkcs` - Used for JWT signing and validation.
+2. PEM keys and certificates - Used for TLS and mTLS.
 
-### Setup Browser Certificate at node.js side
+### Set Up the Browser-Facing Certificate for Node.js
 
 #### Step 1 - Create a CSR and private key for the Node browser-facing server
 
@@ -174,11 +324,11 @@ certs/
 The flow is:
 
 1. Create your own Certificate Authority (CA).
-1. Use the CA to sign the server certificate.
-1. Use the CA to sign the client certificate.
-1. Configure:
-    1. Vert.x with folks-app.key, folks-app.crt, and ca.crt
-    1. Node.js with folks-ui.key, folks-ui.crt, and ca.crt
+2. Use the CA to sign the server certificate.
+3. Use the CA to sign the client certificate.
+4. Configure:
+   - Vert.x with `folks-app.key`, `folks-app.crt`, and `ca.crt`.
+   - Node.js with `folks-ui.key`, `folks-ui.crt`, and `ca.crt`.
 
 #### Step 1 - Create a CA
 
@@ -225,10 +375,10 @@ extendedKeyUsage=serverAuth
 subjectAltName=DNS:localhost,IP:127.0.0.1
 ```
 
-While an `.ext` file may not be not mandatory, but they are highly recommended, especially for TLS and mTLS.
-The `.ext` files tell `OpenSSL` what type of certificate you are creating and what extensions should be embedded in the `X.509` certificate.
+Although an `.ext` file may not always be mandatory, it is highly recommended for TLS and mTLS certificates.
+The `.ext` file tells OpenSSL which extensions should be embedded in the X.509 certificate.
 
-Without an .ext file OpenSSL creates a certificate, but it may not contain important extensions such as:
+Without an `.ext` file, OpenSSL can create a certificate that does not contain important extensions such as:
 
 * Subject Alternative Name (SAN)
 * Extended Key Usage
@@ -237,12 +387,12 @@ Without an .ext file OpenSSL creates a certificate, but it may not contain impor
 
 Modern TLS implementations rely on these extensions.
 
-Here are the attributes of server.ext file:
+The following attributes are defined in `server.ext`:
 
 * basicConstraints - `CA:FALSE`
 
-This says: This certificate cannot act as a Certificate Authority.
-Only the `ca_javalabs.crt` should have: `CA:FALSE`
+This specifies that the server certificate cannot act as a Certificate Authority.
+The CA certificate is the certificate that should be configured as a Certificate Authority; the server certificate remains `CA:FALSE`.
 
 * keyUsage - `digitalSignature,keyEncipherment`
 
@@ -251,17 +401,17 @@ For an HTTPS server, these usages are appropriate. Without them, some clients wi
 
 * extendedKeyUsage - `serverAuth`
 
-This is very important. It tells clients:
+This extension tells clients that:
 
-This certificate is intended to authenticate a TLS server. If you accidentally use a client certificate as the server certificate, 
+The certificate is intended to authenticate a TLS server. If a client-only certificate is used as the server certificate, 
 many TLS stacks will reject it.
 
 * subjectAltName (SAN) - `DNS:localhost,IP:127.0.0.1`
 
-This is probably the most important extension.
+This extension is essential for hostname verification.
 
-Older browsers used the Common Name (CN): `CN=localhost`
-Modern TLS clients ignore the CN and verify the hostname against the SAN extension instead.
+Older clients commonly used the Common Name (CN), such as `CN=localhost`.
+Modern TLS clients verify the hostname against the Subject Alternative Name (SAN) extension.
 
 For example: 
 1. https://localhost:8443 requires: DNS:`localhost`
@@ -342,7 +492,7 @@ certs/
 └── client.crt
 ```
 
-There are other files that will be created.
+The certificate-generation process also creates additional files:
 
 1. `.csr` — Certificate Signing Request
 
@@ -364,7 +514,7 @@ C=IN
 Public Key=...
 ```
 
-You send a CSR to a Certificate Authority (CA), and the CA verifies it and issues a certificate.
+A CSR is submitted to a Certificate Authority (CA), which signs it and issues a certificate.
 
 The flow is:
 
@@ -384,13 +534,11 @@ CA signs it
 folks-ui.crt
 ```
 
-After you receive `folks-ui.crt`, you usually don't need the `.csr` anymore unless you want to reissue the certificate.
+After `folks-ui.crt` has been issued, the CSR is generally not required unless the certificate needs to be reissued.
 
 2. `.srl` — Serial Number File
 
-This file stores the next certificate serial number that your CA will issue.
-
-
+This file stores certificate serial-number information used by the CA.
 
 
 ### Generate Keystore for JWT Signing and Validation
@@ -442,8 +590,9 @@ Enter Import Password:
 
 ## Test the service
 
-The service is just a simple REST service. It uses an in-memory map to store the data.
-You can also do with a relational database like MySQL or PostgreSQL.
+
+
+The service exposes a REST API. Depending on the application configuration, data can be backed by a relational database such as PostgreSQL.
 
 #### Create an element
 
@@ -491,7 +640,7 @@ curl -X DELETE\
 
 ## Configuration
 
-There are 3 configuration files used by this service. These files are placed under `src/main/resources` directory.
+The service uses three configuration files located under `src/main/resources`.
  
 <ul>
 <li><b>vertx-web.xml</b> - This file is the core configuration file that provides configuration and deployment information for Vert.x. It's the standard name used by decl-vertx-container module as a deployment descriptor in Vert.x applications. Apart from standard vert.x configuration, this file also defines the Verticles that will be deployed.</li>

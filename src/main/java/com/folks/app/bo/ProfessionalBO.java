@@ -29,7 +29,7 @@ public class ProfessionalBO extends AbstractBO {
         }
     }
 
-    public Professional create(AppUser usr, Professional professional) {
+    public Professional create(AppUser usr, Professional professional) throws IllegalAccessException {
         ensureAdmin(usr);
         
         StopWatch timer = StopWatch.newTimer();
@@ -44,7 +44,7 @@ public class ProfessionalBO extends AbstractBO {
         return professional;
     }
 
-    public void create(AppUser usr, List<Professional> records) {
+    public void create(AppUser usr, List<Professional> records) throws IllegalAccessException {
         ensureAdmin(usr);
         
         StopWatch timer = StopWatch.newTimer();

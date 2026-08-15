@@ -12,6 +12,7 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 
@@ -38,7 +39,7 @@ public class Address implements Serializable, Cloneable {
     @Column(name = "address_id", nullable = false, updatable = false, precision = 32)
     private Integer addressId;
 
-    @Column(name = "user_id", nullable = false, updatable = true, precision = 32)
+    @Column(name = "user_id", nullable = false, updatable = false, precision = 32)
     @JsonIgnore
     private Integer userId;
 
@@ -65,6 +66,15 @@ public class Address implements Serializable, Cloneable {
 
     @Column(name = "is_default", nullable = false, updatable = true, precision = 16)
     private Short isDefault;
+
+    @Column(name = "label", nullable = false, updatable = true, length = 20)
+    private String label;
+
+    @Column(name = "created_at", nullable = false, updatable = true)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
 
     public Address() {}
 
@@ -146,6 +156,30 @@ public class Address implements Serializable, Cloneable {
 
     public Short getIsDefault() {
         return this.isDefault;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class AddressPK {

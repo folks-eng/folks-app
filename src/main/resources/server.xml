@@ -7,11 +7,11 @@
 -->
 <server-config>
     <server-opts>
-    	<port>8080</port>
+    	<port>9443</port>
         <client-auth>REQUIRED</client-auth>
     </server-opts>
     <tcp-opts>
-        <ssl>false</ssl>
+        <ssl>true</ssl>
     </tcp-opts>
     
     <cross-origin>
@@ -37,8 +37,8 @@
     
     <keystore-config>
         <pem-key-config>
-            <key-path>cert/folks-app.key</key-path>
-            <cert-path>cert/folks-app.crt</cert-path>
+            <key-path>server_cert/folks-app.key</key-path>
+            <cert-path>server_cert/folks-app.crt</cert-path>
         </pem-key-config>
         
         <store-name>folks.pkcs</store-name>

@@ -61,7 +61,7 @@ public class AuthToken {
         
         if (claims.containsKey("scope")) {
             token.setScope((String)claims.get("scope"));
-            token.setExpiresIn(1800L);     // For scope token, the expiry os 30 minute.
+            // token.setExpiresIn(1800L);     // For scope token, the expiry os 30 minute.
         }
         return token;
     }

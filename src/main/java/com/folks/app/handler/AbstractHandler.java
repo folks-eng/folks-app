@@ -5,6 +5,7 @@ import com.folks.app.auth.AppUser;
 import com.folks.app.auth.AppUserImpl;
 import com.folks.app.auth.UserPrincipal;
 import com.folks.app.config.ApplicationConfiguration;
+import com.folks.app.model.ItemList;
 import com.folks.app.util.QueryParams;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
@@ -65,6 +66,50 @@ public abstract class AbstractHandler {
         }
         QueryParams params = new QueryParams(map);
         return params;
+    }
+    
+    /**
+     * Builds an {@link ItemList} containing the supplied items and generates pagination links based on
+     * the provided query parameters.
+     *
+     * <p>The method preserves the existing query parameters from {@code params} when constructing pagination links.
+     * A {@code nextLink} is added when the number of returned items is equal to the requested limit, indicating that
+     * additional results may be available. A {@code previousLink} is added when the current offset indicates that a
+     * previous page exists.</p>
+     *
+     * <p>The pagination links include updated {@code offset} and {@code limit} query parameters while retaining
+     * the other query parameters supplied in {@code params}.</p>
+     *
+     * @param path      The base path used to construct pagination links
+     * @param params    The query parameters containing pagination information such as {@code offset} and {@code limit}
+     *                  , as well as any additional parameters that should be preserved in generated links.
+     * @param list      The items to include in the resulting {@link ItemList}
+     * @return  An {@link ItemList} containing the supplied items and, when applicable, links to the next and previous pages
+    */
+    protected ItemList build(String path, QueryParams params, List<Object> list) {
+        // Build the item list.
+        ItemList itemList = new ItemList(list.size(), list, path);
+        itemList.setHasMore(itemList.getTotal() == params.limit());
+        
+        String sep = "?";
+        int idx = 0;
+        
+        for (String key : params.keys()) {
+            String val = params.param(key);
+            path += sep + key + "=" + val;
+            idx ++;
+
+            if (idx > 0) {
+                sep = "&";
+            }
+        }
+        if (itemList.isHasMore()) {
+            itemList.setNextLink(path + sep + "offset=" + (params.offset() + params.limit()) + "&limit=" + params.limit());
+        }
+        if (params.offset() - params.limit() >= 0) {
+            itemList.setPreviousLink(path + sep + "offset=" + (params.offset() + params.limit()) + "&limit=" + params.limit());
+        }
+        return itemList;
     }
     
     protected void sendResponse(RoutingContext ctx, int httpCode, Object responseObj) {

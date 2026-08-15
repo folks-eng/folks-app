@@ -8,7 +8,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import org.javalabs.jpa.util.QueryHints;
 
 /**
@@ -16,7 +15,7 @@ import org.javalabs.jpa.util.QueryHints;
  *
  * @author Sudiptasish Chanda
  */
-public class UserDAOImpl implements UserDAO {
+public class UserDAOImpl extends AbstractDAO implements UserDAO {
     
     private final String TABLE = "fks_users";
     
@@ -67,46 +66,12 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public List<User> query(SearchCriteria search) {
-        Criteria query = new Criteria()
-                .select(Arrays.asList("*"))
-                .from(TABLE);
-
-        int idx = 0;
-        for (Map.Entry<String, List<Object>> me : search.params().entrySet()) {
-            String col = me.getKey();
-            List<Object> vals = me.getValue();
-            if (vals.isEmpty()) {
-                continue;
-            }
-            if (idx == 0) {
-                if (vals.size() > 1) {
-                    query.where(col).in(vals);
-                }
-                else {
-                    query.where(col).eq(vals.get(0));
-                }
-                idx ++;
-            }
-            else {
-                if (vals.size() > 1) {
-                    query.and(col).in(vals);
-                }
-                else {
-                    query.and(col).eq(vals.get(0));
-                }
-            }
-        }
-        if (search.orderBy() != null) {
-            query.orderBy(search.orderBy());
-        }
-        if (! search.asc()) {
-            query.desc();
-        }
+        Criteria query = getQuery(TABLE, search);
 
         TypedQuery q = em.createNativeQuery(query.toQuery(), User.class);
         List<Object> binds = query.params();
         
-        idx = 1;
+        int idx = 1;
         for (Object bind : binds) {
             q.setParameter(idx ++, bind);
         }

@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Main class.
  */
-public class FolksRestMain {
+public class FolksAppMain {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(FolksRestMain.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FolksAppMain.class);
     
     private static final CountDownLatch LATCH = new CountDownLatch(1);
     

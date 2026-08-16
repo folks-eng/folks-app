@@ -5,12 +5,16 @@ import com.folks.app.auth.AppUserImpl;
 import com.folks.app.auth.UserPrincipal;
 import com.folks.app.ext.DBExtension;
 import com.folks.app.model.User;
+import com.folks.app.util.QueryParams;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,7 +32,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserBOTest {
     
-    private static final UserBO userBO = new UserBO();
+    private static UserBO userBO;
     
     private static String extId;
     private static AppUser adminUser;
@@ -43,6 +47,7 @@ public class UserBOTest {
         map.put("jti", UUID.randomUUID().toString());
         
         adminUser = new AppUserImpl(new UserPrincipal(map));
+        userBO = new UserBO();
     }
  
     @Test
@@ -70,7 +75,6 @@ public class UserBOTest {
         try {
             Map<String, Object> map = new HashMap<>();
             map.put("sub", extId);
-            map.put("name", "Admin User");
             map.put("jti", UUID.randomUUID().toString());
 
             AppUser usr = new AppUserImpl(new UserPrincipal(map));
@@ -102,6 +106,54 @@ public class UserBOTest {
         }
         catch (Exception e) {
             assertTrue(e instanceof IllegalAccessException);
+        }
+    }
+    
+    @Test
+    @Order(4)
+    public void testViewAll() {
+        try {
+            Map<String, List<String>> params = new HashMap<>();
+            
+            params.put("fullName", Arrays.asList("Sudiptasish Chanda"));
+            params.put("email", Arrays.asList("zulu@yahoo.com"));
+            params.put("role", Arrays.asList("CUSTOMER"));
+            
+            List<User> users = userBO.viewAll(adminUser, new QueryParams(params));
+            assertTrue(users.isEmpty());
+            
+            params.put("email", Arrays.asList("zulu@yahoo.co.in"));
+            users = userBO.viewAll(adminUser, new QueryParams(params));
+            assertEquals(1, users.size());
+        }
+        catch (IllegalAccessException e) {
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    @Order(5)
+    public void testDelete() {
+        try {
+            Map<String, Object> map = new HashMap<>();
+            map.put("sub", extId);
+            map.put("jti", UUID.randomUUID().toString());
+
+            AppUser usr = new AppUserImpl(new UserPrincipal(map));
+
+            // Delete this user
+            userBO.remove(usr, extId);
+            
+            // Now query again
+            IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class, 
+                () -> {
+                    User user = userBO.view(usr, extId);
+                }
+            );
+        }
+        catch (IllegalAccessException e) {
+            fail(e.getMessage());
         }
     }
 }

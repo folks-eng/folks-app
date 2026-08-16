@@ -8,6 +8,7 @@ import com.folks.app.dao.UserDAO;
 import com.folks.app.model.User;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
+import jakarta.persistence.NoResultException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
@@ -232,14 +233,14 @@ public class UserBO extends AbstractBO {
      * @throws IllegalArgumentException if no user exists for the external identifier
      */
     private User fetchUser(AppUser usr) {
-        // Query the user based on external_id.
-        // external_id will be part of jwt token as 'sub'.
-        String extId = usr.principal().sub();
-
-        User user = userDAO.select(extId);
-        if (user == null) {
-            throw new IllegalArgumentException("No User found for id: " + extId);
+        try {
+            // Query the user based on external_id.
+            // external_id will be part of jwt token as 'sub'.
+            String extId = usr.principal().sub();
+            return userDAO.select(extId);
         }
-        return user;
+        catch (NoResultException e) {
+            throw new IllegalArgumentException("No User found for id: " + usr.principal().sub());
+        }
     }
 }

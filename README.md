@@ -8,14 +8,34 @@ It provides the operations required to manage application resources and verify t
 
 Java 17 or higher and Maven 3.x are required.
 
+
 ## Table of Contents
 
-* [Getting started](#getting-started)
-* [Review Swagger Doc](#review-swagger-doc)
-* [Test the service](#test-the-service)
-* [What's included](#whats-included)
-* [Security concerns](#security-concerns)
-* [Configuration](#configuration)
+- [Requirements](#requirements)
+- [Getting Started](#getting-started)
+  - [Check Out the Code](#check-out-the-code)
+  - [Compile the Code](#compile-the-code)
+  - [Version Upgrade](#version-upgrade)
+  - [Local Deployment](#local-deployment)
+- [Review the Swagger Documentation](#review-the-swagger-documentation)
+- [SSL Configuration](#ssl-configuration)
+  - [Server Configuration](#server-configuration)
+  - [Keys and Certificates](#keys-and-certificates)
+- [Testing Folks Application](#testing-folks-application)
+  - [Obtain an Admin Token](#step-1---obtain-an-admin-token)
+  - [Create a User](#step-2---create-a-user)
+  - [Generate a User Token (Non-Admin)](#step-3---generate-a-user-token-non-admin)
+  - [View Own Profile](#step-4---view-own-profile)
+- [Keystore Handling](#keystore-handling)
+  - [Set Up the Browser-Facing Certificate for Node.js](#set-up-the-browser-facing-certificate-for-nodejs)
+  - [Setup mTLS](#setup-mtls)
+  - [Generate Keystore for JWT Signing and Validation](#generate-keystore-for-jwt-signing-and-validation)
+  - [View the Keystore](#view-the-keystore)
+  - [Additional Options](#additional-options)
+- [Test the Service](#test-the-service)
+- [Configuration](#configuration)
+
+
 
 ## Getting Started
 
@@ -167,6 +187,7 @@ curl -i \
     -u '9efbd3b3-a0a9-468a-8652-7f489adf6a45:7c6a180b36896a0a8c02787eeafb0e4c' \
     --cert /path/to/folks-app/src/main/resources/client_cert/folks-client.crt \
     --key /path/to/folks-app/src/main/resources/client_cert/folks-client.key \
+    --cacert /path/to/folks-app/src/main/resources/ca/ca_javalabs.crt \
     -H "Content-Type: application/x-www-form-urlencoded" \
     -d 'grant_type=client_credentials&scope=user%3Acreate' \
     https://localhost:9443/api/v1/mgmt/login
@@ -234,6 +255,7 @@ curl -i \
     -X POST \
     --cert /path/to/folks-app/src/main/resources/client_cert/folks-client.crt \
     --key /path/to/folks-app/src/main/resources/client_cert/folks-client.key \
+    --cacert /path/to/folks-app/src/main/resources/ca/ca_javalabs.crt \
     -H "Authorization: Bearer {access_token}" \
     -H "Content-Type:application/json" \
     --data-binary @./user.json \
@@ -268,7 +290,8 @@ After the user is created, a user token can be generated for operations such as 
 curl -i \
     -X POST \
     --cert /path/to/folks-app/src/main/resources/client_cert/folks-client.crt \
-    --key ~/Projects/folks-app/src/main/resources/client_cert/folks-client.key \
+    --key /path/to/folks-app/src/main/resources/client_cert/folks-client.key \
+    --cacert /path/to/folks-app/src/main/resources/ca/ca_javalabs.crt \
     -H "Content-Type: application/x-www-form-urlencoded" \
     -d 'phone1=1-029837467382' \
     https://localhost:9443/api/v1/mgmt/token
@@ -298,6 +321,7 @@ Now Socretes will use this user access_token for any subsequent operation, e.g.,
 curl -i \
     --cert /path/to/folks-app/src/main/resources/client_cert/folks-client.crt \
     --key ~/Projects/folks-app/src/main/resources/client_cert/folks-client.key \
+    --cacert /path/to/folks-app/src/main/resources/ca/ca_javalabs.crt \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer {user_access_token}
     https://localhost:9443/api/v1/users/234b8491-cc5e-4be1-82ac-ba8ac35ff6d8

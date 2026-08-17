@@ -22,11 +22,7 @@ public class SearchCriteriaImpl implements SearchCriteria {
     
     SearchCriteriaImpl() {}
     
-    public SearchCriteriaImpl params(QueryParams params) {
-        return params(params, null);
-    }
-    
-    public SearchCriteriaImpl params(QueryParams params, Integer userId) {
+    public SearchCriteriaImpl params(QueryParams params, String key, Integer userId) {
         Map<String, List<String>> tmp = params.entries();
         List<String> orders = tmp.remove("orderBy");
         
@@ -69,8 +65,9 @@ public class SearchCriteriaImpl implements SearchCriteria {
                 }
             }
         }
-        if (userId != null) {
-            this.params.put("user_id", Arrays.asList(userId));
+        if (key != null && userId != null) {
+            key = key.replaceAll("(?<!^)(?=[A-Z])", "_").toLowerCase();
+            this.params.put(key, Arrays.asList(userId));
         }
         
         this.offset = params.offset();

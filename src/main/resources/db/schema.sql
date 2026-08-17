@@ -42,7 +42,10 @@ CREATE TABLE fks_addresses (
 CREATE TABLE fks_categories (
     category_id         INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
     name                VARCHAR(128)    NOT NULL,
-    parent_id           INT        
+    parent_id           INT             ,
+    icon                VARCHAR(16)     ,
+    tag_line            VARCHAR(128)    ,
+    image               VARCHAR(128)    
 );
 
 CREATE TABLE fks_services (
@@ -51,7 +54,10 @@ CREATE TABLE fks_services (
     name                VARCHAR(128)    NOT NULL,
     description         TEXT            ,
     base_price          NUMERIC(7, 2)   NOT NULL,
-    duration_minutes    SMALLINT             
+    duration_minutes    SMALLINT        ,
+    image               VARCHAR(128)    ,
+    rating_avg          NUMERIC(3, 2)   ,
+    reviews             INT
 );
 
 -- Professional Profiles

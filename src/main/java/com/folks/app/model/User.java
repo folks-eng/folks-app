@@ -52,7 +52,7 @@ public class User implements Serializable, Cloneable {
     @JsonIgnore
     private Integer userId;
 
-    @Column(name = "external_id", nullable = false, updatable = true, length = 36)
+    @Column(name = "external_id", nullable = false, updatable = false, length = 36)
     private String externalId;
 
     @Column(name = "full_name", nullable = false, updatable = true, length = 96)
@@ -67,11 +67,11 @@ public class User implements Serializable, Cloneable {
     @Column(name = "phone2", nullable = true, updatable = true, length = 20)
     private String phone2;
 
-    @Column(name = "password_hash", nullable = true, updatable = true, length = 1000000000)
+    @Column(name = "password_hash", nullable = true, updatable = false, length = 1000000000)
     @JsonIgnore
     private String passwordHash;
 
-    @Column(name = "role", nullable = false, updatable = true, check = @CheckConstraint(constraint = "role IN ('CUSTOMER', 'PROFESSIONAL', 'ADMIN')"))
+    @Column(name = "role", nullable = false, updatable = false, check = @CheckConstraint(constraint = "role IN ('CUSTOMER', 'PROFESSIONAL', 'ADMIN')"))
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -79,7 +79,7 @@ public class User implements Serializable, Cloneable {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Column(name = "created_at", nullable = false, updatable = true)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
 
     @Column(name = "updated_at", nullable = true, updatable = true)

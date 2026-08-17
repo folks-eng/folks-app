@@ -31,7 +31,7 @@
             <property name="javax.persistence.jdbc.password" value="p@$$word"/>
             <property name="javax.persistence.schema-generation.scripts.action" value="drop-and-create"/>
             <property name="javax.persistence.schema-generation.scripts.create-target" value="db/schema.sql"/>
-            <property name="javax.persistence.sql-load-script-source" value="db/user.sql"/>
+            <property name="javax.persistence.sql-load-script-source" value="db/reference_data.sql"/>
             <property name="javax.persistence.schema-generation.create-database-schemas" value="true"/>
             <property name="jpa-lite.logging.level" value="TRACE"/>
             <property name="jpa-lite.dao.package" value="com.folks.app.dao"/>

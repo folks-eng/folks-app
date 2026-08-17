@@ -25,7 +25,7 @@ public class CategoryBO extends AbstractBO {
         this.categoryDAO = DAOProxy.get(CategoryDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized Handler: {}. CategoryDAO: {}", getClass().getSimpleName(), categoryDAO);
+            LOGGER.debug("Initialized BO: {}. CategoryDAO: {}", getClass().getSimpleName(), categoryDAO);
         }
     }
 
@@ -88,6 +88,20 @@ public class CategoryBO extends AbstractBO {
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Fetched {} expanded category record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
+        }
+        return rows;
+    }
+
+    public List<Category> viewAllHierarchy(AppUser usr, QueryParams params) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        SearchCriteria search = SearchCriteria.from(params);
+        List<Category> rows = categoryDAO.queryAll(search);
+
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched {} expanded category hierarchical record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
         }
         return rows;
     }

@@ -2,11 +2,16 @@ package com.folks.app.dao;
 
 import org.javalabs.jpa.query.Criteria;
 import com.folks.app.model.Category;
+import com.folks.app.model.Service;
 import com.folks.app.util.SearchCriteria;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -108,4 +113,90 @@ public class CategoryDAOImpl implements CategoryDAO {
         return result;
     }
     
+    @Override
+    public List<Category> queryAll(SearchCriteria search) {
+        List<Object> ids = search.params().get("id");
+        Integer val = ids != null && !ids.isEmpty() ? 0 : 1;
+        
+        Query q = em.createNamedQuery("Category.selectCategoryAndServices");
+        q.setParameter(1, val);
+        q.setParameter("ids", ids);
+        
+        List<Object[]> rows = q.getResultList();
+        
+        // SELECT a.category_id [0]
+        //      , a.name AS category_name [1]
+        //      , a.icon [2]
+        //      , a.image AS category_image [3]
+        //      , a.tag_line [4]
+        //
+        //      , b.category_id AS sub_category_id [5]
+        //      , b.name AS sub_category_name [6]
+        //      , b.image AS sub_category_image [7]
+        //      , b.parent_id [8]
+        //
+        //      , c.category_id AS srvc_category_id [9]
+        //      , c.service_id [10]
+        //      , c.name AS service_name [11]
+        //      , c.description [12]
+        //      , c.base_price [13]
+        //      , c.duration_minutes [14]
+        //      , c.image [15]
+        //      , c.rating_avg [16]
+        //      , c.reviews [17]
+        
+        Map<Integer, Category> parents = new HashMap<>();
+        Map<Integer, Category> subCategories = new HashMap<>();
+        
+        for (Object[] row : rows) {
+            Integer categoryId = (Integer)row[0];
+            if (! parents.containsKey(categoryId)) {
+                Category category = new Category();
+                category.setCategoryId(categoryId);
+                category.setName((String)row[1]);
+                category.setIcon((String)row[2]);
+                category.setImage((String)row[3]);
+                category.setTagLine((String)row[4]);
+                category.setSubCategories(new ArrayList<>());
+                
+                parents.put(categoryId, category);
+            }
+            
+            Integer subCategoryId = (Integer)row[5];
+            if (! subCategories.containsKey(subCategoryId)) {
+                Category subCategory = new Category();
+                subCategory.setCategoryId(subCategoryId);
+                subCategory.setName((String)row[6]);
+                subCategory.setImage((String)row[7]);
+                subCategory.setServices(new ArrayList<>());
+                
+                subCategories.put(subCategoryId, subCategory);
+                Category parent = parents.get((Integer)row[8]);
+                if (parent == null) {
+                    throw new IllegalArgumentException("Inconsistent data for parentId: " + (Integer)row[8]);
+                }
+                parent.getSubCategories().add(subCategory);
+            }
+            
+            Integer srvcCategoryId = (Integer)row[9];
+            Integer serviceId = (Integer)row[10];
+            
+            Service service = new Service();
+            service.setServiceId(serviceId);
+            service.setName((String)row[11]);
+            service.setDescription((String)row[12]);
+            service.setBasePrice((Double)row[13]);
+            service.setDurationMinutes(((Integer)row[14]).shortValue());
+            service.setImage((String)row[15]);
+            service.setRatingAvg((Double)row[16]);
+            service.setReviews((Integer)row[17]);
+            
+            Category subCategory = subCategories.get(srvcCategoryId);
+            if (subCategory == null) {
+                throw new IllegalArgumentException("Inconsistent data for service: " + serviceId);
+            }
+            subCategory.getServices().add(service);
+        }
+        return new ArrayList<>(parents.values());
+    }
 }

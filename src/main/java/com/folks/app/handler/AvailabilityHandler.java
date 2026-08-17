@@ -11,6 +11,7 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Example REST handler.
@@ -165,7 +166,7 @@ public class AvailabilityHandler extends AbstractHandler {
             List<Availability> availabilitys = availabilityBO.viewAll(user(ctx), params);
             List<Object> rows = (List)availabilitys;
 
-            ItemList itemList = build(params, rows);
+            ItemList itemList = build(ctx.normalizedPath(), params, rows);
             return itemList;
             
         }).onComplete(result -> {
@@ -210,37 +211,5 @@ public class AvailabilityHandler extends AbstractHandler {
                 ctx.fail(result.cause());
             }
         });
-    }
-    
-    private ItemList build(QueryParams params, List<Object> list) {
-        int total = list.size();
-        
-        // Build the item list.
-        String path = "/api/v1/availabilitys";
-        ItemList itemList = new ItemList(total, list, path);
-        
-        itemList.setHasMore(itemList.getTotal() > (params.offset() + params.limit()));
-        
-        String sep = "?";
-        int idx = 0;
-        
-        for (String key : params.keys()) {
-            String val = params.param(key);
-            if (! key.equals("offset") && ! key.equals("limit")) {
-                path += sep + key + "=" + val;
-                idx ++;
-
-                if (idx > 0) {
-                    sep = "&";
-                }
-            }
-        }
-        if (itemList.isHasMore()) {
-            itemList.setNextLink(path + sep + "offset=" + (params.offset() + params.limit()) + "&limit=" + params.limit());
-        }
-        if (params.offset() - params.limit() >= 0) {
-            itemList.setPreviousLink(path + sep + "offset=" + (params.offset() + params.limit()) + "&limit=" + params.limit());
-        }
-        return itemList;
     }
 }

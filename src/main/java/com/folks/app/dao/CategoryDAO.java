@@ -77,5 +77,16 @@ public interface CategoryDAO {
      */
     @NotSupported
     List<Category> query(SearchCriteria search);
+    
+    /**
+     * Query all the categories, sub-categories and associated services from the underlying db.
+     * This is an extension of the {@link #query(SearchCriteria)} method, just that this method
+     * will return all the attributes associated with the record.
+     * 
+     * @param search  Query criteria.
+     * @return List
+     */
+    @NotSupported
+    List<Category> queryAll(SearchCriteria search);
 }
 

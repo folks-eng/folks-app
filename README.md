@@ -346,6 +346,54 @@ curl -i \
 ```
 
 
+#### Step 5 - View All Categories & Services
+
+**Command:**
+
+```
+curl -i \
+--cert src/main/resources/client_cert/folks-client.crt \
+--key src/main/resources/client_cert/folks-client.key \
+--cacert src/main/resources/ca/ca_javalabs.crt \
+-H "Authorization:$jwt" \
+-H "Content-Type:application/json" \
+"https://localhost:9443/api/v1/categories/hierarchy?id=101&id=102&id=103&id=104&id=105"        
+
+```
+
+**Response:**
+
+```
+{
+  "total" : 5,
+  "items" : [ {
+    "categoryId" : 101,
+    "name" : "Salon & Makeup",
+    "icon" : "scissors",
+    "tagLine" : "Professional grooming and beauty services at home.",
+    "image" : "https://images.unsplash.com/photo-1634449571010-02389ed0f9b0?w=800&q=80&auto=format&fit=crop",
+    "parentId" : null,
+    "subCategories" : [ {
+      "categoryId" : 106,
+      "name" : "Women's Salon",
+      "icon" : null,
+      "tagLine" : null,
+      "image" : "https://images.unsplash.com/photo-1634449571010-02389ed0f9b0?w=800&q=80&auto=format&fit=crop",
+      "parentId" : null,
+      "subCategories" : null,
+      "parent" : null,
+      "services" : [ {
+        "serviceId" : 271,
+        "categoryId" : null,
+        "name" : "Fruit Facial Glow",
+
+    ....
+    ....
+    ....
+
+```
+
+
 ## Keystore Handling
 
 `folks-app` uses two types of key material:

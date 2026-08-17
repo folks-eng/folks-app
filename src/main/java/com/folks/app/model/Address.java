@@ -70,7 +70,7 @@ public class Address implements Serializable, Cloneable {
     @Column(name = "label", nullable = false, updatable = true, length = 20)
     private String label;
 
-    @Column(name = "created_at", nullable = false, updatable = true)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
 
     @Column(name = "updated_at", nullable = true, updatable = true)

@@ -11,6 +11,7 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Example REST handler.
@@ -165,7 +166,31 @@ public class CategoryHandler extends AbstractHandler {
             List<Category> categorys = categoryBO.viewAll(user(ctx), params);
             List<Object> rows = (List)categorys;
 
-            ItemList itemList = build(params, rows);
+            ItemList itemList = build(ctx.normalizedPath(), params, rows);
+            return itemList;
+            
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+    
+    /**
+     * View all the hierarchical elements from the store.
+     * 
+     * @param ctx   Vertx {@link RoutingContext} object.
+     */
+    public void viewHierarchy(RoutingContext ctx) {
+        final QueryParams params = params(ctx);
+
+        vertx().executeBlocking(() -> {
+            List<Category> categories = categoryBO.viewAllHierarchy(user(ctx), params);
+            
+            ItemList itemList = build(ctx.normalizedPath(), params, (List)categories);
             return itemList;
             
         }).onComplete(result -> {
@@ -210,37 +235,5 @@ public class CategoryHandler extends AbstractHandler {
                 ctx.fail(result.cause());
             }
         });
-    }
-    
-    private ItemList build(QueryParams params, List<Object> list) {
-        int total = list.size();
-        
-        // Build the item list.
-        String path = "/api/v1/categorys";
-        ItemList itemList = new ItemList(total, list, path);
-        
-        itemList.setHasMore(itemList.getTotal() > (params.offset() + params.limit()));
-        
-        String sep = "?";
-        int idx = 0;
-        
-        for (String key : params.keys()) {
-            String val = params.param(key);
-            if (! key.equals("offset") && ! key.equals("limit")) {
-                path += sep + key + "=" + val;
-                idx ++;
-
-                if (idx > 0) {
-                    sep = "&";
-                }
-            }
-        }
-        if (itemList.isHasMore()) {
-            itemList.setNextLink(path + sep + "offset=" + (params.offset() + params.limit()) + "&limit=" + params.limit());
-        }
-        if (params.offset() - params.limit() >= 0) {
-            itemList.setPreviousLink(path + sep + "offset=" + (params.offset() + params.limit()) + "&limit=" + params.limit());
-        }
-        return itemList;
     }
 }

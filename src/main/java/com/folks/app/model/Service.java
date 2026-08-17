@@ -2,10 +2,14 @@ package com.folks.app.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
@@ -43,10 +47,26 @@ public class Service implements Serializable, Cloneable {
     private String description;
 
     @Column(name = "base_price", nullable = false, updatable = true, precision = 7, scale = 2)
-    private BigDecimal basePrice;
+    private Double basePrice;
 
     @Column(name = "duration_minutes", nullable = true, updatable = true, precision = 16)
     private Short durationMinutes;
+
+    @Column(name = "image", nullable = false, updatable = true, length = 128)
+    private String image;
+
+    @Column(name = "rating_avg", nullable = true, updatable = true, precision = 3, scale = 2)
+    private Double ratingAvg;
+
+    @Column(name = "reviews", nullable = false, updatable = true, precision = 32)
+    private Integer reviews;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(foreignKey = @ForeignKey()
+            , name = "category_id"
+            , table = "fks_categories"
+            , referencedColumnName = "category_id")
+    private Category category;
 
     public Service() {}
 
@@ -82,11 +102,11 @@ public class Service implements Serializable, Cloneable {
         return this.description;
     }
 
-    public void setBasePrice(BigDecimal basePrice) {
+    public void setBasePrice(Double basePrice) {
         this.basePrice = basePrice;
     }
 
-    public BigDecimal getBasePrice() {
+    public Double getBasePrice() {
         return this.basePrice;
     }
 
@@ -96,6 +116,38 @@ public class Service implements Serializable, Cloneable {
 
     public Short getDurationMinutes() {
         return this.durationMinutes;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Double getRatingAvg() {
+        return ratingAvg;
+    }
+
+    public void setRatingAvg(Double ratingAvg) {
+        this.ratingAvg = ratingAvg;
+    }
+
+    public Integer getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Integer reviews) {
+        this.reviews = reviews;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public static class ServicePK {

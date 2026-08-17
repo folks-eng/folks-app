@@ -10,15 +10,16 @@ import java.util.Map;
 public interface SearchCriteria {
     
     static SearchCriteria from(QueryParams params) {
-        SearchCriteriaImpl search = new SearchCriteriaImpl();
-        search.params(params);
-        
-        return search;
+        return from(params, null);
     }
     
     static SearchCriteria from(QueryParams params, Integer userId) {
+        return from(params, "userId", userId);
+    }
+    
+    static SearchCriteria from(QueryParams params, String key, Integer userId) {
         SearchCriteriaImpl search = new SearchCriteriaImpl();
-        search.params(params, userId);
+        search.params(params, key, userId);
         
         return search;
     }

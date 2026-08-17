@@ -150,7 +150,7 @@ public class AddressHandler extends AbstractHandler {
     }
     
     /**
-     * View all the elements from the store.
+     * View all the addresses of the user.
      * 
      * @param ctx   Vertx {@link RoutingContext} object.
      */

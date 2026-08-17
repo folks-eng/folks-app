@@ -1,5 +1,6 @@
 package com.folks.app.bo;
 
+import com.folks.app.util.Validator;
 import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
@@ -34,9 +35,10 @@ public class UserBO extends AbstractBO {
     }
 
     public User create(AppUser usr, User user) throws IllegalAccessException {
-        // Only adming has the privilege to create user.
+        // Only admin has the privilege to create user.
         ensureAdmin(usr);
         validateScope(usr, "user:create");
+        Validator.validateUser(user);
 
         StopWatch timer = StopWatch.newTimer();
         timer.start();
@@ -59,9 +61,11 @@ public class UserBO extends AbstractBO {
     }
 
     public void create(AppUser usr, List<User> records) throws IllegalAccessException {
-        // Only adming has the privilege to create user in bulk.
+        // Only admin has the privilege to create user in bulk.
         ensureAdmin(usr);
         validateScope(usr, "user:create");
+        for (User user : records)
+            Validator.validateUser(user);
 
         StopWatch timer = StopWatch.newTimer();
         timer.start();
@@ -85,6 +89,7 @@ public class UserBO extends AbstractBO {
 
         // Only the logged in user is allowed to modify the user as identified by this id.
         ensureAuthorized(usr, user.getExternalId());
+        Validator.validateUser(user);
         // Fetch the user entry.
         User existing = fetchUser(usr);
 
@@ -93,8 +98,6 @@ public class UserBO extends AbstractBO {
         existing.setEmail(user.getEmail());
         existing.setPhone1(user.getPhone1());
         existing.setPhone2(user.getPhone2());
-        existing.setPasswordHash(user.getPasswordHash());
-        existing.setRole(user.getRole());
         existing.setStatus(user.getStatus());
         existing.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
 
@@ -124,7 +127,7 @@ public class UserBO extends AbstractBO {
     }
 
     public List<User> viewAll(AppUser usr, QueryParams params) throws IllegalAccessException {
-        // Only adming has the privilege to view all users.
+        // Only admin has the privilege to view all users.
         ensureAdmin(usr);
         validateScope(usr, "user:query");
 

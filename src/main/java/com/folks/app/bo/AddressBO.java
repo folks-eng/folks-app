@@ -221,7 +221,7 @@ public class AddressBO extends AbstractBO {
      * @throws IllegalAccessException   If the address does not belong to the requesting user
      */
     private void ensureAuthorized(Address address, Integer userId) throws IllegalAccessException {
-        // Check if this address is associated with the user that has requested a change.
+        // Check if this address is associated with the user that has requested the change.
         if (! userId.equals(address.getUserId())) {
             throw new IllegalAccessException(UNAUTHORIZED_MSG);
         }

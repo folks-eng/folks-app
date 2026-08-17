@@ -61,6 +61,7 @@ public class UserHandler extends AbstractHandler {
                 sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
             }
             else {
+                System.out.println("In ELSe");
                 ctx.fail(result.cause());
             }
         });
@@ -135,7 +136,7 @@ public class UserHandler extends AbstractHandler {
      */
     public void view(RoutingContext ctx) {
         final String id = ctx.pathParam("id");
-        
+        System.out.println("Param id in view " +id);
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             User user = userBO.view(user(ctx), id);

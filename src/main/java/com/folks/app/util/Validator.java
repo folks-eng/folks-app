@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Validator {
 
-    private void validateUser(User user) {
+    public static void validateUser(User user) {
 
         String name = user.getFullName();
         String mandatoryContact = user.getPhone1();
@@ -32,7 +32,7 @@ public class Validator {
                 throw new IllegalArgumentException("Role entered is invalid.");
         }
         if (mandatoryContact == null || mandatoryContact.trim().isEmpty()) {
-            throw new IllegalArgumentException("Mobile number is required.");
+            throw new IllegalArgumentException("Primary mobile number is required.");
         }
         if (!Constants.MOBILENUM_PATTERN.matcher(mandatoryContact).matches()) {
             throw new IllegalArgumentException("Mobile number invalid." );
@@ -49,7 +49,7 @@ public class Validator {
         }
     }
 
-    private void validateAddress(Address addr) {
+    public static void validateAddress(Address addr) {
         String line1 = addr.getAddressLine1();
         if (line1 == null || line1.trim().isEmpty()) {
             throw new IllegalArgumentException("Address line1 is required.");

@@ -57,6 +57,7 @@
         <auth-handler>org.javalabs.decl.vertx.container.handler.AuthorizationHandler</auth-handler>
         <jwt-opts>
             <issuer>folks</issuer>
+            <expiry>18000</expiry> <!-- in minutes -->
         </jwt-opts>
         
         <!-- 

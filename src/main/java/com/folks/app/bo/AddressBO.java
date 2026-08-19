@@ -1,5 +1,6 @@
 package com.folks.app.bo;
 
+import com.folks.app.util.ResourceNotFoundException;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
@@ -176,7 +177,8 @@ public class AddressBO extends AbstractBO {
     private Address fetchAddress(Integer id) {
         Address address = addressDAO.find(new Address.AddressPK(id));
         if (address == null) {
-            throw new IllegalArgumentException("No address found for id: " + id);
+            //throw new IllegalArgumentException("No address found for id: " + id);
+            throw new ResourceNotFoundException("No address found for id: " + id);
         }
         return address;
     }

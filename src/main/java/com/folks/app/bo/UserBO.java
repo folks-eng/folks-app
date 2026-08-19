@@ -1,5 +1,6 @@
 package com.folks.app.bo;
 
+import com.folks.app.util.ResourceNotFoundException;
 import com.folks.app.util.Validator;
 import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
@@ -243,7 +244,8 @@ public class UserBO extends AbstractBO {
             return userDAO.select(extId);
         }
         catch (NoResultException e) {
-            throw new IllegalArgumentException("No User found for id: " + usr.principal().sub());
+            throw new ResourceNotFoundException("No User found for id: " + usr.principal().sub());
+            //throw new IllegalArgumentException("No User found for id: " + usr.principal().sub());
         }
     }
 }

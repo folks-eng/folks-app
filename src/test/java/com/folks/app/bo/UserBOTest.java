@@ -17,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import com.folks.app.util.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -145,8 +147,8 @@ public class UserBOTest {
             userBO.remove(usr, extId);
             
             // Now query again
-            IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class, 
+            ResourceNotFoundException exception = assertThrows(
+                    ResourceNotFoundException.class,
                 () -> {
                     User user = userBO.view(usr, extId);
                 }

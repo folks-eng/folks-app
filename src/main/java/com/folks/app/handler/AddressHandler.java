@@ -1,6 +1,7 @@
 package com.folks.app.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.folks.app.util.ResourceNotFoundException;
 import org.javalabs.decl.util.MapperUtil;
 import org.javalabs.decl.vertx.config.model.ServerMessage;
 import com.folks.app.bo.AddressBO;
@@ -103,17 +104,29 @@ public class AddressHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Address address = MapperUtil.decode(ctx.body().buffer().getBytes(), Address.class);
-            address.setAddressId(Integer.valueOf(id));
-
-
-            // First fetch the entry, to see if this already exists.
-            Address result = addressBO.modify(user(ctx), address);
-            return result;
-            
+            try {
+                Address address = MapperUtil.decode(ctx.body().buffer().getBytes(), Address.class);
+                address.setAddressId(Integer.valueOf(id));
+                // First fetch the entry, to see if this already exists.
+                Address result = addressBO.modify(user(ctx), address);
+                ServerMessage msg = new ServerMessage();
+                msg.setCode(HttpURLConnection.HTTP_OK);
+                msg.setMessage("Address modified successfully.");
+                return msg;
+            } catch (ResourceNotFoundException ex) {
+                    ServerMessage msg = new ServerMessage();
+                    msg.setCode(HttpURLConnection.HTTP_NOT_FOUND);
+                    msg.setMessage(ex.getMessage());
+                    return msg;
+            }
         }).onComplete(result -> {
             if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+                if(result.result().getCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+                    sendResponse(ctx, HttpURLConnection.HTTP_NOT_FOUND, result.result());
+                }
+                else {
+                    sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+                }
             }
             else {
                 ctx.fail(result.cause());
@@ -189,20 +202,31 @@ public class AddressHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Address address = addressBO.remove(user(ctx), Integer.valueOf(id));
+            try {
+                Address address = addressBO.remove(user(ctx), Integer.valueOf(id));
+                ServerMessage msg = new ServerMessage();
+                msg.setCode(HttpURLConnection.HTTP_NO_CONTENT);
+                msg.setMessage("Address deleted successfully");
 
-
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_NO_CONTENT);
-            msg.setMessage("Address deleted successfully");
-
-            return msg;
-            
+                return msg;
+            }
+            catch (ResourceNotFoundException ex) {
+                ServerMessage msg = new ServerMessage();
+                msg.setCode(HttpURLConnection.HTTP_NOT_FOUND);
+                msg.setMessage(ex.getMessage());
+                return msg;
+            }
         }).onComplete(result -> {
             if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_NO_CONTENT, result.result());
+                if(result.result().getCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+                    sendResponse(ctx, HttpURLConnection.HTTP_NOT_FOUND, result.result());
+                }
+                else {
+                    sendResponse(ctx, HttpURLConnection.HTTP_NO_CONTENT, result.result());
+                }
             }
             else {
+                System.out.println("In ELSe " +result.cause());
                 ctx.fail(result.cause());
             }
         });

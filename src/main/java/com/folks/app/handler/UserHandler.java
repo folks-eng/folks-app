@@ -1,6 +1,8 @@
 package com.folks.app.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.folks.app.util.ResourceNotFoundException;
 import org.javalabs.decl.util.MapperUtil;
 import org.javalabs.decl.vertx.config.model.ServerMessage;
 import com.folks.app.bo.UserBO;
@@ -9,6 +11,8 @@ import com.folks.app.model.ItemList;
 import com.folks.app.util.QueryParams;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
+
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
 
@@ -61,7 +65,6 @@ public class UserHandler extends AbstractHandler {
                 sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
             }
             else {
-                System.out.println("In ELSe");
                 ctx.fail(result.cause());
             }
         });
@@ -107,17 +110,31 @@ public class UserHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
-            user.setExternalId(id);
+            try {
+                User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
+                user.setExternalId(id);
+                // First fetch the entry, to see if this already exists.
+                User result = userBO.modify(user(ctx), user);
 
-
-            // First fetch the entry, to see if this already exists.
-            User result = userBO.modify(user(ctx), user);
-            return result;
+                ServerMessage msg = new ServerMessage();
+                msg.setCode(HttpURLConnection.HTTP_OK);
+                msg.setMessage("User modified successfully.");
+                return msg;
+            } catch (RuntimeException ex) {
+                ServerMessage msg = new ServerMessage();
+                msg.setCode(HttpURLConnection.HTTP_BAD_REQUEST);
+                msg.setMessage(ex.getMessage());
+                return msg;
+            }
             
         }).onComplete(result -> {
             if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+                if(result.result().getCode() == HttpURLConnection.HTTP_BAD_REQUEST) {
+                    sendResponse(ctx, HttpURLConnection.HTTP_BAD_REQUEST, result.result());
+                }
+                else {
+                    sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+                }
             }
             else {
                 ctx.fail(result.cause());

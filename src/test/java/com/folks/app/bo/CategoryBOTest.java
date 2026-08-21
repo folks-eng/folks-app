@@ -13,6 +13,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -64,18 +65,24 @@ public class CategoryBOTest {
     @Test
     @Order(3)
     public void testViewAllHierarchy() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("sub", UUID.randomUUID().toString());
-        map.put("jti", UUID.randomUUID().toString());
+        try {
+            Map<String, Object> map = new HashMap<>();
+            map.put("sub", UUID.randomUUID().toString());
+            map.put("jti", UUID.randomUUID().toString());
 
-        AppUser usr = new AppUserImpl(new UserPrincipal(map));
+            AppUser usr = new AppUserImpl(new UserPrincipal(map));
 
-        List<String> ids = List.of("1", "2", "3", "4", "5");
-        Map<String, List<String>> params = new HashMap<>();
-        params.put("id", ids);
-        
-        List<Category> categories = categoryBO.viewAllHierarchy(usr, new QueryParams(params));
-        assertTrue(! categories.isEmpty());
-        assertEquals(5, categories.size());
+            List<String> ids = List.of("101", "102", "103", "104", "105");
+            Map<String, List<String>> params = new HashMap<>();
+            params.put("id", ids);
+
+            List<Category> categories = categoryBO.viewAllHierarchy(usr, new QueryParams(params));
+            assertTrue(! categories.isEmpty());
+            assertEquals(5, categories.size());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            fail(e);
+        }
     }
 }

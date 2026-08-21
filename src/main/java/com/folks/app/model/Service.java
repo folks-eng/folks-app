@@ -49,6 +49,9 @@ public class Service implements Serializable, Cloneable {
     @Column(name = "base_price", nullable = false, updatable = true, precision = 7, scale = 2)
     private Double basePrice;
 
+    @Column(name = "currency", nullable = false, updatable = true, length = 3)
+    private String currency;
+
     @Column(name = "duration_minutes", nullable = true, updatable = true, precision = 16)
     private Short durationMinutes;
 
@@ -108,6 +111,14 @@ public class Service implements Serializable, Cloneable {
 
     public Double getBasePrice() {
         return this.basePrice;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public void setDurationMinutes(Short durationMinutes) {

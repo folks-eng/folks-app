@@ -32,7 +32,7 @@ import org.javalabs.jpa.annotation.Inner;
 @NamedNativeQueries({
     @NamedNativeQuery(name = "Category.selectAll", query = "SELECT * FROM fks_categories"),
     @NamedNativeQuery(name = "Category.selectCategoryAndServices"
-            , query = "SELECT a.category_id, a.name AS category_name, a.icon, a.image AS category_image, a.tag_line, b.category_id AS sub_category_id, b.name AS sub_category_name, b.image AS sub_category_image, b.parent_id, c.category_id AS srvc_category_id, c.service_id, c.name AS service_name, c.description, c.base_price, c.duration_minutes, c.image, c.rating_avg, c.reviews" +
+            , query = "SELECT a.category_id, a.name AS category_name, a.icon, a.image AS category_image, a.tag_line, b.category_id AS sub_category_id, b.name AS sub_category_name, b.image AS sub_category_image, b.parent_id, c.category_id AS srvc_category_id, c.service_id, c.name AS service_name, c.description, c.base_price, c.currency, c.duration_minutes, c.image, c.rating_avg, c.reviews" +
                     "\n  FROM fks_categories a" +
                     "\n INNER JOIN fks_categories b ON (a.category_id = b.parent_id)" +
                     "\n INNER JOIN fks_services c ON (b.category_id = c.category_id)" + 

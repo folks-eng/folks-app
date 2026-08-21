@@ -57,14 +57,17 @@ public class Booking implements Serializable, Cloneable {
     @Column(name = "scheduled_at", nullable = false, updatable = true)
     private Timestamp scheduledAt;
 
-    @Column(name = "status", nullable = true, updatable = true, check = @CheckConstraint(constraint = "status IN ('PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')"))
+    @Column(name = "status", nullable = false, updatable = true, length = 16, check = @CheckConstraint(constraint = "status IN ('PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')"))
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Column(name = "status_msg", nullable = true, updatable = true, length = 255)
+    private String statusMsg;
 
     @Column(name = "total_amount", nullable = false, updatable = true, precision = 20, scale = 6)
     private BigDecimal totalAmount;
 
-    @Column(name = "created_at", nullable = false, updatable = true)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
 
     @Column(name = "updated_at", nullable = true, updatable = true)
@@ -126,6 +129,14 @@ public class Booking implements Serializable, Cloneable {
 
     public Status getStatus() {
         return this.status;
+    }
+
+    public String getStatusMsg() {
+        return statusMsg;
+    }
+
+    public void setStatusMsg(String statusMsg) {
+        this.statusMsg = statusMsg;
     }
 
     public void setTotalAmount(BigDecimal totalAmount) {

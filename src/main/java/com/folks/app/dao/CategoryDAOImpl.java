@@ -10,7 +10,6 @@ import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,7 +119,7 @@ public class CategoryDAOImpl implements CategoryDAO {
         
         Query q = em.createNamedQuery("Category.selectCategoryAndServices");
         q.setParameter(1, val);
-        q.setParameter("ids", ids);
+        q.setParameter("ids", ids != null && !ids.isEmpty() ? ids : Arrays.asList(-1));
         
         List<Object[]> rows = q.getResultList();
         
@@ -186,10 +185,11 @@ public class CategoryDAOImpl implements CategoryDAO {
             service.setName((String)row[11]);
             service.setDescription((String)row[12]);
             service.setBasePrice((Double)row[13]);
-            service.setDurationMinutes(((Integer)row[14]).shortValue());
-            service.setImage((String)row[15]);
-            service.setRatingAvg((Double)row[16]);
-            service.setReviews((Integer)row[17]);
+            service.setCurrency((String)row[14]);
+            service.setDurationMinutes(((Integer)row[15]).shortValue());
+            service.setImage((String)row[16]);
+            service.setRatingAvg((Double)row[17]);
+            service.setReviews((Integer)row[18]);
             
             Category subCategory = subCategories.get(srvcCategoryId);
             if (subCategory == null) {

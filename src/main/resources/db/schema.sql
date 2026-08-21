@@ -42,10 +42,10 @@ CREATE TABLE fks_addresses (
 CREATE TABLE fks_categories (
     category_id         INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
     name                VARCHAR(128)    NOT NULL,
-    parent_id           INT             ,
     icon                VARCHAR(16)     ,
     tag_line            VARCHAR(128)    ,
-    image               VARCHAR(128)    
+    image               VARCHAR(128)    ,
+    parent_id           INT             
 );
 
 CREATE TABLE fks_services (
@@ -54,6 +54,7 @@ CREATE TABLE fks_services (
     name                VARCHAR(128)    NOT NULL,
     description         TEXT            ,
     base_price          NUMERIC(7, 2)   NOT NULL,
+    currency            VARCHAR(3)      NOT NULL,
     duration_minutes    SMALLINT        ,
     image               VARCHAR(128)    ,
     rating_avg          NUMERIC(3, 2)   ,
@@ -92,7 +93,8 @@ CREATE TABLE fks_bookings (
     service_id          INT             NOT NULL,
     address_id          INT             NOT NULL,
     scheduled_at        TIMESTAMP       NOT NULL,
-    status              VARCHAR(255)    CHECK (status IN ('PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')),
+    status              VARCHAR(16)     CHECK (status IN ('PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')),
+    status_msg          VARCHAR(255)    ,
     total_amount        NUMERIC(20, 6)  NOT NULL,
     created_at          TIMESTAMP       NOT NULL,
     updated_at          TIMESTAMP       

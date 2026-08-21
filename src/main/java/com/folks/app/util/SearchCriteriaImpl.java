@@ -1,5 +1,9 @@
 package com.folks.app.util;
 
+import com.folks.app.bo.AuthBO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,17 +23,26 @@ public class SearchCriteriaImpl implements SearchCriteria {
     private Integer limit = 100;
     
     private final Map<String, List<Object>> params = new HashMap<>();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchCriteriaImpl.class);
     
     SearchCriteriaImpl() {}
     
     public SearchCriteriaImpl params(QueryParams params, String key, Integer userId) {
         Map<String, List<String>> tmp = params.entries();
-        List<String> orders = tmp.remove("orderBy");
-        
-        if (orders != null) {
-            this.orderBy = orders.get(0);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Search params {}", params);
         }
+
+        List<String> orderBy = tmp.remove("orderBy");
+        List<String> asc = tmp.remove("asc");
         
+        if (orderBy != null) {
+            this.orderBy = orderBy.get(0);
+        }
+        if (asc != null) {
+            this.asc = Boolean.valueOf(asc.get(0));
+        }
         for (Map.Entry<String, List<String>> me : tmp.entrySet()) {
             String name = me.getKey();
             List<String> values = me.getValue();

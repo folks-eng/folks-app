@@ -66,6 +66,10 @@ public class Validator {
         if (pinCode == null || pinCode.toString().isEmpty()) {
             throw new IllegalArgumentException("PinCode is required.");
         }
+        String label = addr.getLabel();
+        if (label == null || label.toString().isEmpty()) {
+            throw new IllegalArgumentException("Label is required.");
+        }
     }
 
 }

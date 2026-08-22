@@ -96,6 +96,7 @@ CREATE TABLE fks_bookings (
     status              VARCHAR(16)     CHECK (status IN ('PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')),
     status_msg          VARCHAR(255)    ,
     total_amount        NUMERIC(20, 6)  NOT NULL,
+    payment_method      VARCHAR(16)     CHECK (payment_method IN ('CARD', 'UPI', 'WALLET', 'COD')),
     created_at          TIMESTAMP       NOT NULL,
     updated_at          TIMESTAMP       
 );

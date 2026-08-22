@@ -67,6 +67,10 @@ public class Booking implements Serializable, Cloneable {
     @Column(name = "total_amount", nullable = false, updatable = true, precision = 20, scale = 6)
     private BigDecimal totalAmount;
 
+    @Column(name = "payment_method", nullable = true, updatable = true, check = @CheckConstraint(constraint = "payment_method IN ('CARD', 'UPI', 'WALLET', 'COD')"))
+    @Enumerated(EnumType.STRING)
+    private Payment.Paymentmethod paymentMethod;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
 
@@ -145,6 +149,14 @@ public class Booking implements Serializable, Cloneable {
 
     public BigDecimal getTotalAmount() {
         return this.totalAmount;
+    }
+
+    public Payment.Paymentmethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(Payment.Paymentmethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
     public void setCreatedAt(Timestamp createdAt) {

@@ -1,14 +1,7 @@
 package com.folks.app.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.NamedNativeQueries;
-import jakarta.persistence.NamedNativeQuery;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -47,6 +40,11 @@ public class Professional implements Serializable, Cloneable {
 
     @Column(name = "is_verified", nullable = false, updatable = true, precision = 16)
     private Short isVerified;
+
+    //user_id in the professional table references the user_id column in the User table.
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name="user_id", referencedColumnName="user_id", nullable = false, unique = true)
+    private User user;
 
     public Professional() {}
 
@@ -96,6 +94,14 @@ public class Professional implements Serializable, Cloneable {
 
     public Short getIsVerified() {
         return this.isVerified;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public static class ProfessionalPK {

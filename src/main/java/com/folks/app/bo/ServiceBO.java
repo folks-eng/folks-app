@@ -29,6 +29,35 @@ public class ServiceBO extends AbstractBO {
         }
     }
 
+    public List<Service> viewAll(AppUser usr, QueryParams params) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        SearchCriteria search = SearchCriteria.from(params);
+        List<Service> rows = serviceDAO.query(search);
+
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched {} expanded service record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
+        }
+        return rows;
+    }
+
+    public Service view(AppUser usr, Integer id) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        Service service = serviceDAO.find(new Service.ServicePK(id));
+        if (service == null) {
+            throw new IllegalArgumentException("No Service found for id: " + id);
+        }
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched service details. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+        }
+        return service;
+    }
+
     public Service create(AppUser usr, Service service) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
@@ -79,35 +108,6 @@ public class ServiceBO extends AbstractBO {
             LOGGER.info("Service record modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
         return existing;
-    }
-
-    public List<Service> viewAll(AppUser usr, QueryParams params) {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        SearchCriteria search = SearchCriteria.from(params);
-        List<Service> rows = serviceDAO.query(search);
-
-        timer.stop();
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched {} expanded service record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
-        }
-        return rows;
-    }
-
-    public Service view(AppUser usr, Integer id) {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        Service service = serviceDAO.find(new Service.ServicePK(id));
-        if (service == null) {
-            throw new IllegalArgumentException("No Service found for id: " + id);
-        }
-        timer.stop();
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched service details. Elapsed time(ms): {}", timer.elapsedTimeMillis());
-        }
-        return service;
     }
 
     public Service remove(AppUser usr, Integer id) {

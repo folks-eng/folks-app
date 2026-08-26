@@ -1,5 +1,6 @@
 package com.folks.app.bo;
 
+import com.folks.app.util.Validator;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
@@ -30,7 +31,10 @@ public class ProfessionalBO extends AbstractBO {
     }
 
     public Professional create(AppUser usr, Professional professional) throws IllegalAccessException {
+        // Only admin has the privilege to create user.
         ensureAdmin(usr);
+        validateScope(usr, "user:create");
+        Validator.validateProfessional(professional);
         
         StopWatch timer = StopWatch.newTimer();
         timer.start();
@@ -42,6 +46,20 @@ public class ProfessionalBO extends AbstractBO {
             LOGGER.info("Professional created successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
         return professional;
+    }
+
+    public List<Professional> viewAll(AppUser usr, QueryParams params) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        SearchCriteria search = SearchCriteria.from(params);
+        List<Professional> rows = professionalDAO.query(search);
+
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched {} expanded professional record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
+        }
+        return rows;
     }
 
     public void create(AppUser usr, List<Professional> records) throws IllegalAccessException {
@@ -81,20 +99,6 @@ public class ProfessionalBO extends AbstractBO {
             LOGGER.info("Professional record modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
         return existing;
-    }
-
-    public List<Professional> viewAll(AppUser usr, QueryParams params) {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        SearchCriteria search = SearchCriteria.from(params);
-        List<Professional> rows = professionalDAO.query(search);
-
-        timer.stop();
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched {} expanded professional record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
-        }
-        return rows;
     }
 
     public Professional view(AppUser usr, Integer id) {

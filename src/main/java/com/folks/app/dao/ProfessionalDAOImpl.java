@@ -24,7 +24,11 @@ public class ProfessionalDAOImpl implements ProfessionalDAO {
     
     @Override
     public void insert(Professional record) {
-        insert(Arrays.asList(record));
+        // Persist the User entity
+        em.persist(record.getUser());
+
+        // Persist the Professional entity (saves the foreign key user_id)
+        em.persist(record);
     }
 
     @Override

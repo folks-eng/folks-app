@@ -55,6 +55,14 @@ public class AddressDAOImpl extends AbstractDAO implements AddressDAO {
     public Address find(Address.AddressPK pk) {
         return em.find(Address.class, pk);
     }
+    
+    @Override
+    public List<Address> find(List<Integer> ids) {
+        return em.createNamedQuery("Address.selectByIds", Address.class)
+            .setParameter("ids", ids != null && !ids.isEmpty() ? ids : Arrays.asList(-1))
+            .setHint(QueryHints.ALLOW_NATIVE_QUERY, Boolean.TRUE)
+            .getResultList();
+    }
 
     @Override
     public List<Address> query(SearchCriteria search) {

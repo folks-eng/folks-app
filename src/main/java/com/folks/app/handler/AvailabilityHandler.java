@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.javalabs.decl.util.MapperUtil;
 import org.javalabs.decl.vertx.config.model.ServerMessage;
 import com.folks.app.bo.AvailabilityBO;
+import com.folks.app.model.AvailTimeSlot;
 import com.folks.app.model.Availability;
 import com.folks.app.model.ItemList;
 import com.folks.app.util.QueryParams;
@@ -167,6 +168,30 @@ public class AvailabilityHandler extends AbstractHandler {
             List<Object> rows = (List)availabilitys;
 
             ItemList itemList = build(ctx.normalizedPath(), params, rows);
+            return itemList;
+            
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+    
+    /**
+     * View all the availability time slots from the store.
+     * 
+     * @param ctx   Vertx {@link RoutingContext} object.
+     */
+    public void viewSlots(RoutingContext ctx) {
+        final QueryParams params = params(ctx);
+
+        vertx().executeBlocking(() -> {
+            List<AvailTimeSlot> availabilitys = availabilityBO.viewSlotAvailability(user(ctx), params);
+
+            ItemList itemList = build(ctx.normalizedPath(), params, (List)availabilitys);
             return itemList;
             
         }).onComplete(result -> {

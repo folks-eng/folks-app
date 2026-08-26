@@ -1,9 +1,12 @@
 package com.folks.app.dao;
 
+import com.folks.app.model.AvailTimeSlot;
 import org.javalabs.jpa.annotation.Dao;
 import org.javalabs.jpa.annotation.NotSupported;
 import com.folks.app.model.Availability;
+import com.folks.app.model.Service;
 import com.folks.app.util.SearchCriteria;
+import java.sql.Date;
 import java.util.List;
 
 /**
@@ -77,5 +80,32 @@ public interface AvailabilityDAO {
      */
     @NotSupported
     List<Availability> query(SearchCriteria search);
+    
+    /**
+     * Find the availability of slots for a given service and on a specific day.
+     * 
+     * @param serviceId
+     * @param durationMin
+     * @param date
+     * @return 
+     */
+    @NotSupported
+    List<AvailTimeSlot> findAvailability(Integer serviceId, Short durationMin, Date date);
+    
+    /**
+     * Find the availability of slots for a given service and on a specific day.
+     * 
+     * @param serviceId
+     * @param startTime
+     * @param endTime
+     * @param date
+     * 
+     * @return 
+     */
+    @NotSupported
+    List<Availability> findProfessional(Integer serviceId
+            , String date
+            , String startTime
+            , String endTime);
 }
 

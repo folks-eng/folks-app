@@ -103,12 +103,12 @@ CREATE TABLE fks_bookings (
 
 -- Time Slots / Availability
 
-CREATE TABLE fks_availability (
+CREATE TABLE fks_availabilities (
     availability_id     INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
     professional_id     INT             NOT NULL,
     date                DATE            NOT NULL,
-    start_time          TIMESTAMP       ,
-    end_time            TIMESTAMP       ,
+    start_time          TIME            ,
+    end_time            TIME            ,
     is_booked           SMALLINT        NOT NULL
 );
 
@@ -270,8 +270,8 @@ ALTER TABLE fks_bookings
 ADD CONSTRAINT fks_bookings_pk
 PRIMARY KEY (booking_id);
 
-ALTER TABLE fks_availability
-ADD CONSTRAINT fks_availability_pk
+ALTER TABLE fks_availabilities
+ADD CONSTRAINT fks_availabilities_pk
 PRIMARY KEY (availability_id);
 
 ALTER TABLE fks_reviews
@@ -345,8 +345,8 @@ ADD CONSTRAINT fks_bookings_fk2
 FOREIGN KEY (address_id)
 REFERENCES fks_addresses (address_id);
 
-ALTER TABLE fks_availability
-ADD CONSTRAINT fks_availability_fk1
+ALTER TABLE fks_availabilities
+ADD CONSTRAINT fks_availabilities_fk1
 FOREIGN KEY (professional_id)
 REFERENCES fks_professionals (professional_id);
 

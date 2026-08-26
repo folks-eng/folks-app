@@ -4,9 +4,17 @@ import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
 import com.folks.app.dao.AvailabilityDAO;
+import com.folks.app.dao.ServiceDAO;
+import com.folks.app.model.AvailTimeSlot;
 import com.folks.app.model.Availability;
+import com.folks.app.model.Service;
+import com.folks.app.model.Service.ServicePK;
+import com.folks.app.util.AvailSlotUtil;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +28,14 @@ public class AvailabilityBO extends AbstractBO {
     private static final Logger LOGGER = LoggerFactory.getLogger(AvailabilityBO.class);
     
     private final AvailabilityDAO availabilityDAO;
+    private final ServiceDAO serviceDAO;
 
     public AvailabilityBO() {
         this.availabilityDAO = DAOProxy.get(AvailabilityDAO.class);
+        this.serviceDAO = DAOProxy.get(ServiceDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized Handler: {}. AvailabilityDAO: {}", getClass().getSimpleName(), availabilityDAO);
+            LOGGER.debug("Initialized AvailabilityBO: {}. AvailabilityDAO: {}. ServiceDAO: {}", getClass().getSimpleName(), availabilityDAO, serviceDAO);
         }
     }
 
@@ -93,6 +103,62 @@ public class AvailabilityBO extends AbstractBO {
             LOGGER.info("Fetched {} expanded availability record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
         }
         return rows;
+    }
+    
+    public List<AvailTimeSlot> viewSlotAvailability(AppUser usr, QueryParams params) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        Integer serviceId = Integer.valueOf(params.param("serviceId"));
+        String dt = params.params("date").get(0);
+
+        Service service = serviceDAO.find(new ServicePK(serviceId));
+        if (service == null) {
+            throw new IllegalArgumentException("No service found with id " + serviceId);
+        }
+        List<AvailTimeSlot> slots = availabilityDAO.findAvailability(
+                service.getServiceId()
+                , service.getDurationMinutes()
+                , Date.valueOf(LocalDate.parse(dt)));
+
+        slots = AvailSlotUtil.addMissingIntervals(slots, "09:00:00", "18:00:00", service.getDurationMinutes());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        for (AvailTimeSlot slot : slots) {
+            slot.setLabel(slot.getFromTime().toLocalTime().format(formatter) + " - " + slot.getToTime().toLocalTime().format(formatter));
+            slot.setId("sl_" + slot.getLabel());
+            slot.setStartHour(slot.getFromTime().toLocalTime().getHour());
+        }
+        return slots;
+    }
+
+    public List<Availability> viewProfessionalAvailability(AppUser usr, QueryParams params) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        Integer serviceId = Integer.valueOf(params.param("serviceId"));
+        String dt = params.params("date").get(0);
+
+        Service service = serviceDAO.find(new ServicePK(serviceId));
+        if (service == null) {
+            throw new IllegalArgumentException("No service found with id " + serviceId);
+        }
+        String date = params.param("date");
+        String start = params.param("start");
+        String end = params.param("end");
+        Boolean fair = Boolean.valueOf(params.param("fair"));
+        
+        List<Availability> records = availabilityDAO.findProfessional(
+                serviceId
+                , date
+                , start
+                , end);
+
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched {} eligible availability record(s). Elapsed time(ms): {}", records.size(), timer.elapsedTimeMillis());
+        }
+        return records;
     }
 
     public Availability view(AppUser usr, Integer id) {

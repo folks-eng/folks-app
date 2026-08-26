@@ -14,7 +14,6 @@ import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Objects;
 
 
@@ -28,7 +27,11 @@ import java.util.Objects;
 @Table(name = "fks_services")
 @IdClass(Service.ServicePK.class)
 @NamedNativeQueries({
-    @NamedNativeQuery(name = "Service.selectAll", query = "SELECT * FROM fks_services")
+    @NamedNativeQuery(name = "Service.selectAll", query = "SELECT * FROM fks_services"),
+    @NamedNativeQuery(name = "Service.selectByIds"
+            , query = "SELECT *"
+                    + "  FROM fks_services "
+                    + " WHERE service_id IN (:ids)")
 })
 public class Service implements Serializable, Cloneable {
 

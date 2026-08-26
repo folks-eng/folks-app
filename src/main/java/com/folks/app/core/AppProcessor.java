@@ -1,5 +1,7 @@
 package com.folks.app.core;
 
+import com.folks.app.model.Booking;
+import com.folks.app.util.Constants;
 import io.vertx.core.AbstractVerticle;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +35,8 @@ public class AppProcessor extends AbstractVerticle {
      * Initialize the event bus consumer.
      */
     private void initEventBus() {
-        // ToDo
+        getVertx().eventBus().consumer(Constants.BOOKING_ADDRESS, new BookingEventConsumer());
+        getVertx().eventBus().registerDefaultCodec(Booking.class, new BookingCodec());
     }
     
     private void initTimer() {

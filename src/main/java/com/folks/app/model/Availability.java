@@ -11,7 +11,7 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.sql.Date;
-import java.sql.Timestamp;
+import java.sql.Time;
 import java.util.Objects;
 
 
@@ -22,10 +22,16 @@ import java.util.Objects;
  */
 
 @Entity
-@Table(name = "fks_availability")
+@Table(name = "fks_availabilities")
 @IdClass(Availability.AvailabilityPK.class)
 @NamedNativeQueries({
-    @NamedNativeQuery(name = "Availability.selectAll", query = "SELECT * FROM fks_availability")
+    @NamedNativeQuery(name = "Availability.selectAll", query = "SELECT * FROM fks_availability"),
+    @NamedNativeQuery(name = "Availability.selectSlotByStartTime"
+            , query = "SELECT a.service_id, a.name, a.duration_minutes, b.professional_id, c.date, c.start_time, c.end_time, c.is_booked\n"
+                    + "  FROM fks_services a\n"
+                    + " INNER JOIN fks_professional_services b ON (a.service_id = b.service_id)\n"
+                    + " INNER JOIN fks_availabilities c ON (b.professional_id = c.professional_id AND c.date = ? AND c.start_time >= TIME ? AND c.end_time <= c.start_time + CEIL(a.duration_minutes / 60.0) * INTERVAL '1 hour' AND c.is_booked = 0)\n"
+                    + " WHERE a.service_id = ?")
 })
 public class Availability implements Serializable, Cloneable {
 
@@ -41,10 +47,10 @@ public class Availability implements Serializable, Cloneable {
     private Date date;
 
     @Column(name = "start_time", nullable = true, updatable = true)
-    private Timestamp startTime;
+    private Time startTime;
 
     @Column(name = "end_time", nullable = true, updatable = true)
-    private Timestamp endTime;
+    private Time endTime;
 
     @Column(name = "is_booked", nullable = false, updatable = true, precision = 16)
     private Short isBooked;
@@ -75,19 +81,19 @@ public class Availability implements Serializable, Cloneable {
         return this.date;
     }
 
-    public void setStartTime(Timestamp startTime) {
+    public void setStartTime(Time startTime) {
         this.startTime = startTime;
     }
 
-    public Timestamp getStartTime() {
+    public Time getStartTime() {
         return this.startTime;
     }
 
-    public void setEndTime(Timestamp endTime) {
+    public void setEndTime(Time endTime) {
         this.endTime = endTime;
     }
 
-    public Timestamp getEndTime() {
+    public Time getEndTime() {
         return this.endTime;
     }
 

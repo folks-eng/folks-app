@@ -10,8 +10,10 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -55,7 +57,10 @@ public class Booking implements Serializable, Cloneable {
     private Integer addressId;
 
     @Column(name = "scheduled_at", nullable = false, updatable = true)
-    private Timestamp scheduledAt;
+    private Date scheduledAt;
+
+    @Column(name = "time_slot", nullable = true, updatable = true, length = 24)
+    private String timeSlot;
 
     @Column(name = "status", nullable = false, updatable = true, length = 16, check = @CheckConstraint(constraint = "status IN ('PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')"))
     @Enumerated(EnumType.STRING)
@@ -76,7 +81,13 @@ public class Booking implements Serializable, Cloneable {
 
     @Column(name = "updated_at", nullable = true, updatable = true)
     private Timestamp updatedAt;
+    
+    @Transient
+    private String address;
 
+    @Transient
+    private String serviceName;
+    
     public Booking() {}
 
     public void setBookingId(String bookingId) {
@@ -119,12 +130,20 @@ public class Booking implements Serializable, Cloneable {
         return this.addressId;
     }
 
-    public void setScheduledAt(Timestamp scheduledAt) {
+    public void setScheduledAt(Date scheduledAt) {
         this.scheduledAt = scheduledAt;
     }
 
-    public Timestamp getScheduledAt() {
+    public Date getScheduledAt() {
         return this.scheduledAt;
+    }
+
+    public String getTimeSlot() {
+        return timeSlot;
+    }
+
+    public void setTimeSlot(String timeSlot) {
+        this.timeSlot = timeSlot;
     }
 
     public void setStatus(Status status) {
@@ -173,6 +192,22 @@ public class Booking implements Serializable, Cloneable {
 
     public Timestamp getUpdatedAt() {
         return this.updatedAt;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
     public static class BookingPK {

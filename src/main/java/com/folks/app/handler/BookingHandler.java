@@ -6,11 +6,13 @@ import org.javalabs.decl.vertx.config.model.ServerMessage;
 import com.folks.app.bo.BookingBO;
 import com.folks.app.model.Booking;
 import com.folks.app.model.ItemList;
+import com.folks.app.util.Constants;
 import com.folks.app.util.QueryParams;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Example REST handler.
@@ -54,6 +56,8 @@ public class BookingHandler extends AbstractHandler {
             return booking;
         }).onComplete(result -> {
             if (result.succeeded()) {
+                // Send message to message bus
+                vertx().eventBus().send(Constants.BOOKING_ADDRESS, result.result());
                 sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
             }
             else {
@@ -108,6 +112,47 @@ public class BookingHandler extends AbstractHandler {
 
             // First fetch the entry, to see if this already exists.
             Booking rs = bookingBO.modify(user(ctx), booking);
+
+            ServerMessage msg = new ServerMessage();
+            msg.setCode(HttpURLConnection.HTTP_OK);
+            msg.setMessage("Booking modified successfully");
+
+            return msg;
+            
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+    
+    /**
+     * Partially update an existing resource by it's id (PATCH request).
+     * 
+     * <p>
+     * If no corresponding resource is found then this method will throw {@link NoSuchElementException}
+     * resulting a <code>404</code> response.
+     * 
+     * <p>
+     * For a PUT request, the server expects you to include all the information for the resource, even if
+     * you only want to update a small part of it. If you leave something out, that part of the resource
+     * will be erased or set to default.
+     * 
+     * @param ctx   Vertx {@link RoutingContext} object.
+     */
+    public void patch(RoutingContext ctx) {
+        final String id = ctx.pathParam("id");
+        
+        // If you use a remote store, this method will safely execute the blocking code.
+        vertx().executeBlocking(() -> {
+            Booking booking = MapperUtil.decode(ctx.body().buffer().getBytes(), Booking.class);
+            booking.setBookingId(id);
+
+            // First fetch the entry, to see if this already exists.
+            Booking rs = bookingBO.patch(user(ctx), booking);
 
             ServerMessage msg = new ServerMessage();
             msg.setCode(HttpURLConnection.HTTP_OK);

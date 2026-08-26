@@ -77,5 +77,7 @@ public interface BookingDAO {
      */
     @NotSupported
     List<Booking> query(SearchCriteria search);
+    
+    Boolean assignProfessional(Booking booking);
 }
 

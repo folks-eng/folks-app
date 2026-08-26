@@ -1,11 +1,17 @@
 package com.folks.app.dao;
 
+import com.folks.app.model.AvailTimeSlot;
 import org.javalabs.jpa.query.Criteria;
 import com.folks.app.model.Availability;
+import com.folks.app.util.AvailSlotUtil;
 import com.folks.app.util.SearchCriteria;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
+import java.sql.Date;
+import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +112,49 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
         
         List<Availability> result = q.getResultList();
         return result;
+    }
+
+    @Override
+    public List<AvailTimeSlot> findAvailability(Integer serviceId, Short durationMin, Date date) {
+        String query = AvailSlotUtil.buildAvailabilityQuery(serviceId, durationMin, date);
+        
+        Query q = em.createNativeQuery(query);
+        List<Object> binds = List.of(date, serviceId);
+        
+        Integer idx = 1;
+        for (Object bind : binds) {
+            q.setParameter(idx ++, bind);
+        }
+        List<Object[]> result = q.getResultList();
+        
+        List<AvailTimeSlot> list = new ArrayList<>(result.size());
+        for (Object[] row : result) {
+            list.add(new AvailTimeSlot((Time)row[0], (Time)row[1], (Integer)row[2], null));
+        }
+        
+        return list;
+    }
+
+    @Override
+    public List<Availability> findProfessional(Integer serviceId, String date, String startTime, String endTime) {
+        List<Availability> availabilities = internalFind(serviceId, date, startTime, endTime, Boolean.TRUE);
+        if (availabilities.isEmpty()) {
+            availabilities = internalFind(serviceId, date, startTime, endTime, Boolean.FALSE);
+        }
+        return availabilities;
+    }
+    
+    private List<Availability> internalFind(Integer serviceId, String date, String startTime, String endTime, Boolean fair) {
+        String query = AvailSlotUtil.buildMatchingProfessionalQuery(fair);
+        
+        TypedQuery q = em.createNativeQuery(query, Availability.class);
+        List<Object> binds = List.of(date, startTime, endTime, serviceId, 0, 1);
+        
+        Integer idx = 1;
+        for (Object bind : binds) {
+            q.setParameter(idx ++, bind);
+        }
+        return q.getResultList();
     }
     
 }

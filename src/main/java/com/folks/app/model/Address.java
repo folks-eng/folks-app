@@ -30,7 +30,11 @@ import java.util.Objects;
             , query = "SELECT b.*"
                     + "  FROM fks_users a"
                     + " INNER JOIN fks_addresses b ON (a.user_id = b.user_id)"
-                    + " WHERE a.external_id = ?")
+                    + " WHERE a.external_id = ?"),
+    @NamedNativeQuery(name = "Address.selectByIds"
+            , query = "SELECT *"
+                    + "  FROM fks_addresses "
+                    + " WHERE address_id IN (:ids)")
 })
 public class Address implements Serializable, Cloneable {
 

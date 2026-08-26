@@ -1,13 +1,18 @@
 package com.folks.app.dao;
 
+import com.folks.app.model.Availability;
 import org.javalabs.jpa.query.Criteria;
 import com.folks.app.model.Booking;
 import com.folks.app.util.SearchCriteria;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import org.javalabs.decl.util.DateUtil;
+import org.javalabs.jpa.annotation.Dao;
 
 /**
  * Concrete DAO class to handle database operations related.
@@ -17,6 +22,9 @@ import java.util.List;
 public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
     
     private final String TABLE = "fks_bookings";
+    
+    @Dao
+    private AvailabilityDAO availabilityDAO;
     
     @PersistenceContext(name = "folks-app-pu")
     private EntityManager em;
@@ -71,6 +79,33 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
         
         List<Booking> result = q.getResultList();
         return result;
+    }
+    
+    @Override
+    public Boolean assignProfessional(Booking booking) {
+        Date date = booking.getScheduledAt();
+        String start = booking.getTimeSlot().split(" - ")[0];
+        String end = booking.getTimeSlot().split(" - ")[1];
+        
+        List<Availability> availabilities = availabilityDAO.findProfessional(
+                booking.getServiceId()
+                , date.toString()
+                , start
+                , end);
+        
+        if (! availabilities.isEmpty()) {
+            booking.setProfessionalId(availabilities.get(0).getProfessionalId());
+            booking.setStatus(Booking.Status.CONFIRMED);
+            booking.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+            em.merge(booking);
+
+            for (Availability availability : availabilities) {
+                availability.setIsBooked((short)1);
+            }
+            availabilityDAO.update(availabilities);
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
     }
     
 }

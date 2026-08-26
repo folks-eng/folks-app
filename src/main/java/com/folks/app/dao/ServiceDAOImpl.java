@@ -1,5 +1,6 @@
 package com.folks.app.dao;
 
+import com.folks.app.model.Address;
 import org.javalabs.jpa.query.Criteria;
 import com.folks.app.model.Service;
 import com.folks.app.util.SearchCriteria;
@@ -9,6 +10,7 @@ import jakarta.persistence.TypedQuery;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.javalabs.jpa.util.QueryHints;
 
 /**
  * Concrete DAO class to handle database operations related.
@@ -54,6 +56,14 @@ public class ServiceDAOImpl implements ServiceDAO {
     @Override
     public Service find(Service.ServicePK pk) {
         return em.find(Service.class, pk);
+    }
+    
+    @Override
+    public List<Service> find(List<Integer> ids) {
+        return em.createNamedQuery("Service.selectByIds", Service.class)
+            .setParameter("ids", ids != null && !ids.isEmpty() ? ids : Arrays.asList(-1))
+            .setHint(QueryHints.ALLOW_NATIVE_QUERY, Boolean.TRUE)
+            .getResultList();
     }
 
     @Override

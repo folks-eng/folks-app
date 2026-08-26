@@ -1,0 +1,10 @@
+[
+  {
+    "serviceId": 291,
+    "addressId": 107,
+    "scheduledAt": "2026-08-26T14:00:00",
+    "quantity": 1,
+    "totalAmount": 2799,
+    "paymentMethod": "cash"
+  }
+]

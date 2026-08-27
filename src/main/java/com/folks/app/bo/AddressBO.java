@@ -1,5 +1,6 @@
 package com.folks.app.bo;
 
+import com.folks.app.util.Constants;
 import com.folks.app.util.ResourceNotFoundException;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
@@ -44,12 +45,10 @@ public class AddressBO extends AbstractBO {
         // Fetch the user from db and associate it with the address object.
         User user = fetchUser(usr);
         address.setUserId(user.getUserId());
-        
-        if (address.getCreatedAt() == null) {
-            address.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
-        }
+
+        address.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
         if (address.getIsDefault() == null) {
-            address.setIsDefault((short)1);     // All addresses are set to default.
+            address.setIsDefault(Constants.IS_DEFAULT_ADDR);     // All addresses are set to default.
         }
 
         addressDAO.insert(address);

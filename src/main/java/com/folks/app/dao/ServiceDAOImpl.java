@@ -1,12 +1,13 @@
 package com.folks.app.dao;
 
-import com.folks.app.model.Address;
 import org.javalabs.jpa.query.Criteria;
 import com.folks.app.model.Service;
 import com.folks.app.util.SearchCriteria;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +65,16 @@ public class ServiceDAOImpl implements ServiceDAO {
             .setParameter("ids", ids != null && !ids.isEmpty() ? ids : Arrays.asList(-1))
             .setHint(QueryHints.ALLOW_NATIVE_QUERY, Boolean.TRUE)
             .getResultList();
+    }
+
+    @Override
+    public List<Service> findByCat(List<Integer> catIds) {
+        List<Service> serviceList = new ArrayList<>();
+        TypedQuery query = em.createNamedQuery("Service.selectByCatIds", Service.class)
+                .setParameter("ids", catIds != null && !catIds.isEmpty() ? catIds : Arrays.asList(-1))
+                .setHint(QueryHints.ALLOW_NATIVE_QUERY, Boolean.TRUE);
+        serviceList = query.getResultList();
+        return serviceList;
     }
 
     @Override

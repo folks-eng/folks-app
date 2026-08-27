@@ -75,7 +75,10 @@ public interface ServiceDAO {
      */
     @NotSupported
     List<Service> find(List<Integer> ids);
-    
+
+    @NotSupported
+    List<Service> findByCat(List<Integer> catIds);
+
     /**
      * Query all the entries from the underlying db.
      * This is an extension of the {@link #query(SearchCriteria)} method, just that this method

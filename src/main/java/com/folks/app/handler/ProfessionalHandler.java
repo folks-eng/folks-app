@@ -1,6 +1,7 @@
 package com.folks.app.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.folks.app.model.ProfessionalMaster;
 import org.javalabs.decl.util.MapperUtil;
 import org.javalabs.decl.vertx.config.model.ServerMessage;
 import com.folks.app.bo.ProfessionalBO;
@@ -9,6 +10,9 @@ import com.folks.app.model.ItemList;
 import com.folks.app.util.QueryParams;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,14 +29,34 @@ import java.util.NoSuchElementException;
  * Refer to the <code>routing-config.xml</code> to understand the url mapping.
  */
 public class ProfessionalHandler extends AbstractHandler {
-    
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionalHandler.class);
+
     private final ProfessionalBO professionalBO;
     
     public ProfessionalHandler(Vertx vertx) {
         super(vertx);
         this.professionalBO = new ProfessionalBO();
     }
-    
+
+    public void register(RoutingContext ctx) {
+        // If you use a remote store, this method will safely execute the blocking code.
+        LOGGER.info("Start of method register log");
+        System.out.println("Start of method register ");
+        vertx().executeBlocking(() -> {
+            ProfessionalMaster profMaster = MapperUtil.decode(ctx.body().buffer().getBytes(), ProfessionalMaster.class);
+            profMaster = professionalBO.register(user(ctx), profMaster);
+
+            return profMaster;
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
     /**
      * Create a new resource element in the system.
      * 

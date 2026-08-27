@@ -43,6 +43,21 @@ public class ServiceBO extends AbstractBO {
         return rows;
     }
 
+    public List<Service> findByCat(AppUser usr, List<Integer> idList) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        List<Service> serviceList = serviceDAO.findByCat(idList);
+        if (serviceList == null) {
+            throw new IllegalArgumentException("No Service found for category ids: " + idList);
+        }
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched service details. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+        }
+        return serviceList;
+    }
+
     public Service view(AppUser usr, Integer id) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();

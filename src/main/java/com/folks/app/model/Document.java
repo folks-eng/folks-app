@@ -48,6 +48,9 @@ public class Document implements Serializable, Cloneable {
     @Column(name = "document_type", nullable = false, updatable = true, length = 50)
     private String documentType;
 
+    @Column(name = "document_number", nullable = false, updatable = true, length = 50)
+    private String documentNumber;
+
     @Column(name = "document_url", nullable = true, updatable = true, length = 1000000000)
     private String documentUrl;
 
@@ -55,8 +58,8 @@ public class Document implements Serializable, Cloneable {
     @Enumerated(EnumType.STRING)
     private Verificationstatus verificationStatus;
 
-    @Column(name = "uploaded_at", nullable = true, updatable = true)
-    private Timestamp uploadedAt;
+    @Column(name = "created_at", nullable = false, updatable = true)
+    private Timestamp createdAt;
 
     public Document() {}
 
@@ -84,6 +87,14 @@ public class Document implements Serializable, Cloneable {
         return this.documentType;
     }
 
+    public String getDocumentNumber() {
+        return documentNumber;
+    }
+
+    public void setDocumentNumber(String documentNumber) {
+        this.documentNumber = documentNumber;
+    }
+
     public void setDocumentUrl(String documentUrl) {
         this.documentUrl = documentUrl;
     }
@@ -100,12 +111,12 @@ public class Document implements Serializable, Cloneable {
         return this.verificationStatus;
     }
 
-    public void setUploadedAt(Timestamp uploadedAt) {
-        this.uploadedAt = uploadedAt;
+    public void setCreatedAt(Timestamp ts) {
+        this.createdAt = ts;
     }
 
-    public Timestamp getUploadedAt() {
-        return this.uploadedAt;
+    public Timestamp getCreatedAt() {
+        return this.createdAt;
     }
 
     public static class DocumentPK {

@@ -1,5 +1,7 @@
 package com.folks.app.dao;
 
+import com.folks.app.model.Address;
+import com.folks.app.model.Document;
 import org.javalabs.jpa.query.Criteria;
 import com.folks.app.model.Professional;
 import com.folks.app.util.SearchCriteria;
@@ -21,7 +23,15 @@ public class ProfessionalDAOImpl implements ProfessionalDAO {
     
     @PersistenceContext(name = "folks-app-pu")
     private EntityManager em;
-    
+
+    public void insertAll(Address addr, Document doc, Professional prof) {
+        em.persist(addr);
+        em.persist(doc);
+
+        // Persist the Professional entity (saves the foreign key user_id)
+        em.persist(prof);
+    }
+
     @Override
     public void insert(Professional record) {
         // Persist the User entity

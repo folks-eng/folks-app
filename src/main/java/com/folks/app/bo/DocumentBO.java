@@ -70,7 +70,7 @@ public class DocumentBO extends AbstractBO {
         existing.setDocumentType(document.getDocumentType());
         existing.setDocumentUrl(document.getDocumentUrl());
         existing.setVerificationStatus(document.getVerificationStatus());
-        existing.setUploadedAt(document.getUploadedAt());
+        existing.setCreatedAt(document.getCreatedAt());
 
         documentDAO.update(document);
         timer.stop();

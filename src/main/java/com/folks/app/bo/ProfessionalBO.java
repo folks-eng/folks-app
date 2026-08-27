@@ -1,13 +1,19 @@
 package com.folks.app.bo;
 
-import com.folks.app.util.Validator;
+import com.folks.app.dao.*;
+import com.folks.app.model.*;
+import com.folks.app.util.Constants;
+import com.folks.app.util.ResourceNotFoundException;
+import jakarta.persistence.NoResultException;
+import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
-import com.folks.app.dao.ProfessionalDAO;
-import com.folks.app.model.Professional;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,22 +25,92 @@ import org.slf4j.LoggerFactory;
 public class ProfessionalBO extends AbstractBO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionalBO.class);
-    
+
+    private final UserDAO userDAO;
+
     private final ProfessionalDAO professionalDAO;
 
+    private final ServiceDAO serviceDAO;
+
     public ProfessionalBO() {
+        this.userDAO = DAOProxy.get(UserDAO.class);
         this.professionalDAO = DAOProxy.get(ProfessionalDAO.class);
+        this.serviceDAO = DAOProxy.get(ServiceDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Initialized Handler: {}. ProfessionalDAO: {}", getClass().getSimpleName(), professionalDAO);
         }
     }
 
-    public Professional create(AppUser usr, Professional professional) throws IllegalAccessException {
-        // Only admin has the privilege to create user.
+    public ProfessionalMaster register(AppUser usr, ProfessionalMaster profMaster) throws IllegalAccessException {
+        // Only admin has the privilege to create user or professional
         ensureAdmin(usr);
         validateScope(usr, "user:create");
-        Validator.validateProfessional(professional);
+        //Validator.validate(profMaster);
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        // Fetch the user entry and create the Entity objects for inserting into tables Address, Document.
+        User existingUser = fetchUser(profMaster.getExtUserId());
+
+        Address newAddr = profMaster.getAddress();
+        Integer userId = existingUser.getUserId();
+        newAddr.setUserId(userId);
+        if (newAddr.getLabel() == null) {
+            newAddr.setLabel(Constants.DEFAULT_LABEL);
+        }
+        newAddr.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        if (newAddr.getIsDefault() == null) {
+            newAddr.setIsDefault(Constants.IS_DEFAULT_ADDR);     // All addresses are set to default.
+        }
+        Document newDoc = profMaster.getDocument();
+        newDoc.setUserId(userId);
+        if(newDoc.getDocumentType() == null) {
+            newDoc.setDocumentType(Constants.DEFAULT_DOC_TYPE);
+        }
+        newDoc.setVerificationStatus(Document.Verificationstatus.PENDING);
+        newAddr.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        Professional newProf = buildProfObj(userId, profMaster);
+
+        professionalDAO.insertAll(newAddr, newDoc, newProf);
+        profMaster.setAddress(newAddr);
+        profMaster.setDocument(newDoc);
+        timer.stop();
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Professional created successfully with Id {}, Elapsed time(ms): {}", newProf.getProfessionalId(), timer.elapsedTimeMillis());
+        }
+
+        List<Service> serviceList = fetchServices(profMaster.getCategoryIdList());
+        //addProfServices(newProf.getProfessionalId(), serviceList);
+        return profMaster;
+    }
+
+    private void addProfServices(Integer professionalId, List<Service> serviceList) {
+    }
+
+    private List<Service> fetchServices(List<Integer> categoryIdList) {
+        List<Service>  serviceList = new ArrayList<>();
+        try {
+            serviceList = serviceDAO.findByCat(categoryIdList);
+        }
+        catch (NoResultException e) {
+            throw new ResourceNotFoundException("No Service found for Categories  : " + categoryIdList);
+        }
+        return serviceList;
+    }
+
+    private Professional buildProfObj(Integer userId, ProfessionalMaster profMaster) {
+        Professional newProf = new Professional();
+        newProf.setUserId(userId);
+        newProf.setExperienceYears(profMaster.getExperienceYears());
+        newProf.setIsVerified(Constants.NOT_VERIFIED);
+        return newProf;
+    }
+
+    public Professional create(AppUser usr, Professional professional) throws IllegalAccessException {
+        ensureAdmin(usr);
+        validateScope(usr, "user:create");
         
         StopWatch timer = StopWatch.newTimer();
         timer.start();
@@ -133,5 +209,30 @@ public class ProfessionalBO extends AbstractBO {
             LOGGER.info("Deleted Professional. Id: {}. Elapsed time(ms): {}", id, timer.elapsedTimeMillis());
         }
         return professional;
+    }
+
+    /**
+     * Retrieves the user associated with the authenticated application user.
+     *
+     * <p>
+     * The user's external identifier is obtained from the {@code sub} claim of the JWT principal and is used to
+     * query the user data store.
+     *
+     * <p>
+     * The user may first be looked up from a distributed cache to avoid an * unnecessary database query.
+     * If the user is not available in the cache, the persistent data store is queried as a fallback.
+     *
+     * @param extUserId   The authenticated application user containing the JWT principal
+     * @return User The user associated with the external identifier
+     *
+     * @throws IllegalArgumentException if no user exists for the external identifier
+     */
+    private User fetchUser(String extUserId) {
+        try {
+            return userDAO.select(extUserId);
+        }
+        catch (NoResultException e) {
+            throw new ResourceNotFoundException("No User found for id: " + extUserId);
+        }
     }
 }

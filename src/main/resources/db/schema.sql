@@ -192,9 +192,10 @@ CREATE TABLE fks_documents (
     document_id         INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
     user_id             INT             NOT NULL,
     document_type       VARCHAR(50)     NOT NULL,
+    document_number       VARCHAR(50)     NOT NULL,
     document_url        TEXT            ,
-    verification_status VARCHAR(16)     CHECK (verification_status IN ('PENDING', 'APPROVED', 'REJECTED')),
-    uploaded_at         TIMESTAMP     
+    verification_status VARCHAR(16)     NOT NULL CHECK (verification_status IN ('PENDING', 'APPROVED', 'REJECTED')),
+    created_at         TIMESTAMP        NOT NULL
 );
 
 -- 9. Surge Pricing

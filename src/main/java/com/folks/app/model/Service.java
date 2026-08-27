@@ -31,7 +31,11 @@ import java.util.Objects;
     @NamedNativeQuery(name = "Service.selectByIds"
             , query = "SELECT *"
                     + "  FROM fks_services "
-                    + " WHERE service_id IN (:ids)")
+                    + " WHERE service_id IN (:ids)"),
+        @NamedNativeQuery(name = "Service.selectByCatIds"
+                , query = "SELECT *"
+                + "  FROM fks_services "
+                + " WHERE category_id IN (:ids)")
 })
 public class Service implements Serializable, Cloneable {
 

@@ -25,6 +25,12 @@ public interface SearchCriteria {
     }
     
     /**
+     * Indicate whether to fetch the dependent records in a flattened structure.
+     * @return Boolean
+     */
+    Boolean fetchDependency();
+    
+    /**
      * Return a map of search key parameters.
      * @return Map
      */

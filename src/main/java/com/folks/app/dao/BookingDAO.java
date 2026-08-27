@@ -79,5 +79,7 @@ public interface BookingDAO {
     List<Booking> query(SearchCriteria search);
     
     Boolean assignProfessional(Booking booking);
+    
+    Boolean freeProfessional(Booking booking, SearchCriteria search);
 }
 

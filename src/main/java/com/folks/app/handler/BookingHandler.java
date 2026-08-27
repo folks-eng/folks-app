@@ -56,7 +56,7 @@ public class BookingHandler extends AbstractHandler {
             return booking;
         }).onComplete(result -> {
             if (result.succeeded()) {
-                // Send message to message bus
+                // Send message to message bus to add professional
                 vertx().eventBus().send(Constants.BOOKING_ADDRESS, result.result());
                 sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
             }
@@ -112,47 +112,6 @@ public class BookingHandler extends AbstractHandler {
 
             // First fetch the entry, to see if this already exists.
             Booking rs = bookingBO.modify(user(ctx), booking);
-
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_OK);
-            msg.setMessage("Booking modified successfully");
-
-            return msg;
-            
-        }).onComplete(result -> {
-            if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
-            }
-            else {
-                ctx.fail(result.cause());
-            }
-        });
-    }
-    
-    /**
-     * Partially update an existing resource by it's id (PATCH request).
-     * 
-     * <p>
-     * If no corresponding resource is found then this method will throw {@link NoSuchElementException}
-     * resulting a <code>404</code> response.
-     * 
-     * <p>
-     * For a PUT request, the server expects you to include all the information for the resource, even if
-     * you only want to update a small part of it. If you leave something out, that part of the resource
-     * will be erased or set to default.
-     * 
-     * @param ctx   Vertx {@link RoutingContext} object.
-     */
-    public void patch(RoutingContext ctx) {
-        final String id = ctx.pathParam("id");
-        
-        // If you use a remote store, this method will safely execute the blocking code.
-        vertx().executeBlocking(() -> {
-            Booking booking = MapperUtil.decode(ctx.body().buffer().getBytes(), Booking.class);
-            booking.setBookingId(id);
-
-            // First fetch the entry, to see if this already exists.
-            Booking rs = bookingBO.patch(user(ctx), booking);
 
             ServerMessage msg = new ServerMessage();
             msg.setCode(HttpURLConnection.HTTP_OK);
@@ -239,17 +198,15 @@ public class BookingHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             Booking booking = bookingBO.remove(user(ctx), id);
-
-
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_NO_CONTENT);
-            msg.setMessage("Booking deleted successfully");
-
-            return msg;
+            return booking;
             
         }).onComplete(result -> {
             if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_NO_CONTENT, result.result());
+                // Send message to message bus to add professional
+                vertx().eventBus().send(Constants.BOOKING_ADDRESS, result.result());
+
+                ServerMessage msg = new ServerMessage(HttpURLConnection.HTTP_NO_CONTENT, "Booking deleted successfully");
+                sendResponse(ctx, HttpURLConnection.HTTP_NO_CONTENT, msg);
             }
             else {
                 ctx.fail(result.cause());

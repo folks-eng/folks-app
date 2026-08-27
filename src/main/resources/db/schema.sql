@@ -93,9 +93,10 @@ CREATE TABLE fks_bookings (
     service_id          INT             NOT NULL,
     address_id          INT             NOT NULL,
     scheduled_at        TIMESTAMP       NOT NULL,
+    time_slot           VARCHAR(24)     NOT NULL,
     status              VARCHAR(16)     CHECK (status IN ('PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')),
     status_msg          VARCHAR(255)    ,
-    total_amount        NUMERIC(20, 6)  NOT NULL,
+    total_amount        NUMERIC(8, 2)   NOT NULL,
     payment_method      VARCHAR(16)     CHECK (payment_method IN ('CARD', 'UPI', 'WALLET', 'COD')),
     created_at          TIMESTAMP       NOT NULL,
     updated_at          TIMESTAMP       

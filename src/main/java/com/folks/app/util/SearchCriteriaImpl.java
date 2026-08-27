@@ -1,6 +1,7 @@
 package com.folks.app.util;
 
-import com.folks.app.bo.AuthBO;
+import java.sql.Date;
+import java.sql.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,7 @@ import java.util.Map;
  */
 public class SearchCriteriaImpl implements SearchCriteria {
     
+    private Boolean fetchDependency = Boolean.FALSE;
     private Boolean history = Boolean.FALSE;
     private Boolean asc = Boolean.TRUE;
     private String orderBy;
@@ -36,12 +38,16 @@ public class SearchCriteriaImpl implements SearchCriteria {
 
         List<String> orderBy = tmp.remove("orderBy");
         List<String> asc = tmp.remove("asc");
+        List<String> deps = tmp.remove("fetchDependency");
         
         if (orderBy != null) {
             this.orderBy = orderBy.get(0);
         }
         if (asc != null) {
             this.asc = Boolean.valueOf(asc.get(0));
+        }
+        if (deps != null) {
+            this.fetchDependency = Boolean.valueOf(deps.get(0));
         }
         for (Map.Entry<String, List<String>> me : tmp.entrySet()) {
             String name = me.getKey();
@@ -70,6 +76,20 @@ public class SearchCriteriaImpl implements SearchCriteria {
                     List<Object> genValues = new ArrayList<>(values.size());
                     for (String val : values) {
                         genValues.add(Double.valueOf(val));
+                    }
+                    this.params.put(name, genValues);
+                }
+                else if (values.get(0).matches("^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$")) {
+                    List<Object> genValues = new ArrayList<>(values.size());
+                    for (String val : values) {
+                        genValues.add(Date.valueOf(val));
+                    }
+                    this.params.put(name, genValues);
+                }
+                else if (values.get(0).matches("^(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$")) {
+                    List<Object> genValues = new ArrayList<>(values.size());
+                    for (String val : values) {
+                        genValues.add(Time.valueOf(val));
                     }
                     this.params.put(name, genValues);
                 }
@@ -142,6 +162,11 @@ public class SearchCriteriaImpl implements SearchCriteria {
     @Override
     public Integer limit() {
         return limit;
+    }
+
+    @Override
+    public Boolean fetchDependency() {
+        return fetchDependency;
     }
     
 }

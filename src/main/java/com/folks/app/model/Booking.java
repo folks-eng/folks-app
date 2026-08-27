@@ -12,8 +12,6 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -57,7 +55,7 @@ public class Booking implements Serializable, Cloneable {
     private Integer addressId;
 
     @Column(name = "scheduled_at", nullable = false, updatable = true)
-    private Date scheduledAt;
+    private Timestamp scheduledAt;
 
     @Column(name = "time_slot", nullable = true, updatable = true, length = 24)
     private String timeSlot;
@@ -70,7 +68,7 @@ public class Booking implements Serializable, Cloneable {
     private String statusMsg;
 
     @Column(name = "total_amount", nullable = false, updatable = true, precision = 20, scale = 6)
-    private BigDecimal totalAmount;
+    private Double totalAmount;
 
     @Column(name = "payment_method", nullable = true, updatable = true, check = @CheckConstraint(constraint = "payment_method IN ('CARD', 'UPI', 'WALLET', 'COD')"))
     @Enumerated(EnumType.STRING)
@@ -87,6 +85,12 @@ public class Booking implements Serializable, Cloneable {
 
     @Transient
     private String serviceName;
+
+    @Transient
+    private String professionalName;
+
+    @Transient
+    private String professionalContact;
     
     public Booking() {}
 
@@ -130,11 +134,11 @@ public class Booking implements Serializable, Cloneable {
         return this.addressId;
     }
 
-    public void setScheduledAt(Date scheduledAt) {
+    public void setScheduledAt(Timestamp scheduledAt) {
         this.scheduledAt = scheduledAt;
     }
 
-    public Date getScheduledAt() {
+    public Timestamp getScheduledAt() {
         return this.scheduledAt;
     }
 
@@ -162,11 +166,11 @@ public class Booking implements Serializable, Cloneable {
         this.statusMsg = statusMsg;
     }
 
-    public void setTotalAmount(BigDecimal totalAmount) {
+    public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
     }
 
-    public BigDecimal getTotalAmount() {
+    public Double getTotalAmount() {
         return this.totalAmount;
     }
 
@@ -208,6 +212,22 @@ public class Booking implements Serializable, Cloneable {
 
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
+    }
+
+    public String getProfessionalName() {
+        return professionalName;
+    }
+
+    public void setProfessionalName(String professionalName) {
+        this.professionalName = professionalName;
+    }
+
+    public String getProfessionalContact() {
+        return professionalContact;
+    }
+
+    public void setProfessionalContact(String professionalContact) {
+        this.professionalContact = professionalContact;
     }
 
     public static class BookingPK {

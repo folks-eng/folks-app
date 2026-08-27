@@ -4,7 +4,6 @@ import com.folks.app.model.AvailTimeSlot;
 import org.javalabs.jpa.annotation.Dao;
 import org.javalabs.jpa.annotation.NotSupported;
 import com.folks.app.model.Availability;
-import com.folks.app.model.Service;
 import com.folks.app.util.SearchCriteria;
 import java.sql.Date;
 import java.util.List;

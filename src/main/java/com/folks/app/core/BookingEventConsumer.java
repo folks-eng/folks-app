@@ -23,15 +23,28 @@ public class BookingEventConsumer implements Handler<Message<Booking>> {
 
     @Override
     public void handle(Message<Booking> event) {
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Received new booking creation event. Booking id: {}", event.body().getBookingId());
-        }
         // Now find and assign a professional.
-        assignProfessional(event.body());
+        Booking booking = event.body();
+        if (booking.getStatus() == Booking.Status.PENDING) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Received new booking creation event. Booking id: {}", event.body().getBookingId());
+            }
+            assignProfessional(booking);
+        }
+        else if (booking.getStatus() == Booking.Status.CANCELLED) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Received booking cancellation event. Booking id: {}", event.body().getBookingId());
+            }
+            freeProfessional(booking);
+        }
     }
 
     private void assignProfessional(Booking booking) {
         bookingBO.assignProfessional(booking);
+    }
+
+    private void freeProfessional(Booking booking) {
+        bookingBO.freeProfessional(booking);
     }
     
 }

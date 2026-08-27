@@ -80,7 +80,15 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
                     query.where(col).in(vals);
                 }
                 else {
-                    query.where(col).eq(vals.get(0));
+                    if (col.equals("start_time")) {
+                        query.where(col).gte(vals.get(0));
+                    }
+                    if (col.equals("end_time")) {
+                        query.where(col).lte(vals.get(0));
+                    }
+                    else {
+                        query.where(col).eq(vals.get(0));
+                    }
                 }
                 idx ++;
             }
@@ -89,7 +97,15 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
                     query.and(col).in(vals);
                 }
                 else {
-                    query.and(col).eq(vals.get(0));
+                    if (col.equals("start_time")) {
+                        query.and(col).gte(vals.get(0));
+                    }
+                    if (col.equals("end_time")) {
+                        query.and(col).lte(vals.get(0));
+                    }
+                    else {
+                        query.and(col).eq(vals.get(0));
+                    }
                 }
             }
         }

@@ -25,13 +25,16 @@ import java.util.Objects;
 @Table(name = "fks_availabilities")
 @IdClass(Availability.AvailabilityPK.class)
 @NamedNativeQueries({
-    @NamedNativeQuery(name = "Availability.selectAll", query = "SELECT * FROM fks_availability"),
+    @NamedNativeQuery(name = "Availability.selectAll", query = "SELECT * FROM fks_availabilities"),
+    @NamedNativeQuery(name = "Availability.selectMinMaxDate", query = "SELECT MIN(date), MAX(date) FROM fks_availabilities"),
     @NamedNativeQuery(name = "Availability.selectSlotByStartTime"
-            , query = "SELECT a.service_id, a.name, a.duration_minutes, b.professional_id, c.date, c.start_time, c.end_time, c.is_booked\n"
-                    + "  FROM fks_services a\n"
-                    + " INNER JOIN fks_professional_services b ON (a.service_id = b.service_id)\n"
-                    + " INNER JOIN fks_availabilities c ON (b.professional_id = c.professional_id AND c.date = ? AND c.start_time >= TIME ? AND c.end_time <= c.start_time + CEIL(a.duration_minutes / 60.0) * INTERVAL '1 hour' AND c.is_booked = 0)\n"
-                    + " WHERE a.service_id = ?")
+            , query = """
+                      SELECT a.service_id, a.name, a.duration_minutes, b.professional_id, c.date, c.start_time, c.end_time, c.is_booked
+                        FROM fks_services a
+                       INNER JOIN fks_professional_services b ON (a.service_id = b.service_id)
+                       INNER JOIN fks_availabilities c ON (b.professional_id = c.professional_id AND c.date = ? AND c.start_time >= TIME ? AND c.end_time <= c.start_time + CEIL(a.duration_minutes / 60.0) * INTERVAL '1 hour' AND c.is_booked = 0)
+                       WHERE a.service_id = ?
+                      """)
 })
 public class Availability implements Serializable, Cloneable {
 

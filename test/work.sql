@@ -36,23 +36,21 @@ HAVING COUNT(*) = 5;
 
 
 WITH avail_status AS (
-    SELECT c.professional_id
-           , c.date
-           , c.start_time AS slot_1
-           , CASE LEAD(c.start_time, 0) OVER w
+    SELECT d.professional_id
+           , d.date
+           , d.start_time AS slot_1
+           , CASE LEAD(d.start_time, 0) OVER w
                 WHEN '17:00:00'::time THEN '18:00:00'::time
-                ELSE LEAD(c.start_time, 1) OVER w
+                ELSE LEAD(d.start_time, 1) OVER w
              END AS slot_2
       FROM fks_services a
      INNER JOIN fks_professional_services b ON (a.service_id = b.service_id)
-     INNER JOIN fks_availabilities c ON (
-           b.professional_id = c.professional_id
-           AND c.date = '2026-08-28'
-           AND c.is_booked = 0)
-     WHERE a.service_id = 271
+     INNER JOIN fks_professionals c ON (b.professional_id = c.professional_id AND c.is_verified = 1)
+     INNER JOIN fks_availabilities d ON (c.professional_id = d.professional_id AND d.date = '2026-08-29' AND d.is_booked = 0)
+     WHERE a.service_id = 1
     WINDOW w AS (
-        PARTITION BY c.professional_id, c.date
-        ORDER BY c.start_time
+        PARTITION BY d.professional_id, d.date
+        ORDER BY d.start_time
     )
 )
 , prof_avail_status AS (
@@ -60,9 +58,10 @@ WITH avail_status AS (
       FROM avail_status
      WHERE EXTRACT(HOUR FROM (slot_2 - slot_1)) = 1
 )
-SELECT slot_1, slot_2, COUNT(*) AS slots
+SELECT slot_1 AS from_time, slot_2 AS to_time, COUNT(*) AS slots
   FROM prof_avail_status
  GROUP BY slot_1, slot_2
+ ORDER BY slot_1, slot_2
 
 
 WITH avail_status AS (

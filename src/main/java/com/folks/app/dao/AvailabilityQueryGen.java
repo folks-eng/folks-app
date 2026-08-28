@@ -1,20 +1,16 @@
-package com.folks.app.util;
+package com.folks.app.dao;
 
-import com.folks.app.model.AvailTimeSlot;
 import java.sql.Date;
-import java.sql.Time;
-import java.time.Duration;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
  * @author schan280
  */
-public final class AvailSlotUtil {
-
-    public static String buildAvailabilityQuery(Integer serviceId, Short durationMin, Date date) {
+public class AvailabilityQueryGen {
+    
+    AvailabilityQueryGen() {}
+    
+    String availabilityQuery(Integer serviceId, Short durationMin, Date date) {
         StringBuilder buff = new StringBuilder(1024);
         short slots = (short) Math.ceil(durationMin / 60.0);
 
@@ -63,7 +59,7 @@ public final class AvailSlotUtil {
         return buff.toString();
     }
     
-    public static String buildMatchingProfessionalQuery(Boolean fair) {
+    String matchingProfessionalQuery(Boolean fair) {
         String fairQuery = """
             WITH params AS (
                 SELECT
@@ -140,48 +136,5 @@ public final class AvailSlotUtil {
             """;
         
         return fair ? fairQuery : query;
-    }
-
-    public static List<AvailTimeSlot> addMissingIntervals(
-            List<AvailTimeSlot> slots
-            , String dayStart
-            , String dayEnd
-            , int durationMin) {
-
-        List<AvailTimeSlot> result = new ArrayList<>();
-
-        LocalTime start = LocalTime.parse(dayStart);
-        LocalTime end = LocalTime.parse(dayEnd);
-        Duration duration = Duration.ofHours((long)Math.ceil(durationMin / 60.0));
-        
-        for (AvailTimeSlot slot : slots) {
-            LocalTime from = slot.getFromTime().toLocalTime();
-            LocalTime to = slot.getToTime().toLocalTime();
-            
-            for (LocalTime tmp = start; tmp.isBefore(from); tmp = tmp.plusHours(1)) {
-                AvailTimeSlot booked = new AvailTimeSlot();
-                booked.setFromTime(Time.valueOf(tmp));
-                booked.setToTime(Time.valueOf(tmp.plusHours(duration.toHours())));
-                booked.setMessage("Booked");
-
-                result.add(booked);
-                start = start.plusHours(1);
-            }
-            result.add(slot);
-            start = start.plusHours(1);
-        }
-        for (LocalTime tmp = start; tmp.isBefore(end); tmp = tmp.plusHours(1)) {
-            if (tmp.plusHours(duration.toHours()).isAfter(end)) {
-                break;
-            }
-            AvailTimeSlot booked = new AvailTimeSlot();
-            booked.setFromTime(Time.valueOf(tmp));
-            booked.setToTime(Time.valueOf(tmp.plusHours(duration.toHours())));
-            booked.setMessage("Booked");
-
-            result.add(booked);
-            start = start.plusHours(1);
-        }
-        return result;
     }
 }

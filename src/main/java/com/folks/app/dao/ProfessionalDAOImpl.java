@@ -6,6 +6,7 @@ import org.javalabs.jpa.query.Criteria;
 import com.folks.app.util.SearchCriteria;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,13 +93,19 @@ public class ProfessionalDAOImpl implements ProfessionalDAO {
         Criteria query = new Criteria()
                 .select("professional_id")
                 .from(TABLE)
-                .where("is_verified").eq(1)
+                .where("is_verified").eq((short)1)
                 .orderBy("professional_id");
         
-        return em.createNativeQuery(query.toQuery())
-                .setFirstResult(offset)
-                .setMaxResults(limit)
-                .getResultList();
+        Query q = em.createNativeQuery(query.toQuery());
+        List<Object> binds = query.params();
+        
+        int idx = 1;
+        for (Object bind : binds) {
+            q.setParameter(idx ++, bind);
+        }
+        return q.setFirstResult(offset)
+            .setMaxResults(limit)
+            .getResultList();
     }
 
     @Override

@@ -17,6 +17,11 @@
 -->
 
 <vertx-web>
+    <context-params>
+        <blocked-thread-check-interval>120000</blocked-thread-check-interval>
+        <max-event-loop-execute-time>120000</max-event-loop-execute-time>
+        <max-worker-execute-time>120000</max-worker-execute-time>
+    </context-params>
     <verticles>
         <verticle>
             <name>app.http.server</name>

@@ -3,8 +3,6 @@ package com.folks.app.bo;
 import com.folks.app.model.AvailTimeSlot;
 import com.folks.app.model.Availability;
 import java.sql.Time;
-import java.time.Duration;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -27,61 +25,62 @@ public class AvailabilityHelper {
 
         List<AvailTimeSlot> result = new ArrayList<>();
 
-        LocalTime start = LocalTime.parse(dayStart);
-        LocalTime end = LocalTime.parse(dayEnd);
-        Duration duration = Duration.ofHours((long)Math.ceil(durationMin / 60.0));
+        Time start = Time.valueOf(dayStart);
+        Time end = Time.valueOf(dayEnd);
+        Long durationHr = (long)Math.ceil(durationMin / 60.0);
         
         for (AvailTimeSlot slot : slots) {
-            LocalTime from = slot.getFromTime().toLocalTime();
-            LocalTime to = slot.getToTime().toLocalTime();
+            Time from = slot.getFromTime();
+            Time to = slot.getToTime();
             
-            for (LocalTime tmp = start; tmp.isBefore(from); tmp = tmp.plusHours(1)) {
+            for (Time tmp = start; tmp.before(from); tmp = new Time(tmp.getTime() + 60 * 60 * 1000)) {
                 AvailTimeSlot booked = new AvailTimeSlot();
-                booked.setFromTime(Time.valueOf(tmp));
-                booked.setToTime(Time.valueOf(tmp.plusHours(duration.toHours())));
+                booked.setFromTime(tmp);
+                booked.setToTime(new Time(tmp.getTime() + durationHr * 60 * 60 * 1000));
                 booked.setMessage("Booked");
 
                 result.add(booked);
-                start = start.plusHours(1);
+                start = new Time(start.getTime() + 60 * 60 * 1000);
             }
             result.add(slot);
-            start = start.plusHours(1);
+            start = new Time(start.getTime() + 60 * 60 * 1000);
         }
-        for (LocalTime tmp = start; tmp.isBefore(end); tmp = tmp.plusHours(1)) {
-            if (tmp.plusHours(duration.toHours()).isAfter(end)) {
+        for (Time tmp = start; tmp.before(end); tmp = new Time(tmp.getTime() + 60 * 60 * 1000)) {
+            Time toTime = new Time(tmp.getTime() + durationHr * 60 * 60 * 1000);
+            if (toTime.after(end)) {
                 break;
             }
             AvailTimeSlot booked = new AvailTimeSlot();
-            booked.setFromTime(Time.valueOf(tmp));
-            booked.setToTime(Time.valueOf(tmp.plusHours(duration.toHours())));
+            booked.setFromTime(tmp);
+            booked.setToTime(toTime);
             booked.setMessage("Booked");
 
             result.add(booked);
-            start = start.plusHours(1);
+            start = new Time(start.getTime() + 60 * 60 * 1000);
         }
         return result;
     }
     
     List<Availability> generateAvailability(
             Integer professionalId,
-            Date startDate,
+            Date currentDate,
             int numberOfDays) {
 
         List<Availability> availabilities = new ArrayList<>();
 
         Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
-        calendar.setTime(startDate);
+        calendar.setTime(currentDate);
         calendar.add(Calendar.DAY_OF_MONTH, 1);
 
         for (int day = 0; day < numberOfDays; day++) {
-            Date currentDate = calendar.getTime();
+            Date startDate = calendar.getTime();
 
             // Generate slots from 9 AM to 5 PM
-            for (int hour = 9; hour < 17; hour++) {
+            for (int hour = 9; hour < 18; hour++) {
                 Availability availability = new Availability();
 
                 availability.setProfessionalId(professionalId);
-                availability.setDate(new java.sql.Date(currentDate.getTime()));
+                availability.setDate(new java.sql.Date(startDate.getTime()));
 
                 availability.setStartTime(Time.valueOf(String.format("%02d:00:00", hour)));
                 availability.setEndTime(Time.valueOf(String.format("%02d:00:00", hour + 1)));

@@ -67,9 +67,9 @@
     </resource-mapping>
     
     <resource-mapping name="Availability" path="/availabilities" resource="com.folks.app.handler.AvailabilityHandler" schema="com.folks.app.model.Availability">
-        <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/gen" method="POST" api="generate"/>
+        <mapping uri="" method="POST" api="create"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
         <mapping uri="/slots" method="GET" api="viewSlots"/>
         <mapping uri="/:id" method="GET" api="view"/>

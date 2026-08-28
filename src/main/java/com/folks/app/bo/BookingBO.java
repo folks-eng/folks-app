@@ -11,13 +11,12 @@ import com.folks.app.model.User;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
 import jakarta.persistence.NoResultException;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import org.javalabs.jpa.util.MD5HashGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +47,6 @@ public class BookingBO extends AbstractBO {
         // Fetch the user.
         User user = fetchUser(usr);
 
-        booking.setBookingId(UUID.randomUUID().toString());
         booking.setCustomerId(user.getUserId());
         booking.setProfessionalId(-1);              // A dummy professional id. Professional will be added later a cron job
         booking.setStatus(Booking.Status.PENDING);
@@ -56,7 +54,13 @@ public class BookingBO extends AbstractBO {
         if (booking.getCreatedAt() == null) {
             booking.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
         }
-
+        booking.setBookingId(MD5HashGenerator.digest(
+                String.valueOf(booking.getCustomerId())
+                , String.valueOf(booking.getServiceId())
+                , String.valueOf(booking.getAddressId())
+                , String.valueOf(booking.getScheduledAt())
+                , String.valueOf(booking.getTimeSlot())));
+        
         bookingDAO.insert(booking);
         timer.stop();
 
@@ -238,7 +242,7 @@ public class BookingBO extends AbstractBO {
         Calendar cal = Calendar.getInstance();
         cal.setTime(booking.getScheduledAt());
         String date = String.valueOf(cal.get(Calendar.YEAR))
-                        + "-" + String.format("%02d", cal.get(Calendar.MONTH + 1))
+                        + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1)
                         + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH));
         
         String start = booking.getTimeSlot().split(" - ")[0];
@@ -247,8 +251,8 @@ public class BookingBO extends AbstractBO {
         Map<String, List<String>> map = new HashMap<>();
         map.put("professionalId", List.of(String.valueOf(booking.getProfessionalId())));
         map.put("date", List.of(date));
-        map.put("startTime", List.of(start));
-        map.put("endTime", List.of(end));
+        map.put("startTime", List.of(start + ":00"));
+        map.put("endTime", List.of(end + ":00"));
         
         SearchCriteria search = SearchCriteria.from(new QueryParams(map));
         Boolean flag = bookingDAO.freeProfessional(booking, search);

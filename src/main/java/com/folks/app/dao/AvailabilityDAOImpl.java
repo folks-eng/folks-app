@@ -66,7 +66,7 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
     @Override
     public Object[] findMinMaxDate() {
         Criteria query = new Criteria()
-                .select("MIN(date)", "MAX(date)")
+                .select("COALESCE(MIN(date), CURRENT_DATE - 1)", "COALESCE(MAX(date), CURRENT_DATE - 1)")
                 .from(TABLE);
         
         return (Object[])em.createNativeQuery(query.toQuery()).getSingleResult();
@@ -93,7 +93,7 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
                     if (col.equals("start_time")) {
                         query.where(col).gte(vals.get(0));
                     }
-                    if (col.equals("end_time")) {
+                    else if (col.equals("end_time")) {
                         query.where(col).lte(vals.get(0));
                     }
                     else {
@@ -110,7 +110,7 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
                     if (col.equals("start_time")) {
                         query.and(col).gte(vals.get(0));
                     }
-                    if (col.equals("end_time")) {
+                    else if (col.equals("end_time")) {
                         query.and(col).lte(vals.get(0));
                     }
                     else {

@@ -13,7 +13,6 @@ import com.folks.app.model.Service.ServicePK;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
 import java.sql.Date;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +91,7 @@ public class AvailabilityBO extends AbstractBO {
         int profCount = 0;
         int availCount = 0;
         int limit = 2000;
-        List<Availability> availabilities = new ArrayList<>(550 * 5 * 9);
+        List<Availability> availabilities = new ArrayList<>(550 * numberOfDays * 9);
         
         for (int offset = 0; ; offset += limit) {
             List<Integer> professionalIds = professionalDAO.findProfessionalIds(offset, limit);
@@ -103,8 +102,9 @@ public class AvailabilityBO extends AbstractBO {
             
             // Generate calendar events for the next few days.
             for (Integer professionalId : professionalIds) {
-                availabilities.addAll(helper.generateAvailability(professionalId, currentDate, numberOfDays));
-                availCount += availabilities.size();
+                List<Availability> tmp = helper.generateAvailability(professionalId, currentDate, numberOfDays);
+                availabilities.addAll(tmp);
+                availCount += tmp.size();
             }
             // Insert the availability records.
             availabilityDAO.insert(availabilities);
@@ -172,7 +172,7 @@ public class AvailabilityBO extends AbstractBO {
         List<AvailTimeSlot> slots = availabilityDAO.findAvailability(
                 service.getServiceId()
                 , service.getDurationMinutes()
-                , Date.valueOf(LocalDate.parse(dt)));
+                , Date.valueOf(dt));
 
         slots = helper.addMissingIntervals(slots, "09:00:00", "18:00:00", service.getDurationMinutes());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");

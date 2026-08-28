@@ -2,6 +2,7 @@ package com.folks.app.dao;
 
 import com.folks.app.model.Address;
 import com.folks.app.model.Document;
+import com.folks.app.model.Service;
 import org.javalabs.jpa.annotation.Dao;
 import org.javalabs.jpa.annotation.NotSupported;
 import com.folks.app.model.Professional;
@@ -30,7 +31,7 @@ public interface ProfessionalDAO {
      * @param newDoc    Document entry to be created
      * @param newProf   Professional entry to be created
      */
-    void insertAll(Address newAddr, Document newDoc, Professional newProf);
+    void insertAll(Address newAddr, Document newDoc, Professional newProf, List<Service> serviceList);
     /**
      * Insert a new record in the designated table.
      * @param record    Professional entry to be created

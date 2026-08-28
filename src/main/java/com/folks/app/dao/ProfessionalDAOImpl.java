@@ -1,13 +1,16 @@
 package com.folks.app.dao;
 
-import com.folks.app.model.Address;
-import com.folks.app.model.Document;
+import com.folks.app.model.*;
+import com.folks.app.util.Constants;
 import org.javalabs.jpa.query.Criteria;
-import com.folks.app.model.Professional;
 import com.folks.app.util.SearchCriteria;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -18,18 +21,31 @@ import java.util.Map;
  * @author Sudiptasish Chanda
  */
 public class ProfessionalDAOImpl implements ProfessionalDAO {
-    
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionalDAOImpl.class);
+
     private final String TABLE = "fks_professionals";
     
     @PersistenceContext(name = "folks-app-pu")
     private EntityManager em;
 
-    public void insertAll(Address addr, Document doc, Professional prof) {
+    public void insertAll(Address addr, Document doc, Professional prof, List<Service> serviceList) {
         em.persist(addr);
         em.persist(doc);
 
-        // Persist the Professional entity (saves the foreign key user_id)
+        // Persist the Professional entity after which it has the professionalId
         em.persist(prof);
+        Integer profId = prof.getProfessionalId();
+        LOGGER.info( "Professional inserted with id " +profId);
+        for(Service service: serviceList) {
+            ProfessionalService pService = new ProfessionalService();
+            pService.setProfessionalId(profId);
+            pService.setServiceId(service.getServiceId());
+            pService.setPrice(BigDecimal.valueOf(service.getBasePrice().doubleValue()));
+            pService.setIsActive(Constants.PROF_SERVICE_ACTIVE);
+            em.persist(pService);
+        }
+        LOGGER.info( "Professional services inserted  to complete registration of Professional " +serviceList.size());
     }
 
     @Override

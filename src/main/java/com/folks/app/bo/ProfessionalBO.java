@@ -71,8 +71,9 @@ public class ProfessionalBO extends AbstractBO {
         newDoc.setVerificationStatus(Document.Verificationstatus.PENDING);
         newAddr.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
         Professional newProf = buildProfObj(userId, profMaster);
+        List<Service> serviceList = fetchServices(profMaster.getSubCategories());
 
-        professionalDAO.insertAll(newAddr, newDoc, newProf);
+        professionalDAO.insertAll(newAddr, newDoc, newProf, serviceList);
         profMaster.setAddress(newAddr);
         profMaster.setDocument(newDoc);
         timer.stop();
@@ -81,7 +82,7 @@ public class ProfessionalBO extends AbstractBO {
             LOGGER.info("Professional created successfully with Id {}, Elapsed time(ms): {}", newProf.getProfessionalId(), timer.elapsedTimeMillis());
         }
 
-        List<Service> serviceList = fetchServices(profMaster.getCategoryIdList());
+
         //addProfServices(newProf.getProfessionalId(), serviceList);
         return profMaster;
     }
@@ -104,7 +105,7 @@ public class ProfessionalBO extends AbstractBO {
         Professional newProf = new Professional();
         newProf.setUserId(userId);
         newProf.setExperienceYears(profMaster.getExperienceYears());
-        newProf.setIsVerified(Constants.NOT_VERIFIED);
+        newProf.setIsVerified(Constants.PROF_NOT_VERIFIED);
         return newProf;
     }
 

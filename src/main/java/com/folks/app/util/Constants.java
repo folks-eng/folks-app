@@ -16,7 +16,10 @@ public class Constants {
     public static final String  DEFAULT_DOC_TYPE = "AADHAAR";
 
     // PROFESSIONAL
-    public static final short NOT_VERIFIED = 0;
+    public static final short PROF_NOT_VERIFIED = 0;
+
+    // PROFESSIONAL SERVICE
+    public static final short PROF_SERVICE_ACTIVE = 1;
 
     //Booking
     public static final String BOOKING_ADDRESS = "booking.event.address";

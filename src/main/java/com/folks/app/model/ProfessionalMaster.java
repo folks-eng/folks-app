@@ -3,7 +3,6 @@ package com.folks.app.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *
@@ -27,7 +26,7 @@ public class ProfessionalMaster implements Serializable, Cloneable {
     private Address address;
 
     /******************* Category, sub-category fields **********/
-    private List<Integer> categoryIdList;
+    private List<Integer> subCategories;
 
     public ProfessionalMaster() {}
 
@@ -87,12 +86,12 @@ public class ProfessionalMaster implements Serializable, Cloneable {
         this.address = address;
     }
 
-    public List<Integer> getCategoryIdList() {
-        return categoryIdList;
+    public List<Integer> getSubCategories() {
+        return subCategories;
     }
 
-    public void setCategoryIdList(List<Integer> categoryIdList) {
-        this.categoryIdList = categoryIdList;
+    public void setSubCategories(List<Integer> subCategories) {
+        this.subCategories = subCategories;
     }
 
 

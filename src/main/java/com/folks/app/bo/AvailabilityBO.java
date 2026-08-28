@@ -4,18 +4,20 @@ import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
 import com.folks.app.dao.AvailabilityDAO;
+import com.folks.app.dao.ProfessionalDAO;
 import com.folks.app.dao.ServiceDAO;
 import com.folks.app.model.AvailTimeSlot;
 import com.folks.app.model.Availability;
 import com.folks.app.model.Service;
 import com.folks.app.model.Service.ServicePK;
-import com.folks.app.util.AvailSlotUtil;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +31,14 @@ public class AvailabilityBO extends AbstractBO {
     
     private final AvailabilityDAO availabilityDAO;
     private final ServiceDAO serviceDAO;
+    private final ProfessionalDAO professionalDAO;
+    
+    private final AvailabilityHelper helper = new AvailabilityHelper();
 
     public AvailabilityBO() {
         this.availabilityDAO = DAOProxy.get(AvailabilityDAO.class);
         this.serviceDAO = DAOProxy.get(ServiceDAO.class);
+        this.professionalDAO = DAOProxy.get(ProfessionalDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Initialized AvailabilityBO: {}. AvailabilityDAO: {}. ServiceDAO: {}", getClass().getSimpleName(), availabilityDAO, serviceDAO);
@@ -42,7 +48,6 @@ public class AvailabilityBO extends AbstractBO {
     public Availability create(AppUser usr, Availability availability) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-        
         
         availabilityDAO.insert(availability);
         timer.stop();
@@ -56,7 +61,6 @@ public class AvailabilityBO extends AbstractBO {
     public void create(AppUser usr, List<Availability> records) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-
         
         availabilityDAO.insert(records);
         timer.stop();
@@ -64,6 +68,55 @@ public class AvailabilityBO extends AbstractBO {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Created {} Availability record(s) successfully. Elapsed time(ms): {}", records.size(), timer.elapsedTimeMillis());
         }
+    }
+    
+    public Map<String, Integer> generate(AppUser usr, Map<String, Object> payload) throws IllegalAccessException {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+        
+        ensureAdmin(usr);
+        
+        Integer numberOfDays = 5;
+        if (payload.containsKey("numberOfDays")) {
+            numberOfDays = (Integer)payload.get("numberOfDays");
+        }
+        if (numberOfDays <= 0 || numberOfDays > 7) {
+            throw new IllegalArgumentException("Invalid number of days specified. Must be between 1 and 7");
+        }
+        
+        Object[] dates = availabilityDAO.findMinMaxDate();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Retrieved minimum date {} and maximum date {}", dates[0], dates[1]);
+        }
+        Date currentDate = (Date)dates[1];
+        int profCount = 0;
+        int availCount = 0;
+        int limit = 2000;
+        List<Availability> availabilities = new ArrayList<>(550 * 5 * 9);
+        
+        for (int offset = 0; ; offset += limit) {
+            List<Integer> professionalIds = professionalDAO.findProfessionalIds(offset, limit);
+            if (professionalIds.isEmpty()) {
+                break;
+            }
+            profCount += professionalIds.size();
+            
+            // Generate calendar events for the next few days.
+            for (Integer professionalId : professionalIds) {
+                availabilities.addAll(helper.generateAvailability(professionalId, currentDate, numberOfDays));
+                availCount += availabilities.size();
+            }
+            // Insert the availability records.
+            availabilityDAO.insert(availabilities);
+            availabilities.clear();
+        }
+        timer.stop();
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Generated {} calendar record(s) for {} professional(s). Elapsed time(ms): {}"
+                    , availCount, profCount, timer.elapsedTimeMillis());
+        }
+        return Map.of("profCount", profCount, "availCount", availCount);
     }
 
     public Availability modify(AppUser usr, Availability availability) {
@@ -121,7 +174,7 @@ public class AvailabilityBO extends AbstractBO {
                 , service.getDurationMinutes()
                 , Date.valueOf(LocalDate.parse(dt)));
 
-        slots = AvailSlotUtil.addMissingIntervals(slots, "09:00:00", "18:00:00", service.getDurationMinutes());
+        slots = helper.addMissingIntervals(slots, "09:00:00", "18:00:00", service.getDurationMinutes());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
         for (AvailTimeSlot slot : slots) {

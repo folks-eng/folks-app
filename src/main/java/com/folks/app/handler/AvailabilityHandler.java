@@ -11,7 +11,9 @@ import com.folks.app.util.QueryParams;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 import java.net.HttpURLConnection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -73,6 +75,27 @@ public class AvailabilityHandler extends AbstractHandler {
             ServerMessage msg = new ServerMessage();
             msg.setCode(HttpURLConnection.HTTP_CREATED);
             msg.setMessage("Inserted " + list.size() + " record(s)");
+            
+            return msg;
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+
+    public void generate(RoutingContext ctx) {
+        // If you use a remote store, this method will safely execute the blocking code.
+        vertx().executeBlocking(() -> {
+            Map<String, Object> payload = MapperUtil.decode(ctx.body().buffer().getBytes(), HashMap.class);
+            Map<String, Integer> result = availabilityBO.generate(user(ctx), payload);
+            
+            ServerMessage msg = new ServerMessage();
+            msg.setCode(HttpURLConnection.HTTP_CREATED);
+            msg.setMessage("Generated " + result.get("availCount") + " calendar record(s) for " + result.get("profCount") + " professional(s)");
             
             return msg;
         }).onComplete(result -> {

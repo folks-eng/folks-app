@@ -88,6 +88,20 @@ public class ProfessionalDAOImpl implements ProfessionalDAO {
     }
 
     @Override
+    public List<Integer> findProfessionalIds(int offset, int limit) {
+        Criteria query = new Criteria()
+                .select("professional_id")
+                .from(TABLE)
+                .where("is_verified").eq(1)
+                .orderBy("professional_id");
+        
+        return em.createNativeQuery(query.toQuery())
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+    @Override
     public List<Professional> query(SearchCriteria search) {
         Criteria query = new Criteria()
                 .select(Arrays.asList("*"))

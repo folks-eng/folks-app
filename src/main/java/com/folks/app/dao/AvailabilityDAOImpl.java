@@ -3,7 +3,6 @@ package com.folks.app.dao;
 import com.folks.app.model.AvailTimeSlot;
 import org.javalabs.jpa.query.Criteria;
 import com.folks.app.model.Availability;
-import com.folks.app.util.AvailSlotUtil;
 import com.folks.app.util.SearchCriteria;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -23,10 +22,12 @@ import java.util.Map;
  */
 public class AvailabilityDAOImpl implements AvailabilityDAO {
     
-    private final String TABLE = "fks_availability";
+    private final String TABLE = "fks_availabilities";
     
     @PersistenceContext(name = "folks-app-pu")
     private EntityManager em;
+    
+    private final AvailabilityQueryGen queryGen = new AvailabilityQueryGen();
     
     @Override
     public void insert(Availability record) {
@@ -60,6 +61,15 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
     @Override
     public Availability find(Availability.AvailabilityPK pk) {
         return em.find(Availability.class, pk);
+    }
+
+    @Override
+    public Object[] findMinMaxDate() {
+        Criteria query = new Criteria()
+                .select("MIN(date)", "MAX(date)")
+                .from(TABLE);
+        
+        return (Object[])em.createNativeQuery(query.toQuery()).getSingleResult();
     }
 
     @Override
@@ -132,7 +142,7 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
 
     @Override
     public List<AvailTimeSlot> findAvailability(Integer serviceId, Short durationMin, Date date) {
-        String query = AvailSlotUtil.buildAvailabilityQuery(serviceId, durationMin, date);
+        String query = queryGen.availabilityQuery(serviceId, durationMin, date);
         
         Query q = em.createNativeQuery(query);
         List<Object> binds = List.of(date, serviceId);
@@ -161,7 +171,7 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
     }
     
     private List<Availability> internalFind(Integer serviceId, String date, String startTime, String endTime, Boolean fair) {
-        String query = AvailSlotUtil.buildMatchingProfessionalQuery(fair);
+        String query = queryGen.matchingProfessionalQuery(fair);
         
         TypedQuery q = em.createNativeQuery(query, Availability.class);
         List<Object> binds = List.of(date, startTime, endTime, serviceId, 0, 1);

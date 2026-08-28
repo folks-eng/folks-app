@@ -77,6 +77,15 @@ public interface ProfessionalDAO {
     Professional find(Professional.ProfessionalPK pk);
     
     /**
+     * Fetch the list of all professional ids.
+     * 
+     * @param offset
+     * @param limit
+     * @return List
+     */
+    List<Integer> findProfessionalIds(int offset, int limit);
+    
+    /**
      * Query all the entries from the underlying db.
      * This is an extension of the {@link #query(SearchCriteria)} method, just that this method
      * will return all the attributes associated with the record.

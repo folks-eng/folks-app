@@ -35,6 +35,7 @@ public class ProfessionalDAOImpl implements ProfessionalDAO {
 
         // Persist the Professional entity after which it has the professionalId
         em.persist(prof);
+        em.flush();
         Integer profId = prof.getProfessionalId();
         LOGGER.info( "Professional inserted with id " +profId);
         for(Service service: serviceList) {

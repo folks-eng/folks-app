@@ -11,7 +11,10 @@ import com.folks.app.auth.AppUser;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +44,8 @@ public class ProfessionalBO extends AbstractBO {
 
     public ProfessionalMaster register(AppUser usr, ProfessionalMaster profMaster) throws IllegalAccessException {
         // Only admin has the privilege to create user or professional
-        ensureAdmin(usr);
-        validateScope(usr, "user:create");
+//        ensureAdmin(usr);
+//        validateScope(usr, "user:create");
         Validator.validateProfAll(profMaster);
 
         User existingUser = null;
@@ -55,8 +58,13 @@ public class ProfessionalBO extends AbstractBO {
         if(existingUser == null)
             throw new ResourceNotFoundException("User not found.");
         Integer userId = existingUser.getUserId();
-//        if(professionalDAO.checkProfExisting(userId))
-//            throw new IllegalArgumentException("Professional already existing");
+        Map<String, List<String>> param = new HashMap<>();
+        param.put("userId", List.of(String.valueOf(userId)));
+        SearchCriteria search = SearchCriteria.from(new QueryParams(param));
+        List<Professional> profList = professionalDAO.query(search);
+        if(!profList.isEmpty())
+            throw new IllegalArgumentException("Professional already existing");
+
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

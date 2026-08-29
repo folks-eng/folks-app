@@ -47,18 +47,6 @@ public class ProfessionalDAOImpl implements ProfessionalDAO {
             pService.setIsActive(Constants.PROF_SERVICE_ACTIVE);
             em.persist(pService);
         }
-        LOGGER.info( "Professional services inserted  to complete registration of Professional " +serviceList.size());
-    }
-
-    public boolean checkProfExisting(Integer userId) {
-        boolean exists = false;
-        String jpql = "SELECT p.professionalId FROM Professional p WHERE p.user.userId = :id";
-        long idCount = em.createQuery(jpql, String.class)
-                .setParameter("id", userId)
-                .getResultCount();
-        if(idCount != 0)
-            exists = true;
-        return exists;
     }
 
     @Override

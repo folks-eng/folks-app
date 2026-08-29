@@ -107,7 +107,7 @@ public class UserDAOTest {
     @Order(3)
     public void testSelect() {
         try {
-            User user = userDAO.select(extId);
+            User user = userDAO.findByExtId(extId);
             assertNotNull(user);
             
             assertEquals("Sudiptasish Chanda", user.getFullName());
@@ -128,7 +128,7 @@ public class UserDAOTest {
     @Order(4)
     public void testSelectNotResult() {
         try {
-            User user = userDAO.select(UUID.randomUUID().toString());
+            User user = userDAO.findByExtId(UUID.randomUUID().toString());
             fail("Should not find any user");
         }
         catch (NoResultException e) {

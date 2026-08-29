@@ -34,7 +34,7 @@ public class ProfessionalDAOImpl implements ProfessionalDAO {
         em.persist(addr);
         em.persist(doc);
 
-        // Persist the Professional entity after which it has the professionalId
+        // Persist the Professional entity and flush the cache, after which it has the professionalId
         em.persist(prof);
         em.flush();
         Integer profId = prof.getProfessionalId();
@@ -43,11 +43,22 @@ public class ProfessionalDAOImpl implements ProfessionalDAO {
             ProfessionalService pService = new ProfessionalService();
             pService.setProfessionalId(profId);
             pService.setServiceId(service.getServiceId());
-            pService.setPrice(BigDecimal.valueOf(service.getBasePrice().doubleValue()));
+            pService.setPrice(service.getBasePrice());
             pService.setIsActive(Constants.PROF_SERVICE_ACTIVE);
             em.persist(pService);
         }
         LOGGER.info( "Professional services inserted  to complete registration of Professional " +serviceList.size());
+    }
+
+    public boolean checkProfExisting(Integer userId) {
+        boolean exists = false;
+        String jpql = "SELECT p.professionalId FROM Professional p WHERE p.user.userId = :id";
+        long idCount = em.createQuery(jpql, String.class)
+                .setParameter("id", userId)
+                .getResultCount();
+        if(idCount != 0)
+            exists = true;
+        return exists;
     }
 
     @Override

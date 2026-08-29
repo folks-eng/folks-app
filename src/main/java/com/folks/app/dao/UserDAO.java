@@ -75,7 +75,7 @@ public interface UserDAO {
      * @return  User
      */
     @NotSupported
-    User select(String externalId);
+    User findByExtId(String externalId);
     
     /**
      * Query all the entries from the underlying db.

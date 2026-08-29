@@ -95,5 +95,8 @@ public interface ProfessionalDAO {
      */
     @NotSupported
     List<Professional> query(SearchCriteria search);
+
+    @NotSupported
+    boolean checkProfExisting(Integer userId);
 }
 

@@ -42,7 +42,6 @@ public class ProfessionalHandler extends AbstractHandler {
     public void register(RoutingContext ctx) {
         // If you use a remote store, this method will safely execute the blocking code.
         LOGGER.info("Start of method register log");
-        System.out.println("Start of method register ");
         vertx().executeBlocking(() -> {
             ProfessionalMaster profMaster = MapperUtil.decode(ctx.body().buffer().getBytes(), ProfessionalMaster.class);
             profMaster = professionalBO.register(user(ctx), profMaster);

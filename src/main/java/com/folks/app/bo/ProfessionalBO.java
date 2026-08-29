@@ -2,15 +2,12 @@ package com.folks.app.bo;
 
 import com.folks.app.dao.*;
 import com.folks.app.model.*;
-import com.folks.app.util.Constants;
-import com.folks.app.util.ResourceNotFoundException;
+import com.folks.app.util.*;
 import jakarta.persistence.NoResultException;
 import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
-import com.folks.app.util.QueryParams;
-import com.folks.app.util.SearchCriteria;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -46,15 +43,25 @@ public class ProfessionalBO extends AbstractBO {
         // Only admin has the privilege to create user or professional
         ensureAdmin(usr);
         validateScope(usr, "user:create");
-        //Validator.validate(profMaster);
+        Validator.validateProfAll(profMaster);
+
+        User existingUser = null;
+        try {
+            existingUser = userDAO.findByExtId(profMaster.getExtUserId());
+        }
+        catch(NoResultException ex) {
+            throw new ResourceNotFoundException("User not existing.");
+        }
+        if(existingUser == null)
+            throw new ResourceNotFoundException("User not found.");
+        Integer userId = existingUser.getUserId();
+//        if(professionalDAO.checkProfExisting(userId))
+//            throw new IllegalArgumentException("Professional already existing");
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        // Fetch the user entry and create the Entity objects for inserting into tables Address, Document.
-        User existingUser = fetchUser(profMaster.getExtUserId());
-
+        // Fetch the user entry and create the Entity objects for inserting into tables Address, Document, Professional, ProfServices
         Address newAddr = profMaster.getAddress();
-        Integer userId = existingUser.getUserId();
         newAddr.setUserId(userId);
         if (newAddr.getLabel() == null) {
             newAddr.setLabel(Constants.DEFAULT_LABEL);
@@ -81,9 +88,6 @@ public class ProfessionalBO extends AbstractBO {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Professional created successfully with Id {}, Elapsed time(ms): {}", newProf.getProfessionalId(), timer.elapsedTimeMillis());
         }
-
-
-        //addProfServices(newProf.getProfessionalId(), serviceList);
         return profMaster;
     }
 
@@ -230,7 +234,7 @@ public class ProfessionalBO extends AbstractBO {
      */
     private User fetchUser(String extUserId) {
         try {
-            return userDAO.select(extUserId);
+            return userDAO.findByExtId(extUserId);
         }
         catch (NoResultException e) {
             throw new ResourceNotFoundException("No User found for id: " + extUserId);

@@ -74,13 +74,27 @@ public class Validator {
         }
     }
 
-    public static void validate(ProfessionalMaster profMaster) {
+    public static void validateProfAll(ProfessionalMaster profMaster) {
         Short exp = profMaster.getExperienceYears();
-        if(exp == null || exp.toString().isEmpty()) {
+        // User, Professional
+        if(profMaster.getExtUserId() == null || profMaster.getExtUserId().isEmpty())
+            throw new IllegalArgumentException("User Id is required.");
+        if(exp == null || exp.toString().isEmpty())
             throw new IllegalArgumentException("Experience is years is required.");
-        }
-//        User user = profMaster.getUserId();
-//        if(user == null)
-//            throw new IllegalArgumentException("User is required.");
+
+        //Document
+        if(profMaster.getDocument().getDocumentType() == null || profMaster.getDocument().getDocumentType().isEmpty())
+            throw new IllegalArgumentException("Document type is required.");
+        if(profMaster.getDocument().getDocumentNumber() == null || profMaster.getDocument().getDocumentNumber().isEmpty())
+            throw new IllegalArgumentException("Document number is required.");
+
+        //Address
+        if(profMaster.getAddress().getAddressLine1() == null || profMaster.getAddress().getAddressLine1().isEmpty())
+            throw new IllegalArgumentException("Address line is required.");
+        if(profMaster.getAddress().getPincode() == null || profMaster.getAddress().getPincode() == 0)
+            throw new IllegalArgumentException("Pin code is required.");
+
+        if(profMaster.getSubCategories() == null || profMaster.getSubCategories().isEmpty())
+            throw new IllegalArgumentException("Sub categories is required.");
     }
 }

@@ -40,7 +40,7 @@ public class ProfessionalService implements Serializable, Cloneable {
     private Integer serviceId;
 
     @Column(name = "price", nullable = false, updatable = true, precision = 7, scale = 2)
-    private BigDecimal price;
+    private Double price;
 
     @Column(name = "is_active", nullable = false, updatable = true, precision = 16)
     private Short isActive;
@@ -71,11 +71,11 @@ public class ProfessionalService implements Serializable, Cloneable {
         return this.serviceId;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public BigDecimal getPrice() {
+    public Double getPrice() {
         return this.price;
     }
 

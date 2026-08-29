@@ -3,6 +3,7 @@ package com.folks.app.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -10,8 +11,6 @@ import java.util.List;
  */
 
 public class ProfessionalMaster implements Serializable, Cloneable {
-
-    //private Integer professionalId;
 
     private String extUserId;
 
@@ -29,14 +28,6 @@ public class ProfessionalMaster implements Serializable, Cloneable {
     private List<Integer> subCategories;
 
     public ProfessionalMaster() {}
-
-//    public void setProfessionalId(Integer professionalId) {
-//        this.professionalId = professionalId;
-//    }
-//
-//    public Integer getProfessionalId() {
-//        return this.professionalId;
-//    }
 
     public void setExtUserId(String userId) {
         this.extUserId = userId;
@@ -95,29 +86,29 @@ public class ProfessionalMaster implements Serializable, Cloneable {
     }
 
 
-//    @Override
-//    public int hashCode() {
-//        int hash = 7;
-//        hash = 71 * hash + Objects.hashCode(this.professionalId);
-//        return hash;
-//    }
-//
-//    @Override
-//    public boolean equals(Object obj) {
-//        if (this == obj) {
-//            return true;
-//        }
-//        if (obj == null) {
-//            return false;
-//        }
-//        if (getClass() != obj.getClass()) {
-//            return false;
-//        }
-//        Integer id = ((Professional)obj).getProfessionalId();
-//        if (!this.professionalId.equals(id)) {
-//            return false;
-//        }
-//        return true;
-//    }
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 71 * hash + Objects.hashCode(this.extUserId);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        String id = ((ProfessionalMaster) obj).getExtUserId();
+        if (!this.extUserId.equals(id)) {
+            return false;
+        }
+        return true;
+    }
 
 }

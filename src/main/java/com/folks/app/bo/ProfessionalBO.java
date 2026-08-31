@@ -239,7 +239,7 @@ public class ProfessionalBO extends AbstractBO {
      */
     private User fetchUser(String extUserId) {
         try {
-            return userDAO.select(extUserId);
+            return userDAO.findByExtId(extUserId);
         }
         catch (NoResultException e) {
             throw new ResourceNotFoundException("No User found for id: " + extUserId);

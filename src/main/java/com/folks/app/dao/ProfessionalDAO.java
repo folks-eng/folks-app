@@ -88,5 +88,6 @@ public interface ProfessionalDAO {
      */
     @NotSupported
     List<Professional> query(SearchCriteria search);
+
 }
 

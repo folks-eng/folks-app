@@ -241,7 +241,7 @@ public class UserBO extends AbstractBO {
             // Query the user based on external_id.
             // external_id will be part of jwt token as 'sub'.
             String extId = usr.principal().sub();
-            return userDAO.select(extId);
+            return userDAO.findByExtId(extId);
         }
         catch (NoResultException e) {
             throw new ResourceNotFoundException("No User found for id: " + usr.principal().sub());

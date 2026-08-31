@@ -49,6 +49,12 @@ public class PricingRule implements Serializable, Cloneable {
     @Column(name = "end_time", nullable = false, updatable = true)
     private Timestamp endTime;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
+
     public PricingRule() {}
 
     public void setRuleId(Integer ruleId) {
@@ -97,6 +103,22 @@ public class PricingRule implements Serializable, Cloneable {
 
     public Timestamp getEndTime() {
         return this.endTime;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class PricingRulePK {

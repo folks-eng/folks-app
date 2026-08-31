@@ -3,11 +3,13 @@ package com.folks.app.bo;
 import com.folks.app.model.AvailTimeSlot;
 import com.folks.app.model.Availability;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import org.javalabs.decl.util.DateUtil;
 
 /**
  *
@@ -71,6 +73,8 @@ public class AvailabilityHelper {
         Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
         calendar.setTime(currentDate);
         calendar.add(Calendar.DAY_OF_MONTH, 1);
+        
+        Timestamp createdAt = new Timestamp(DateUtil.currentUTCDate().getTime());
 
         for (int day = 0; day < numberOfDays; day++) {
             Date startDate = calendar.getTime();
@@ -87,6 +91,7 @@ public class AvailabilityHelper {
 
                 // 0 = available, 1 = booked
                 availability.setIsBooked((short) 0);
+                availability.setCreatedAt(createdAt);
 
                 availabilities.add(availability);
             }

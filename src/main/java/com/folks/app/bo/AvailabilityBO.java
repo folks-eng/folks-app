@@ -13,10 +13,12 @@ import com.folks.app.model.Service.ServicePK;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.javalabs.decl.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +50,9 @@ public class AvailabilityBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         
+        if (availability.getCreatedAt() == null) {
+            availability.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        }
         availabilityDAO.insert(availability);
         timer.stop();
 
@@ -60,6 +65,10 @@ public class AvailabilityBO extends AbstractBO {
     public void create(AppUser usr, List<Availability> records) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
+        
+        for (Availability availability : records) {
+            availability.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        }
         
         availabilityDAO.insert(records);
         timer.stop();

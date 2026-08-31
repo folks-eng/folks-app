@@ -39,11 +39,14 @@ public class JobStatus implements Serializable, Cloneable {
     @Column(name = "status", nullable = false, updatable = true, length = 32)
     private String status;
 
-    @Column(name = "updated_at", nullable = true, updatable = true)
-    private Timestamp updatedAt;
-
     @Column(name = "updated_by", nullable = true, updatable = true, precision = 32)
     private Integer updatedBy;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
 
     public JobStatus() {}
 
@@ -73,6 +76,14 @@ public class JobStatus implements Serializable, Cloneable {
 
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Timestamp getUpdatedAt() {

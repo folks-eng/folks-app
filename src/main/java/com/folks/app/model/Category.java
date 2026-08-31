@@ -2,22 +2,18 @@ package com.folks.app.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
-import org.javalabs.jpa.annotation.Inner;
 
 
 /**
@@ -60,20 +56,17 @@ public class Category implements Serializable, Cloneable {
 
     @Column(name = "parent_id", nullable = true, updatable = true, precision = 32)
     private Integer parentId;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
     
-    @Inner
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parent")
+    @Transient
     private List<Category> subCategories;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(foreignKey = @ForeignKey()
-            , name = "parent_id"
-            , table = "fks_categories"
-            , referencedColumnName = "category_id")
-    private Category parent;
-    
-    @Inner
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+    @Transient
     private List<Service> services;
 
     public Category() {}
@@ -126,20 +119,28 @@ public class Category implements Serializable, Cloneable {
         this.image = image;
     }
 
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public List<Category> getSubCategories() {
         return subCategories;
     }
 
     public void setSubCategories(List<Category> subCategories) {
         this.subCategories = subCategories;
-    }
-
-    public Category getParent() {
-        return parent;
-    }
-
-    public void setParent(Category parent) {
-        this.parent = parent;
     }
 
     public List<Service> getServices() {

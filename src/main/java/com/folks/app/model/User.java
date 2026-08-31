@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -75,8 +76,11 @@ public class User implements Serializable, Cloneable {
     @Column(name = "updated_at", nullable = true, updatable = true)
     private Timestamp updatedAt;
 
-//    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private Professional professional;
+    @Transient
+    private List<Address> addresses;
+    
+    @Transient
+    private List<Document> documents;
 
     public User() {}
 
@@ -170,6 +174,22 @@ public class User implements Serializable, Cloneable {
     
     public static boolean isAdmin(String role) {
         return Role.ADMIN.name().toLowerCase().equals(role);
+    }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
+    }
+
+    public List<Document> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<Document> documents) {
+        this.documents = documents;
     }
 
     public static class UserPK {

@@ -45,8 +45,11 @@ public class AuditLog implements Serializable, Cloneable {
     @Column(name = "entity_id", nullable = false, updatable = true, precision = 32)
     private Integer entityId;
 
-    @Column(name = "created_at", nullable = false, updatable = true)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
 
     public AuditLog() {}
 
@@ -96,6 +99,14 @@ public class AuditLog implements Serializable, Cloneable {
 
     public Timestamp getCreatedAt() {
         return this.createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class AuditLogPK {

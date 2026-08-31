@@ -71,6 +71,12 @@ public class Payment implements Serializable, Cloneable {
     @Column(name = "paid_at", nullable = false, updatable = true)
     private Timestamp paidAt;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
+
     public Payment() {}
 
     public void setPaymentId(Integer paymentId) {
@@ -127,6 +133,22 @@ public class Payment implements Serializable, Cloneable {
 
     public Timestamp getPaidAt() {
         return this.paidAt;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class PaymentPK {

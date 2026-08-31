@@ -45,6 +45,12 @@ public class CouponUsage implements Serializable, Cloneable {
     @Column(name = "used_at", nullable = false, updatable = true)
     private Timestamp usedAt;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
+
     public CouponUsage() {}
 
     public void setUsageId(Integer usageId) {
@@ -85,6 +91,22 @@ public class CouponUsage implements Serializable, Cloneable {
 
     public Timestamp getUsedAt() {
         return this.usedAt;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class CouponUsagePK {

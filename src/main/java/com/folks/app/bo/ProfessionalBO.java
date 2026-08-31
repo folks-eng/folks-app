@@ -14,7 +14,10 @@ import com.folks.app.util.SearchCriteria;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,80 +45,86 @@ public class ProfessionalBO extends AbstractBO {
         }
     }
 
-    public ProfessionalMaster register(AppUser usr, ProfessionalMaster profMaster) throws IllegalAccessException {
-        // Only admin has the privilege to create user or professional
-        ensureAdmin(usr);
-        validateScope(usr, "user:create");
-        //Validator.validate(profMaster);
+    public ProfessionalProfile register(AppUser usr, ProfessionalProfile profProfile) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
+        //Validator.validate(profMaster);
         // Fetch the user entry and create the Entity objects for inserting into tables Address, Document.
-        User existingUser = fetchUser(profMaster.getExtUserId());
+        User user = fetchUser(usr.principal().sub());
 
-        Address newAddr = profMaster.getAddress();
-        Integer userId = existingUser.getUserId();
-        newAddr.setUserId(userId);
-        if (newAddr.getLabel() == null) {
-            newAddr.setLabel(Constants.DEFAULT_LABEL);
-        }
-        newAddr.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
-        if (newAddr.getIsDefault() == null) {
-            newAddr.setIsDefault(Constants.IS_DEFAULT_ADDR);     // All addresses are set to default.
-        }
-        Document newDoc = profMaster.getDocument();
-        newDoc.setUserId(userId);
-        if(newDoc.getDocumentType() == null) {
-            newDoc.setDocumentType(Constants.DEFAULT_DOC_TYPE);
-        }
-        newDoc.setVerificationStatus(Document.Verificationstatus.PENDING);
-        newAddr.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
-        Professional newProf = buildProfObj(userId, profMaster);
-        List<Service> serviceList = fetchServices(profMaster.getSubCategories());
+        // String applicationId = MD5HashGenerator.digest("professional", usr.principal().sub());
+        String applicationId = UUID.randomUUID().toString();
+        Timestamp createdAt = new Timestamp(DateUtil.currentUTCDate().getTime());
 
-        professionalDAO.insertAll(newAddr, newDoc, newProf, serviceList);
-        profMaster.setAddress(newAddr);
-        profMaster.setDocument(newDoc);
+        // Build the professional details.
+        Professional professional = new Professional();
+        professional.setUserId(user.getUserId());
+        professional.setExperienceYears(profProfile.getExperienceYears());
+        professional.setServingCities(profProfile.getServingCities());
+        professional.setIsVerified(Constants.PROF_NOT_VERIFIED);
+        professional.setCreatedAt(createdAt);
+        professional.setUser(user);
+        
+        // Build the local address.
+        Address localAddress = profProfile.getAddress();
+        localAddress.setUserId(user.getUserId());
+        if (localAddress.getLabel() == null) {
+            localAddress.setLabel(Constants.DEFAULT_LABEL);
+        }
+        if (localAddress.getIsDefault() == null) {
+            localAddress.setIsDefault(Constants.IS_DEFAULT_ADDR);     // All addresses are set to default.
+        }
+        localAddress.setCreatedAt(createdAt);
+        user.setAddresses(List.of(localAddress));
+        
+        // Build the document parts.
+        List<Document> documents = profProfile.getDocuments();
+        for (Document doc : documents) {
+            doc.setUserId(user.getUserId());
+            doc.setApplicationId(applicationId);
+            doc.setVerificationStatus(Document.Verificationstatus.PENDING);
+            doc.setCreatedAt(createdAt);
+        }
+        user.setDocuments(documents);
+        
+        // Build the professional vs services mapping.
+        List<Service> services = fetchServices(profProfile.getExpertise());
+        
+        // Assign individual services to this professional's profile
+        List<ProfessionalService> pServices = new ArrayList<>(services.size());
+        for(Service service: services) {
+            ProfessionalService pService = new ProfessionalService();
+            pService.setProfessionalId(professional.getProfessionalId());
+            pService.setServiceId(service.getServiceId());
+            pService.setPrice(service.getBasePrice());
+            pService.setIsActive(Constants.PROF_SERVICE_ACTIVE);
+            pService.setCreatedAt(createdAt);
+            
+            pServices.add(pService);
+        }
+        professional.setProfServices(pServices);
+        
+        professionalDAO.insertProfile(professional);
         timer.stop();
 
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Professional created successfully with Id {}, Elapsed time(ms): {}", newProf.getProfessionalId(), timer.elapsedTimeMillis());
+            LOGGER.info("Professional onboarded successfully with Id {}, Elapsed time(ms): {}"
+                    , professional.getProfessionalId(), timer.elapsedTimeMillis());
         }
+        // Set the applicationId before sending the response. Pros may use this id for further followup.
+        profProfile.setApplicationId(applicationId);
 
-
-        //addProfServices(newProf.getProfessionalId(), serviceList);
-        return profMaster;
-    }
-
-    private void addProfServices(Integer professionalId, List<Service> serviceList) {
-    }
-
-    private List<Service> fetchServices(List<Integer> categoryIdList) {
-        List<Service>  serviceList = new ArrayList<>();
-        try {
-            serviceList = serviceDAO.findByCat(categoryIdList);
-        }
-        catch (NoResultException e) {
-            throw new ResourceNotFoundException("No Service found for Categories  : " + categoryIdList);
-        }
-        return serviceList;
-    }
-
-    private Professional buildProfObj(Integer userId, ProfessionalMaster profMaster) {
-        Professional newProf = new Professional();
-        newProf.setUserId(userId);
-        newProf.setExperienceYears(profMaster.getExperienceYears());
-        newProf.setIsVerified(Constants.PROF_NOT_VERIFIED);
-        return newProf;
+        return profProfile;
     }
 
     public Professional create(AppUser usr, Professional professional) throws IllegalAccessException {
-        ensureAdmin(usr);
-        validateScope(usr, "user:create");
-        
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         
+        if (professional.getCreatedAt() == null) {
+            professional.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        }        
         professionalDAO.insert(professional);
         timer.stop();
 
@@ -234,6 +243,28 @@ public class ProfessionalBO extends AbstractBO {
         }
         catch (NoResultException e) {
             throw new ResourceNotFoundException("No User found for id: " + extUserId);
+        }
+    }
+
+    private List<Service> fetchServices(List<Integer> expertise) {
+        try {
+            List<String> subCategoryIds = new ArrayList<>(expertise.size());
+            for (Integer subCategoryId : expertise) {
+                subCategoryIds.add(String.valueOf(subCategoryId));
+            }
+            Map<String, List<String>> param = new HashMap<>();
+            param.put("categoryId", subCategoryIds);
+
+            SearchCriteria search = SearchCriteria.from(new QueryParams(param));
+            List<Service> services = serviceDAO.query(search);
+            
+            if (services.size() < subCategoryIds.size()) {
+                throw new IllegalArgumentException("Invalid non-existent sub-categories provided.");
+            }
+            return services;
+        }
+        catch (NoResultException e) {
+            throw new ResourceNotFoundException("No Service found for the sub-categories: " + expertise);
         }
     }
 }

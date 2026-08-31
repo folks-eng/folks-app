@@ -7,7 +7,9 @@ import com.folks.app.dao.ServiceDAO;
 import com.folks.app.model.Service;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
+import java.sql.Timestamp;
 import java.util.List;
+import org.javalabs.decl.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,55 +31,13 @@ public class ServiceBO extends AbstractBO {
         }
     }
 
-    public List<Service> viewAll(AppUser usr, QueryParams params) {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        SearchCriteria search = SearchCriteria.from(params);
-        List<Service> rows = serviceDAO.query(search);
-
-        timer.stop();
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched {} expanded service record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
-        }
-        return rows;
-    }
-
-    public List<Service> findByCat(AppUser usr, List<Integer> idList) {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        List<Service> serviceList = serviceDAO.findByCat(idList);
-        if (serviceList == null) {
-            throw new IllegalArgumentException("No Service found for category ids: " + idList);
-        }
-        timer.stop();
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched service details. Elapsed time(ms): {}", timer.elapsedTimeMillis());
-        }
-        return serviceList;
-    }
-
-    public Service view(AppUser usr, Integer id) {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        Service service = serviceDAO.find(new Service.ServicePK(id));
-        if (service == null) {
-            throw new IllegalArgumentException("No Service found for id: " + id);
-        }
-        timer.stop();
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched service details. Elapsed time(ms): {}", timer.elapsedTimeMillis());
-        }
-        return service;
-    }
-
     public Service create(AppUser usr, Service service) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         
-        
+        if (service.getCreatedAt() == null) {
+            service.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        }
         serviceDAO.insert(service);
         timer.stop();
 
@@ -90,8 +50,12 @@ public class ServiceBO extends AbstractBO {
     public void create(AppUser usr, List<Service> records) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-
         
+        for (Service service : records) {
+            if (service.getCreatedAt() == null) {
+                service.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+            }
+        }
         serviceDAO.insert(records);
         timer.stop();
 
@@ -123,6 +87,35 @@ public class ServiceBO extends AbstractBO {
             LOGGER.info("Service record modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
         return existing;
+    }
+
+    public List<Service> viewAll(AppUser usr, QueryParams params) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        SearchCriteria search = SearchCriteria.from(params);
+        List<Service> rows = serviceDAO.query(search);
+
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched {} expanded service record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
+        }
+        return rows;
+    }
+
+    public Service view(AppUser usr, Integer id) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        Service service = serviceDAO.find(new Service.ServicePK(id));
+        if (service == null) {
+            throw new IllegalArgumentException("No Service found for id: " + id);
+        }
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Fetched service details. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+        }
+        return service;
     }
 
     public Service remove(AppUser usr, Integer id) {

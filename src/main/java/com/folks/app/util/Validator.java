@@ -2,7 +2,7 @@ package com.folks.app.util;
 
 import com.folks.app.model.Address;
 import com.folks.app.model.Professional;
-import com.folks.app.model.ProfessionalMaster;
+import com.folks.app.model.ProfessionalProfile;
 import com.folks.app.model.User;
 
 import java.util.Arrays;
@@ -74,7 +74,7 @@ public class Validator {
         }
     }
 
-    public static void validate(ProfessionalMaster profMaster) {
+    public static void validate(ProfessionalProfile profMaster) {
         Short exp = profMaster.getExperienceYears();
         if(exp == null || exp.toString().isEmpty()) {
             throw new IllegalArgumentException("Experience is years is required.");

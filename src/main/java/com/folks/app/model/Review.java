@@ -48,8 +48,11 @@ public class Review implements Serializable, Cloneable {
     @Column(name = "comment", nullable = true, updatable = true, length = 1000000000)
     private String comment;
 
-    @Column(name = "created_at", nullable = false, updatable = true)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
 
     public Review() {}
 
@@ -107,6 +110,14 @@ public class Review implements Serializable, Cloneable {
 
     public Timestamp getCreatedAt() {
         return this.createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class ReviewPK {

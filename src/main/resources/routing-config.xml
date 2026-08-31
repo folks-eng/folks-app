@@ -49,8 +49,8 @@
 
     <resource-mapping name="Professional" path="/professionals" resource="com.folks.app.handler.ProfessionalHandler" schema="com.folks.app.model.ProfessionalMaster">
         <mapping uri="/register" method="POST" api="register"/>
-        <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="" method="POST" api="create"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
         <mapping uri="/:id" method="GET" api="view"/>
         <mapping uri="/:id" method="DELETE" api="remove"/>

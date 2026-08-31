@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -35,16 +37,26 @@ public class Professional implements Serializable, Cloneable {
     @Column(name = "experience_years", nullable = false, updatable = true, precision = 16)
     private Short experienceYears;
 
+    @Column(name = "serving_cities", nullable = true, updatable = true, length = 256)
+    private String servingCities;
+
     @Column(name = "rating_avg", nullable = true, updatable = true, precision = 3, scale = 2)
     private BigDecimal ratingAvg;
 
     @Column(name = "is_verified", nullable = false, updatable = true, precision = 16)
     private Short isVerified;
 
-    //user_id in the professional table references the user_id column in the User table.
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name="user_id", referencedColumnName="user_id", nullable = false, unique = true)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
+
+    @Transient
     private User user;
+    
+    @Transient
+    private List<ProfessionalService> profServices;
 
     public Professional() {}
 
@@ -80,6 +92,14 @@ public class Professional implements Serializable, Cloneable {
         return this.experienceYears;
     }
 
+    public String getServingCities() {
+        return servingCities;
+    }
+
+    public void setServingCities(String servingCities) {
+        this.servingCities = servingCities;
+    }
+
     public void setRatingAvg(BigDecimal ratingAvg) {
         this.ratingAvg = ratingAvg;
     }
@@ -96,12 +116,36 @@ public class Professional implements Serializable, Cloneable {
         return this.isVerified;
     }
 
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public User getUser() {
         return user;
     }
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<ProfessionalService> getProfServices() {
+        return profServices;
+    }
+
+    public void setProfServices(List<ProfessionalService> profServices) {
+        this.profServices = profServices;
     }
 
     public static class ProfessionalPK {

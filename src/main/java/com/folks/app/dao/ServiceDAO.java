@@ -66,18 +66,6 @@ public interface ServiceDAO {
      */
     @NotSupported
     Service find(Service.ServicePK pk);
-    
-    /**
-     * Find services by the ids.
-     * 
-     * @param ids
-     * @return List
-     */
-    @NotSupported
-    List<Service> find(List<Integer> ids);
-
-    @NotSupported
-    List<Service> findByCat(List<Integer> catIds);
 
     /**
      * Query all the entries from the underlying db.

@@ -33,6 +33,8 @@ public abstract class AbstractDAO {
      */
     private static final List<String> ALL = Arrays.asList("*");
     
+    private static final String NOT_NULL = "not_null";
+    
     /**
      * Builds a query for the specified table using all available columns.
      *
@@ -96,7 +98,8 @@ public abstract class AbstractDAO {
         for (Map.Entry<String, List<Object>> me : search.params().entrySet()) {
             String col = me.getKey();
             List<Object> vals = me.getValue();
-            if (vals.isEmpty()) {
+            
+            if (vals == null || vals.isEmpty()) {
                 continue;
             }
             if (idx == 0) {
@@ -104,7 +107,13 @@ public abstract class AbstractDAO {
                     query.where(col).in(vals);
                 }
                 else {
-                    query.where(col).eq(vals.get(0));
+                    // A special value to indicate if a column is not null.
+                    if (NOT_NULL.equalsIgnoreCase(String.valueOf(vals.get(0)))) {
+                        query.where(col).isNotNull();
+                    }
+                    else {
+                        query.where(col).eq(vals.get(0));
+                    }
                 }
                 idx ++;
             }
@@ -113,11 +122,16 @@ public abstract class AbstractDAO {
                     query.and(col).in(vals);
                 }
                 else {
-                    query.and(col).eq(vals.get(0));
+                    // A special value to indicate if a column is not null.
+                    if (NOT_NULL.equalsIgnoreCase(String.valueOf(vals.get(0)))) {
+                        query.and(col).isNotNull();
+                    }
+                    else {
+                        query.and(col).eq(vals.get(0));
+                    }
                 }
             }
         }
-        
         query.orderBy(search.orderBy() != null ? search.orderBy() : "created_at");
         if (! search.asc()) {
             query.desc();

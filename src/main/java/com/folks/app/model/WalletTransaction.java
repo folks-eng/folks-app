@@ -49,8 +49,11 @@ public class WalletTransaction implements Serializable, Cloneable {
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    @Column(name = "created_at", nullable = false, updatable = true)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
 
     public WalletTransaction() {}
 
@@ -92,6 +95,14 @@ public class WalletTransaction implements Serializable, Cloneable {
 
     public Timestamp getCreatedAt() {
         return this.createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class WalletTransactionPK {

@@ -2,18 +2,15 @@ package com.folks.app.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 
@@ -27,15 +24,7 @@ import java.util.Objects;
 @Table(name = "fks_services")
 @IdClass(Service.ServicePK.class)
 @NamedNativeQueries({
-    @NamedNativeQuery(name = "Service.selectAll", query = "SELECT * FROM fks_services"),
-    @NamedNativeQuery(name = "Service.selectByIds"
-            , query = "SELECT *"
-                    + "  FROM fks_services "
-                    + " WHERE service_id IN (:ids)"),
-        @NamedNativeQuery(name = "Service.selectByCatIds"
-                , query = "SELECT *"
-                + "  FROM fks_services "
-                + " WHERE category_id IN (:ids)")
+    @NamedNativeQuery(name = "Service.selectAll", query = "SELECT * FROM fks_services")
 })
 public class Service implements Serializable, Cloneable {
 
@@ -70,13 +59,12 @@ public class Service implements Serializable, Cloneable {
 
     @Column(name = "reviews", nullable = false, updatable = true, precision = 32)
     private Integer reviews;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(foreignKey = @ForeignKey()
-            , name = "category_id"
-            , table = "fks_categories"
-            , referencedColumnName = "category_id")
-    private Category category;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
 
     public Service() {}
 
@@ -160,12 +148,20 @@ public class Service implements Serializable, Cloneable {
         this.reviews = reviews;
     }
 
-    public Category getCategory() {
-        return category;
+    public Timestamp getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class ServicePK {

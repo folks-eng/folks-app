@@ -54,6 +54,7 @@ public class BookingBO extends AbstractBO {
         if (booking.getCreatedAt() == null) {
             booking.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
         }
+        // 
         booking.setBookingId(MD5HashGenerator.digest(
                 String.valueOf(booking.getCustomerId())
                 , String.valueOf(booking.getServiceId())

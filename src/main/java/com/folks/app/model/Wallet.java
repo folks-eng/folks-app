@@ -9,6 +9,7 @@ import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 
@@ -34,7 +35,13 @@ public class Wallet implements Serializable, Cloneable {
     private Integer userId;
 
     @Column(name = "balance", nullable = true, updatable = true, precision = 7, scale = 2)
-    private BigDecimal balance;
+    private Double balance;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
 
     public Wallet() {}
 
@@ -54,12 +61,28 @@ public class Wallet implements Serializable, Cloneable {
         return this.userId;
     }
 
-    public void setBalance(BigDecimal balance) {
+    public void setBalance(Double balance) {
         this.balance = balance;
     }
 
-    public BigDecimal getBalance() {
+    public Double getBalance() {
         return this.balance;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class WalletPK {

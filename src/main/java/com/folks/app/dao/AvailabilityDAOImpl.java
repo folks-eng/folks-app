@@ -20,7 +20,7 @@ import java.util.Map;
  *
  * @author Sudiptasish Chanda
  */
-public class AvailabilityDAOImpl implements AvailabilityDAO {
+public class AvailabilityDAOImpl extends AbstractDAO implements AvailabilityDAO {
     
     private final String TABLE = "fks_availabilities";
     

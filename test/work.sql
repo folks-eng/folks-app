@@ -259,3 +259,24 @@ fks_users                   => 149 - 700
 fks_professionals           => 31 - 582
 fks_professional_services   => 69
 
+
+
+
+INSERT INTO fks_availabilities (professional_id, date, start_time, end_time, is_booked, created_at)
+SELECT
+    p.professional_id
+    , d::date AS date
+    , CAST ('09:00:00' + (h * INTERVAL '1 hour') AS TIME) AS start_time
+    , CAST ('09:00:00' + ((h + 1) * INTERVAL '1 hour') AS TIME) AS end_time
+    , 0 AS is_booked
+    , CAST ((TO_CHAR(CURRENT_DATE, 'yyyy-mm-dd') || ' 00:00:00') AS TIMESTAMP) AS created_at
+  FROM fks_professionals p
+ CROSS JOIN generate_series(
+       CAST (TO_CHAR(CURRENT_DATE, 'yyyy-mm-dd') AS DATE),
+       CAST (TO_CHAR(CURRENT_DATE + 4, 'yyyy-mm-dd') AS DATE),
+       INTERVAL '1 day'
+ ) AS d
+ CROSS JOIN generate_series(0, 8) AS h
+ WHERE p.professional_id BETWEEN 1 AND 2
+ ORDER BY p.professional_id, date, start_time;
+

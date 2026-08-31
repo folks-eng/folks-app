@@ -36,8 +36,11 @@ public class Conversation implements Serializable, Cloneable {
     @Column(name = "booking_id", nullable = false, updatable = true, length = 36)
     private String bookingId;
 
-    @Column(name = "created_at", nullable = false, updatable = true)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
 
     public Conversation() {}
 
@@ -63,6 +66,14 @@ public class Conversation implements Serializable, Cloneable {
 
     public Timestamp getCreatedAt() {
         return this.createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class ConversationPK {

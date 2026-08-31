@@ -41,11 +41,14 @@ public class Document implements Serializable, Cloneable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "document_id", nullable = false, updatable = false, precision = 32)
     private Integer documentId;
-
-    @Column(name = "user_id", nullable = false, updatable = true, precision = 32)
+    
+    @Column(name = "user_id", nullable = false, updatable = false, precision = 32)
     private Integer userId;
+    
+    @Column(name = "application_id", nullable = false, updatable = false, length = 36)
+    private String applicationId;
 
-    @Column(name = "document_type", nullable = false, updatable = true, length = 50)
+    @Column(name = "document_type", nullable = false, updatable = false, length = 50)
     private String documentType;
 
     @Column(name = "document_number", nullable = false, updatable = true, length = 50)
@@ -54,12 +57,18 @@ public class Document implements Serializable, Cloneable {
     @Column(name = "document_url", nullable = true, updatable = true, length = 1000000000)
     private String documentUrl;
 
+    @Column(name = "name_on_document", nullable = false, updatable = false, length = 50)
+    private String nameOnDocument;
+
     @Column(name = "verification_status", nullable = true, updatable = true, check = @CheckConstraint(constraint = "verification_status IN ('PENDING', 'APPROVED', 'REJECTED')"))
     @Enumerated(EnumType.STRING)
     private Verificationstatus verificationStatus;
 
-    @Column(name = "created_at", nullable = false, updatable = true)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
 
     public Document() {}
 
@@ -77,6 +86,22 @@ public class Document implements Serializable, Cloneable {
 
     public Integer getUserId() {
         return this.userId;
+    }
+
+    public String getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(String applicationId) {
+        this.applicationId = applicationId;
+    }
+
+    public String getNameOnDocument() {
+        return nameOnDocument;
+    }
+
+    public void setNameOnDocument(String nameOnDocument) {
+        this.nameOnDocument = nameOnDocument;
     }
 
     public void setDocumentType(String documentType) {
@@ -117,6 +142,14 @@ public class Document implements Serializable, Cloneable {
 
     public Timestamp getCreatedAt() {
         return this.createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class DocumentPK {

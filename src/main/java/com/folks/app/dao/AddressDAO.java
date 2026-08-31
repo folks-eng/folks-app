@@ -68,15 +68,6 @@ public interface AddressDAO {
     Address find(Address.AddressPK pk);
     
     /**
-     * Find addresses by the ids.
-     * 
-     * @param ids
-     * @return List
-     */
-    @NotSupported
-    List<Address> find(List<Integer> ids);
-    
-    /**
      * Query all the entries from the underlying db.
      * This is an extension of the {@link #query(SearchCriteria)} method, just that this method
      * will return all the attributes associated with the record.

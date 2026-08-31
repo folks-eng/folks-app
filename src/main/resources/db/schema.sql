@@ -45,7 +45,9 @@ CREATE TABLE fks_categories (
     icon                VARCHAR(16)     ,
     tag_line            VARCHAR(128)    ,
     image               VARCHAR(128)    ,
-    parent_id           INT             
+    parent_id           INT             ,
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 CREATE TABLE fks_services (
@@ -58,7 +60,9 @@ CREATE TABLE fks_services (
     duration_minutes    SMALLINT        ,
     image               VARCHAR(128)    ,
     rating_avg          NUMERIC(3, 2)   ,
-    reviews             INT
+    reviews             INT             ,
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 -- Professional Profiles
@@ -68,8 +72,11 @@ CREATE TABLE fks_professionals (
     user_id             INT             NOT NULL,
     bio                 TEXT            ,
     experience_years    SMALLINT        NOT NULL,
+    serving_cities      VARCHAR(255)    NOT NULL,
     rating_avg          NUMERIC(3, 2)   ,
-    is_verified         SMALLINT        NOT NULL
+    is_verified         SMALLINT        NOT NULL,
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 -- Professional Skills
@@ -79,7 +86,9 @@ CREATE TABLE fks_professional_services (
     professional_id     INT             NOT NULL,
     service_id          INT             NOT NULL,
     price               NUMERIC(7, 2)   NOT NULL,
-    is_active           SMALLINT        NOT NULL
+    is_active           SMALLINT        NOT NULL,
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 -- 3. Booking & Scheduling
@@ -95,8 +104,8 @@ CREATE TABLE fks_bookings (
     scheduled_at        TIMESTAMP       NOT NULL,
     time_slot           VARCHAR(24)     NOT NULL,
     status              VARCHAR(16)     CHECK (status IN ('PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')),
-    status_msg          VARCHAR(255)    ,
-    total_amount        NUMERIC(8, 2)   NOT NULL,
+    status_msg          VARCHAR(255)    NUll,
+    total_amount        NUMERIC(20, 6)  NOT NULL,
     payment_method      VARCHAR(16)     CHECK (payment_method IN ('CARD', 'UPI', 'WALLET', 'COD')),
     created_at          TIMESTAMP       NOT NULL,
     updated_at          TIMESTAMP       
@@ -110,7 +119,9 @@ CREATE TABLE fks_availabilities (
     date                DATE            NOT NULL,
     start_time          TIME            ,
     end_time            TIME            ,
-    is_booked           SMALLINT        NOT NULL
+    is_booked           SMALLINT        NOT NULL,
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 -- 4. Payments & Pricing
@@ -124,7 +135,9 @@ CREATE TABLE fks_payments (
     payment_method      VARCHAR(16)     CHECK (payment_method IN ('CARD', 'UPI', 'WALLET', 'COD')),
     payment_status      VARCHAR(16)     CHECK (payment_status IN ('INITIATED', 'SUCCESS', 'FAILED', 'REFUNDED')),
     transaction_ref     VARCHAR(128)    NOT NULL,
-    paid_at             TIMESTAMP       NOT NULL
+    paid_at             TIMESTAMP       NOT NULL,
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 -- Coupons & Discounts
@@ -136,7 +149,9 @@ CREATE TABLE fks_coupons (
     discount_value      NUMERIC(7, 2)   ,
     max_discount        NUMERIC(7, 2)   ,
     expiry_date         DATE            NOT NULL,
-    usage_limit         SMALLINT
+    usage_limit         SMALLINT        ,
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 CREATE TABLE fks_coupon_usage (
@@ -144,7 +159,9 @@ CREATE TABLE fks_coupon_usage (
     coupon_id           INT             NOT NULL,
     user_id             INT             NOT NULL,
     booking_id          VARCHAR(36)     NOT NULL,
-    used_at             TIMESTAMP       NOT NULL
+    used_at             TIMESTAMP       NOT NULL,
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 -- 5. Ratings & Reviews
@@ -156,7 +173,8 @@ CREATE TABLE fks_reviews (
     professional_id     INT             NOT NULL,
     rating              SMALLINT        ,
     comment             TEXT            ,
-    created_at          TIMESTAMP       NOT NULL
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 -- 6. Communication
@@ -164,7 +182,8 @@ CREATE TABLE fks_reviews (
 CREATE TABLE fks_conversations (
     conversation_id     INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
     booking_id          VARCHAR(36)     NOT NULL,
-    created_at          TIMESTAMP       NOT NULL
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 CREATE TABLE fks_messages (
@@ -172,7 +191,9 @@ CREATE TABLE fks_messages (
     conversation_id     INT             NOT NULL,
     sender_id           INT             NOT NULL,
     message_text        TEXT            ,
-    sent_at             TIMESTAMP       NOT NULL
+    sent_at             TIMESTAMP       NOT NULL,
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 -- 7. Operations & Logistics
@@ -181,8 +202,9 @@ CREATE TABLE fks_job_status (
     log_id              INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
     booking_id          VARCHAR(36)     NOT NULL,
     status              VARCHAR(32)     NOT NULL,
-    updated_at          TIMESTAMP       ,
-    updated_by          INT       
+    updated_by          INT             ,
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 -- 8. Admin & Compliance
@@ -192,11 +214,12 @@ CREATE TABLE fks_job_status (
 CREATE TABLE fks_documents (
     document_id         INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
     user_id             INT             NOT NULL,
+    application_id      VARCHAR(36)     NOT NULL,
     document_type       VARCHAR(50)     NOT NULL,
-    document_number       VARCHAR(50)     NOT NULL,
     document_url        TEXT            ,
-    verification_status VARCHAR(16)     NOT NULL CHECK (verification_status IN ('PENDING', 'APPROVED', 'REJECTED')),
-    created_at         TIMESTAMP        NOT NULL
+    verification_status VARCHAR(16)     CHECK (verification_status IN ('PENDING', 'APPROVED', 'REJECTED')),
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 -- 9. Surge Pricing
@@ -207,7 +230,9 @@ CREATE TABLE fks_pricing_rules (
     city                VARCHAR(100)    NOT NULL,
     multiplier          NUMERIC(7, 2)   NOT NULL,
     start_time          TIMESTAMP       NOT NULL,
-    end_time            TIMESTAMP       NOT NULL
+    end_time            TIMESTAMP       NOT NULL,
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 -- 10. Wallet Systems
@@ -215,7 +240,9 @@ CREATE TABLE fks_pricing_rules (
 CREATE TABLE fks_wallets (
     wallet_id           VARCHAR(36)     NOT NULL,
     user_id             INT             NOT NULL,
-    balance             NUMERIC(7, 2)  
+    balance             NUMERIC(7, 2)   ,
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 CREATE TABLE fks_wallet_transactions (
@@ -223,7 +250,8 @@ CREATE TABLE fks_wallet_transactions (
     wallet_id           VARCHAR(36)     NOT NULL,
     amount              NUMERIC(7, 2)   NOT NULL,
     type                VARCHAR(16)     CHECK (type IN ('CREDIT', 'DEBIT')),
-    created_at          TIMESTAMP       NOT NULL
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
 
 -- 11. Analytics / Audit
@@ -234,9 +262,9 @@ CREATE TABLE fks_audit_logs (
     action              VARCHAR(64)     NOT NULL,
     entity_type         VARCHAR(50)     NOT NULL,
     entity_id           INT             NOT NULL,
-    created_at          TIMESTAMP       NOT NULL
+    created_at          TIMESTAMP       NOT NULL,
+    updated_at          TIMESTAMP     
 );
-
 
 -- Primary Key Constraint --
 
@@ -320,6 +348,12 @@ ALTER TABLE fks_coupon_usage
 ADD CONSTRAINT fks_coupon_usage_pk
 PRIMARY KEY (usage_id);
 
+-- Unique Key Constraint --
+
+ALTER TABLE fks_professional_services
+ADD CONSTRAINT fks_professional_services_uk
+UNIQUE (professional_id, service_id);
+
 -- Foreign Key Constraint --
 
 ALTER TABLE fks_addresses
@@ -391,7 +425,6 @@ ALTER TABLE fks_payments
 ADD CONSTRAINT fks_payments_fk1
 FOREIGN KEY (booking_id)
 REFERENCES fks_bookings (booking_id);
-
 
 -- Indexes --
 

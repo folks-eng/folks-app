@@ -45,7 +45,7 @@ public class UserBO extends AbstractBO {
         timer.start();
 
         user.setExternalId(UUID.randomUUID().toString());
-        user.setRole(User.Role.CUSTOMER);
+        user.setRole(user.getRole() != null ? user.getRole() : User.Role.CUSTOMER);
         user.setStatus(User.Status.ACTIVE);
 
         if (user.getCreatedAt() == null) {

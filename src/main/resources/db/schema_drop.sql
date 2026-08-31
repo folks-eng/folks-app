@@ -5,7 +5,7 @@
 
 DROP TABLE IF EXISTS fks_addresses CASCADE;
 DROP TABLE IF EXISTS fks_audit_logs CASCADE;
-DROP TABLE IF EXISTS fks_availability CASCADE;
+DROP TABLE IF EXISTS fks_availabilities CASCADE;
 DROP TABLE IF EXISTS fks_bookings CASCADE;
 DROP TABLE IF EXISTS fks_categories CASCADE;
 DROP TABLE IF EXISTS fks_conversations CASCADE;

@@ -40,11 +40,21 @@ public class BookingEventConsumer implements Handler<Message<Booking>> {
     }
 
     private void assignProfessional(Booking booking) {
-        bookingBO.assignProfessional(booking);
+        try {
+            bookingBO.assignProfessional(booking);
+        }
+        catch (RuntimeException e) {
+            LOGGER.error("Error in assigning professional to booking {}", booking.getBookingId());
+        }
     }
 
     private void freeProfessional(Booking booking) {
-        bookingBO.freeProfessional(booking);
+        try {
+            bookingBO.freeProfessional(booking);
+        }
+        catch (RuntimeException e) {
+            LOGGER.error("Error in freeing up professional from booking {}", booking.getBookingId());
+        }
     }
     
 }

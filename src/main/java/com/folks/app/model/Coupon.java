@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 
@@ -51,6 +52,12 @@ public class Coupon implements Serializable, Cloneable {
 
     @Column(name = "usage_limit", nullable = true, updatable = true, precision = 16)
     private Short usageLimit;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
 
     public Coupon() {}
 
@@ -108,6 +115,22 @@ public class Coupon implements Serializable, Cloneable {
 
     public Short getUsageLimit() {
         return this.usageLimit;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class CouponPK {

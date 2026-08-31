@@ -10,7 +10,7 @@ import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 
@@ -40,10 +40,16 @@ public class ProfessionalService implements Serializable, Cloneable {
     private Integer serviceId;
 
     @Column(name = "price", nullable = false, updatable = true, precision = 7, scale = 2)
-    private BigDecimal price;
+    private Double price;
 
     @Column(name = "is_active", nullable = false, updatable = true, precision = 16)
     private Short isActive;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
 
     public ProfessionalService() {}
 
@@ -71,11 +77,11 @@ public class ProfessionalService implements Serializable, Cloneable {
         return this.serviceId;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public BigDecimal getPrice() {
+    public Double getPrice() {
         return this.price;
     }
 
@@ -85,6 +91,22 @@ public class ProfessionalService implements Serializable, Cloneable {
 
     public Short getIsActive() {
         return this.isActive;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class ProfessionalServicePK {

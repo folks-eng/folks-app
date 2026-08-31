@@ -1,66 +1,76 @@
 package com.folks.app.dao;
 
 import com.folks.app.model.*;
-import com.folks.app.util.Constants;
 import org.javalabs.jpa.query.Criteria;
 import com.folks.app.util.SearchCriteria;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.ArrayList;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import org.javalabs.jpa.annotation.Dao;
 
 /**
  * Concrete DAO class to handle database operations related.
  *
  * @author Sudiptasish Chanda
  */
-public class ProfessionalDAOImpl implements ProfessionalDAO {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionalDAOImpl.class);
+public class ProfessionalDAOImpl extends AbstractDAO implements ProfessionalDAO {
 
     private final String TABLE = "fks_professionals";
     
     @PersistenceContext(name = "folks-app-pu")
     private EntityManager em;
+    
+    @Dao
+    private UserDAO userDAO;
+    
+    @Dao
+    private AddressDAO addressDAO;
+    
+    @Dao
+    private DocumentDAO documentDAO;
+    
+    @Dao
+    private ProfessionalServiceDAO profServiceDAO;
+    
+    @Override
+    public void insertProfile(Professional professional) {
+        // User record is already present, no need to insert it again.
+        // Maintain the below insertion order.
+        
+        addressDAO.insert(professional.getUser().getAddresses());
+        documentDAO.insert(professional.getUser().getDocuments());
 
-    public void insertAll(Address addr, Document doc, Professional prof, List<Service> serviceList) {
-        em.persist(addr);
-        em.persist(doc);
-
-        // Persist the Professional entity after which it has the professionalId
-        em.persist(prof);
+        // Persist the Professional entity after which the professional_id will be generated.
+        // Flushing is important because it ensures that the insert statement is immediately sent to the RDBMS,
+        // allowing the database-generated identity value, professional_id to become available.
+        em.persist(professional);
         em.flush();
-        Integer profId = prof.getProfessionalId();
-        LOGGER.info( "Professional inserted with id " +profId);
-        for(Service service: serviceList) {
-            ProfessionalService pService = new ProfessionalService();
-            pService.setProfessionalId(profId);
-            pService.setServiceId(service.getServiceId());
-            pService.setPrice(BigDecimal.valueOf(service.getBasePrice().doubleValue()));
-            pService.setIsActive(Constants.PROF_SERVICE_ACTIVE);
-            em.persist(pService);
+        
+        // Assign this professional_id to all the professional service objects.
+        for (ProfessionalService pService: professional.getProfServices()) {
+            pService.setProfessionalId(professional.getProfessionalId());
         }
-        LOGGER.info( "Professional services inserted  to complete registration of Professional " +serviceList.size());
+        profServiceDAO.insert(professional.getProfServices());
     }
 
     @Override
     public void insert(Professional record) {
-        // Persist the User entity
-        em.persist(record.getUser());
-
-        // Persist the Professional entity (saves the foreign key user_id)
-        em.persist(record);
+        insert(Arrays.asList(record));
     }
 
     @Override
     public void insert(List<Professional> records) {
+        List<User> users = new ArrayList<>(records.size());
+        for (Professional record : records) {
+            users.add(record.getUser());
+        }
+        userDAO.insert(users);
+        
         for (Professional record : records) {
             em.persist(record);
         }
@@ -110,46 +120,12 @@ public class ProfessionalDAOImpl implements ProfessionalDAO {
 
     @Override
     public List<Professional> query(SearchCriteria search) {
-        Criteria query = new Criteria()
-                .select(Arrays.asList("*"))
-                .from(TABLE);
-
-        int idx = 0;
-        for (Map.Entry<String, List<Object>> me : search.params().entrySet()) {
-            String col = me.getKey();
-            List<Object> vals = me.getValue();
-            if (vals.isEmpty()) {
-                continue;
-            }
-            if (idx == 0) {
-                if (vals.size() > 1) {
-                    query.where(col).in(vals);
-                }
-                else {
-                    query.where(col).eq(vals.get(0));
-                }
-                idx ++;
-            }
-            else {
-                if (vals.size() > 1) {
-                    query.and(col).in(vals);
-                }
-                else {
-                    query.and(col).eq(vals.get(0));
-                }
-            }
-        }
-        if (search.orderBy() != null) {
-            query.orderBy(search.orderBy());
-        }
-        if (! search.asc()) {
-            query.desc();
-        }
+        Criteria query = getQuery(TABLE, search);
 
         TypedQuery q = em.createNativeQuery(query.toQuery(), Professional.class);
         List<Object> binds = query.params();
         
-        idx = 1;
+        int idx = 1;
         for (Object bind : binds) {
             q.setParameter(idx ++, bind);
         }

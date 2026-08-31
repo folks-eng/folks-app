@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 
@@ -26,15 +27,7 @@ import java.util.Objects;
 @IdClass(Availability.AvailabilityPK.class)
 @NamedNativeQueries({
     @NamedNativeQuery(name = "Availability.selectAll", query = "SELECT * FROM fks_availabilities"),
-    @NamedNativeQuery(name = "Availability.selectMinMaxDate", query = "SELECT MIN(date), MAX(date) FROM fks_availabilities"),
-    @NamedNativeQuery(name = "Availability.selectSlotByStartTime"
-            , query = """
-                      SELECT a.service_id, a.name, a.duration_minutes, b.professional_id, c.date, c.start_time, c.end_time, c.is_booked
-                        FROM fks_services a
-                       INNER JOIN fks_professional_services b ON (a.service_id = b.service_id)
-                       INNER JOIN fks_availabilities c ON (b.professional_id = c.professional_id AND c.date = ? AND c.start_time >= TIME ? AND c.end_time <= c.start_time + CEIL(a.duration_minutes / 60.0) * INTERVAL '1 hour' AND c.is_booked = 0)
-                       WHERE a.service_id = ?
-                      """)
+    @NamedNativeQuery(name = "Availability.selectMinMaxDate", query = "SELECT MIN(date), MAX(date) FROM fks_availabilities")
 })
 public class Availability implements Serializable, Cloneable {
 
@@ -57,6 +50,12 @@ public class Availability implements Serializable, Cloneable {
 
     @Column(name = "is_booked", nullable = false, updatable = true, precision = 16)
     private Short isBooked;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
 
     public Availability() {}
 
@@ -106,6 +105,22 @@ public class Availability implements Serializable, Cloneable {
 
     public Short getIsBooked() {
         return this.isBooked;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public static class AvailabilityPK {

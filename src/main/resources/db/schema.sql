@@ -216,7 +216,9 @@ CREATE TABLE fks_documents (
     user_id             INT             NOT NULL,
     application_id      VARCHAR(36)     NOT NULL,
     document_type       VARCHAR(50)     NOT NULL,
+    document_number     VARCHAR(50)     NOT NULL,
     document_url        TEXT            ,
+    name_on_document    VARCHAR(50)     NOT NULL,
     verification_status VARCHAR(16)     CHECK (verification_status IN ('PENDING', 'APPROVED', 'REJECTED')),
     created_at          TIMESTAMP       NOT NULL,
     updated_at          TIMESTAMP     

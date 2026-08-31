@@ -1,7 +1,6 @@
 package com.folks.app.util;
 
 import com.folks.app.model.Address;
-import com.folks.app.model.Professional;
 import com.folks.app.model.ProfessionalProfile;
 import com.folks.app.model.User;
 

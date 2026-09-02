@@ -40,7 +40,6 @@ public class ProfessionalServiceBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         
-        
         professionalServiceDAO.insert(professionalService);
         timer.stop();
 
@@ -53,6 +52,7 @@ public class ProfessionalServiceBO extends AbstractBO {
     public void create(AppUser usr, List<ProfessionalService> records) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
+        
         professionalServiceDAO.insert(records);
         timer.stop();
 

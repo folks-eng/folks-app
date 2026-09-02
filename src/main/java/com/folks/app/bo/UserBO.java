@@ -54,10 +54,8 @@ public class UserBO extends AbstractBO {
         user.setExternalId(IdGenerator.generate(user.getPhone1(), user.getEmail()));
         user.setRole(user.getRole() != null ? user.getRole() : User.Role.CUSTOMER);
         user.setStatus(User.Status.ACTIVE);
-
-        if (user.getCreatedAt() == null) {
-            user.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
-        }
+        user.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        
         userDAO.insert(user);
         
         timer.stop();

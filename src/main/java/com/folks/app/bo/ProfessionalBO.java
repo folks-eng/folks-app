@@ -9,6 +9,7 @@ import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
+import com.folks.app.util.IdGenerator;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
 
@@ -57,6 +58,9 @@ public class ProfessionalBO extends AbstractBO {
         }
         // Get the underlying registered user object.
         User user = existing.getUser();
+        if (user.getRole() == User.Role.CUSTOMER) {
+            throw new IllegalStateException("You cannot register as both customer and professional");
+        }
 
         // String applicationId = MD5HashGenerator.digest("professional", usr.principal().sub());
         String applicationId = UUID.randomUUID().toString();
@@ -127,6 +131,16 @@ public class ProfessionalBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         
+        ensureAdmin(usr);
+        validateScope(usr, "user:create");
+        
+        User user = professional.getUser();
+        if (user != null) {
+            user.setExternalId(IdGenerator.generate(user.getPhone1(), user.getEmail()));
+            user.setRole(user.getRole() != null ? user.getRole() : User.Role.PROFESSIONAL);
+            user.setStatus(User.Status.ACTIVE);
+            user.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        }
         if (professional.getCreatedAt() == null) {
             professional.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
         }        

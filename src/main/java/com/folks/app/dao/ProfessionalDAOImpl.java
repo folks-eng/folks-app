@@ -69,10 +69,13 @@ public class ProfessionalDAOImpl extends AbstractDAO implements ProfessionalDAO 
     public void insert(List<Professional> records) {
         List<User> users = new ArrayList<>(records.size());
         for (Professional record : records) {
-            users.add(record.getUser());
+            if (record.getUser() != null) {
+                users.add(record.getUser());
+            }
         }
-        userDAO.insert(users);
-        
+        if (! users.isEmpty()) {
+            userDAO.insert(users);
+        }
         for (Professional record : records) {
             em.persist(record);
         }

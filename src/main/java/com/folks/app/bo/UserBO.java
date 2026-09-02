@@ -1,19 +1,18 @@
 package com.folks.app.bo;
 
-import com.folks.app.util.ResourceNotFoundException;
 import com.folks.app.util.Validator;
 import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
-import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
-import com.folks.app.dao.UserDAO;
 import com.folks.app.model.User;
+import com.folks.app.util.IdGenerator;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
-import jakarta.persistence.NoResultException;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
+import org.javalabs.decl.vertx.container.ResourceAlreadyExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,14 +23,10 @@ import org.slf4j.LoggerFactory;
 public class UserBO extends AbstractBO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(UserBO.class);
-    
-    private final UserDAO userDAO;
 
     public UserBO() {
-        this.userDAO = DAOProxy.get(UserDAO.class);
-        
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized Handler: {}. UserDAO: {}", getClass().getSimpleName(), userDAO);
+            LOGGER.debug("Initialized UserBO: {}. UserDAO: {}", getClass().getSimpleName(), userDAO);
         }
     }
 
@@ -43,18 +38,29 @@ public class UserBO extends AbstractBO {
 
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-
-        user.setExternalId(UUID.randomUUID().toString());
+        
+        Map<String, List<String>> map = new HashMap<>();
+        map.put("operator", List.of("OR"));
+        map.put("phone1", List.of(user.getPhone1()));
+        map.put("email", List.of(user.getEmail()));
+        
+        SearchCriteria search = SearchCriteria.from(new QueryParams(map));
+        List<User> users = userDAO.query(search);
+        if (! users.isEmpty()) {
+            LOGGER.warn("User for {} or {} already exists. Skipping user creation ...", user.getPhone1(), user.getEmail());
+            throw new ResourceAlreadyExistsException("User for " + user.getPhone1() + " or " + user.getEmail() + " already exists");
+        }
+        // User does not exist. Proceed to create the user ...
+        user.setExternalId(IdGenerator.generate(user.getPhone1(), user.getEmail()));
         user.setRole(user.getRole() != null ? user.getRole() : User.Role.CUSTOMER);
         user.setStatus(User.Status.ACTIVE);
 
         if (user.getCreatedAt() == null) {
             user.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
         }
-
         userDAO.insert(user);
+        
         timer.stop();
-
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("User created successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
@@ -110,22 +116,6 @@ public class UserBO extends AbstractBO {
         }
         return existing;
     }
-    
-    /**
-     * Ensure the logged in user is authorized to perform certain operation.
-     * 
-     * <p>
-     * Ensure the external id present in the path parameter or in the payload matches with the {@code sub} 
-     * claim of the JWT principal.
-     * 
-     * @param usr   The authenticated application user containing the JWT principal
-     * @param extId The external id passed in the path parameter. 
-     */
-    private void ensureAuthorized(AppUser usr, String extId) throws IllegalAccessException {
-        if (extId != null && ! usr.principal().sub().contains(extId)) {
-            throw new IllegalAccessException(UNAUTHORIZED_MSG);
-        }
-    }
 
     public List<User> viewAll(AppUser usr, QueryParams params) throws IllegalAccessException {
         // Only admin has the privilege to view all users.
@@ -151,6 +141,7 @@ public class UserBO extends AbstractBO {
 
         // Only the logged in user is allowed to modify the user as identified by this id.
         ensureAuthorized(usr, id);
+        
         // Fetch the user entry.
         User user = fetchUser(usr);
 
@@ -218,33 +209,5 @@ public class UserBO extends AbstractBO {
             LOGGER.info("User record patched up successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
         return existing;
-    }
-    
-    /**
-     * Retrieves the user associated with the authenticated application user.
-     *
-     * <p>
-     * The user's external identifier is obtained from the {@code sub} claim of the JWT principal and is used to
-     * query the user data store.
-     *
-     * <p>
-     * The user may first be looked up from a distributed cache to avoid an * unnecessary database query.
-     * If the user is not available in the cache, the persistent data store is queried as a fallback.
-     *
-     * @param usr   The authenticated application user containing the JWT principal
-     * @return User The user associated with the external identifier
-     *
-     * @throws IllegalArgumentException if no user exists for the external identifier
-     */
-    private User fetchUser(AppUser usr) {
-        try {
-            // Query the user based on external_id.
-            // external_id will be part of jwt token as 'sub'.
-            return userDAO.findByExtId(usr.principal().sub());
-        }
-        catch (NoResultException e) {
-            throw new ResourceNotFoundException("No User found for id: " + usr.principal().sub());
-            //throw new IllegalArgumentException("No User found for id: " + usr.principal().sub());
-        }
     }
 }

@@ -7,11 +7,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.List;
 import org.javalabs.jpa.annotation.Dao;
+import org.javalabs.jpa.util.QueryHints;
 
 /**
  * Concrete DAO class to handle database operations related.
@@ -96,6 +98,48 @@ public class ProfessionalDAOImpl extends AbstractDAO implements ProfessionalDAO 
     @Override
     public Professional find(Professional.ProfessionalPK pk) {
         return em.find(Professional.class, pk);
+    }
+
+    @Override
+    public Professional findByExtId(String externalId) {
+        List<Object[]> list = em.createNamedQuery("Professional.selectByExtId")
+            .setParameter(1, externalId)
+            .setHint(QueryHints.ALLOW_NATIVE_QUERY, Boolean.TRUE)
+            .getResultList();
+        
+        if (! list.isEmpty()) {
+            Object[] row = list.get(0);
+            Professional professional = new Professional();
+            
+            // SELECT a.professional_id, a.bio, a.experience_years, a.serving_cities, a.rating_avg, a.is_verified, a.created_at, a.updated_at
+            //        , b.user_id, b.external_id, b.full_name, b.email, b.phone1, b.phone2, b.password_hash, b.role, b.status, b.created_at
+            if (row[0] != null) {
+                professional.setProfessionalId((Integer)row[0]);
+                professional.setBio((String)row[1]);
+                professional.setExperienceYears(((Integer)row[2]).shortValue());
+                professional.setServingCities((String)row[3]);
+                professional.setRatingAvg((Double)row[4]);
+                professional.setIsVerified(((Integer)row[5]).shortValue());
+                professional.setCreatedAt((Timestamp)row[6]);
+                professional.setUpdatedAt((Timestamp)row[7]);
+            }
+            // Populate user details.
+            User user = new User();
+            user.setUserId((Integer)row[8]);
+            user.setExternalId((String)row[9]);
+            user.setFullName((String)row[10]);
+            user.setEmail((String)row[11]);
+            user.setPhone1((String)row[12]);
+            user.setPhone2((String)row[13]);
+            user.setPasswordHash((String)row[14]);
+            user.setRole(Enum.valueOf(User.Role.class, (String)row[15]));
+            user.setStatus(Enum.valueOf(User.Status.class, (String)row[16]));
+            user.setCreatedAt((Timestamp)row[17]);
+            
+            professional.setUser(user);
+            return professional;
+        }
+        return null;
     }
 
     @Override

@@ -29,19 +29,16 @@ public class ProfessionalBO extends AbstractBO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionalBO.class);
 
-    private final UserDAO userDAO;
-
     private final ProfessionalDAO professionalDAO;
 
     private final ServiceDAO serviceDAO;
 
     public ProfessionalBO() {
-        this.userDAO = DAOProxy.get(UserDAO.class);
         this.professionalDAO = DAOProxy.get(ProfessionalDAO.class);
         this.serviceDAO = DAOProxy.get(ServiceDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized Handler: {}. ProfessionalDAO: {}", getClass().getSimpleName(), professionalDAO);
+            LOGGER.debug("Initialized ProfessionalBO: {}. ProfessionalDAO: {}", getClass().getSimpleName(), professionalDAO);
         }
     }
 
@@ -51,7 +48,15 @@ public class ProfessionalBO extends AbstractBO {
 
         //Validator.validate(profMaster);
         // Fetch the user entry and create the Entity objects for inserting into tables Address, Document.
-        User user = fetchUser(usr.principal().sub());
+        Professional existing = professionalDAO.findByExtId(usr.principal().sub());
+        if (existing == null) {
+            throw new IllegalArgumentException("User has to be registered first");
+        }
+        if (existing.getProfessionalId() != null) {
+            throw new IllegalArgumentException("You have already applied as a professional");
+        }
+        // Get the underlying registered user object.
+        User user = existing.getUser();
 
         // String applicationId = MD5HashGenerator.digest("professional", usr.principal().sub());
         String applicationId = UUID.randomUUID().toString();
@@ -187,11 +192,14 @@ public class ProfessionalBO extends AbstractBO {
         return existing;
     }
 
-    public Professional view(AppUser usr, Integer id) {
+    public Professional view(AppUser usr, String id) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
+        
+        // Only the logged in user is allowed to modify the user as identified by this id.
+        ensureAuthorized(usr, id);
 
-        Professional professional = professionalDAO.find(new Professional.ProfessionalPK(id));
+        Professional professional = professionalDAO.findByExtId(id);
         if (professional == null) {
             throw new IllegalArgumentException("No Professional found for id: " + id);
         }
@@ -219,31 +227,6 @@ public class ProfessionalBO extends AbstractBO {
             LOGGER.info("Deleted Professional. Id: {}. Elapsed time(ms): {}", id, timer.elapsedTimeMillis());
         }
         return professional;
-    }
-
-    /**
-     * Retrieves the user associated with the authenticated application user.
-     *
-     * <p>
-     * The user's external identifier is obtained from the {@code sub} claim of the JWT principal and is used to
-     * query the user data store.
-     *
-     * <p>
-     * The user may first be looked up from a distributed cache to avoid an * unnecessary database query.
-     * If the user is not available in the cache, the persistent data store is queried as a fallback.
-     *
-     * @param extUserId   The authenticated application user containing the JWT principal
-     * @return User The user associated with the external identifier
-     *
-     * @throws IllegalArgumentException if no user exists for the external identifier
-     */
-    private User fetchUser(String extUserId) {
-        try {
-            return userDAO.findByExtId(extUserId);
-        }
-        catch (NoResultException e) {
-            throw new ResourceNotFoundException("No User found for id: " + extUserId);
-        }
     }
 
     private List<Service> fetchServices(List<Integer> expertise) {

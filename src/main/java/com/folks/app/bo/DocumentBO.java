@@ -5,6 +5,7 @@ import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
 import com.folks.app.dao.DocumentDAO;
 import com.folks.app.model.Document;
+import com.folks.app.model.User;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
 import java.util.List;
@@ -20,19 +21,18 @@ public class DocumentBO extends AbstractBO {
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentBO.class);
     
     private final DocumentDAO documentDAO;
-
+    
     public DocumentBO() {
         this.documentDAO = DAOProxy.get(DocumentDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized Handler: {}. DocumentDAO: {}", getClass().getSimpleName(), documentDAO);
+            LOGGER.debug("Initialized Handler: {}. DocumentDAO: {}. UserDAO: {}", getClass().getSimpleName(), documentDAO, userDAO);
         }
     }
 
     public Document create(AppUser usr, Document document) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-        
         
         documentDAO.insert(document);
         timer.stop();
@@ -46,7 +46,6 @@ public class DocumentBO extends AbstractBO {
     public void create(AppUser usr, List<Document> records) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-
         
         documentDAO.insert(records);
         timer.stop();
@@ -84,8 +83,12 @@ public class DocumentBO extends AbstractBO {
     public List<Document> viewAll(AppUser usr, QueryParams params) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
+        
+        // Fetch the user.
+        User user = fetchUser(usr);
 
-        SearchCriteria search = SearchCriteria.from(params);
+        // We need to fetch the documents for the current user only.
+        SearchCriteria search = SearchCriteria.from(params, user.getUserId());
         List<Document> rows = documentDAO.query(search);
 
         timer.stop();

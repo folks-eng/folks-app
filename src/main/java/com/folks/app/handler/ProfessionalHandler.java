@@ -160,7 +160,7 @@ public class ProfessionalHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Professional professional = professionalBO.view(user(ctx), Integer.valueOf(id));
+            Professional professional = professionalBO.view(user(ctx), id);
 
             return professional;
             

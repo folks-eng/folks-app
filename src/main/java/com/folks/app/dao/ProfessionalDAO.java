@@ -68,6 +68,8 @@ public interface ProfessionalDAO {
      */
     @NotSupported
     Professional find(Professional.ProfessionalPK pk);
+
+    Professional findByExtId(String externalId);
     
     /**
      * Fetch the list of all professional ids.

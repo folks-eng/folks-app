@@ -3,7 +3,6 @@ package com.folks.app.model;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
@@ -19,7 +18,14 @@ import java.util.Objects;
 @Table(name = "fks_professionals")
 @IdClass(Professional.ProfessionalPK.class)
 @NamedNativeQueries({
-    @NamedNativeQuery(name = "Professional.selectAll", query = "SELECT * FROM fks_professionals")
+    @NamedNativeQuery(name = "Professional.selectAll", query = "SELECT * FROM fks_professionals"),
+    @NamedNativeQuery(name = "Professional.selectByExtId"
+            , query = """
+                      SELECT a.professional_id, a.bio, a.experience_years, a.serving_cities, a.rating_avg, a.is_verified, a.created_at, a.updated_at       , b.user_id, b.external_id, b.full_name, b.email, b.phone1, b.phone2, b.password_hash, b.role, b.status, b.created_at
+                        FROM fks_professionals a
+                       RIGHT OUTER JOIN fks_users b ON (a.user_id = b.user_id)
+                       WHERE b.external_id = ?
+                """)
 })
 public class Professional implements Serializable, Cloneable {
 
@@ -41,7 +47,7 @@ public class Professional implements Serializable, Cloneable {
     private String servingCities;
 
     @Column(name = "rating_avg", nullable = true, updatable = true, precision = 3, scale = 2)
-    private BigDecimal ratingAvg;
+    private Double ratingAvg;
 
     @Column(name = "is_verified", nullable = false, updatable = true, precision = 16)
     private Short isVerified;
@@ -100,11 +106,11 @@ public class Professional implements Serializable, Cloneable {
         this.servingCities = servingCities;
     }
 
-    public void setRatingAvg(BigDecimal ratingAvg) {
+    public void setRatingAvg(Double ratingAvg) {
         this.ratingAvg = ratingAvg;
     }
 
-    public BigDecimal getRatingAvg() {
+    public Double getRatingAvg() {
         return this.ratingAvg;
     }
 

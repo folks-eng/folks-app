@@ -94,6 +94,7 @@ public abstract class AbstractDAO {
                 .select(columns != null ? columns : Arrays.asList("*"))
                 .from(table);
 
+        String operator = search.operator();
         int idx = 0;
         for (Map.Entry<String, List<Object>> me : search.params().entrySet()) {
             String col = me.getKey();
@@ -119,15 +120,30 @@ public abstract class AbstractDAO {
             }
             else {
                 if (vals.size() > 1) {
-                    query.and(col).in(vals);
+                    if ("or".equals(operator)) {
+                        query.or(col).in(vals);
+                    }
+                    else {
+                        query.and(col).in(vals);
+                    }
                 }
                 else {
                     // A special value to indicate if a column is not null.
                     if (NOT_NULL.equalsIgnoreCase(String.valueOf(vals.get(0)))) {
-                        query.and(col).isNotNull();
+                        if ("or".equals(operator)) {
+                            query.or(col).isNotNull();
+                        }
+                        else {
+                            query.and(col).isNotNull();
+                        }
                     }
                     else {
-                        query.and(col).eq(vals.get(0));
+                        if ("or".equals(operator)) {
+                            query.or(col).eq(vals.get(0));
+                        }
+                        else {
+                            query.and(col).eq(vals.get(0));
+                        }
                     }
                 }
             }

@@ -1,8 +1,12 @@
 package com.folks.app.core;
 
+import com.folks.app.cache.impl.CategoryCache;
+import com.folks.app.cache.impl.ServiceCache;
 import com.folks.app.cache.impl.UserRoleCache;
 import org.javalabs.decl.vertx.container.VertxContainer;
 import com.folks.app.config.ApplicationConfiguration;
+import com.folks.app.model.Category;
+import com.folks.app.model.Service;
 import com.folks.app.model.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -113,6 +117,8 @@ public class AppContainer extends VertxContainer {
         
         try {
             em = emf.createEntityManager();
+            
+            // 1. Load admin users
             List<User> adminUsers = em.createNamedQuery("User.selectByRole", User.class)
                     .setParameter(1, User.Role.ADMIN)
                     .getResultList();
@@ -123,9 +129,31 @@ public class AppContainer extends VertxContainer {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Loaded {} admin user(s)", adminUsers.size());
             }
+            
+            // 2. Load categories.
+            List<Category> categories = em.createNamedQuery("Category.selectAll", Category.class)
+                    .getResultList();
+            
+            for (Category category : categories) {
+                CategoryCache.getCache().add(category.getCategoryId(), category);
+            }
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Loaded {} category(s)", categories.size());
+            }
+            
+            // 3. Load services.
+            List<Service> services = em.createNamedQuery("Service.selectAll", Service.class)
+                    .getResultList();
+            
+            for (Service service : services) {
+                ServiceCache.getCache().add(service.getServiceId(), service);
+            }
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Loaded {} service(s)", services.size());
+            }
         }
         catch (JdbcException e) {
-            LOGGER.error("Error loading admin users", e);
+            LOGGER.error("Error loading startup cache", e);
         }
         finally {
             if (em != null) {

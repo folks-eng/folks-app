@@ -9,6 +9,7 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -50,6 +51,9 @@ public class ProfessionalService implements Serializable, Cloneable {
 
     @Column(name = "updated_at", nullable = true, updatable = true)
     private Timestamp updatedAt;
+    
+    @Transient
+    private String serviceName;
 
     public ProfessionalService() {}
 
@@ -107,6 +111,14 @@ public class ProfessionalService implements Serializable, Cloneable {
 
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
     public static class ProfessionalServicePK {

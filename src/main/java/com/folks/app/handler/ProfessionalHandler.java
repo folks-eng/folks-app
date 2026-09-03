@@ -161,7 +161,6 @@ public class ProfessionalHandler extends AbstractHandler {
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             Professional professional = professionalBO.view(user(ctx), extId);
-
             return professional;
             
         }).onComplete(result -> {
@@ -210,12 +209,11 @@ public class ProfessionalHandler extends AbstractHandler {
      * @param ctx   Vertx {@link RoutingContext} object.
      */
     public void remove(RoutingContext ctx) {
-        final String id = ctx.pathParam("id");
+        final String extId = ctx.pathParam("id");
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Professional professional = professionalBO.remove(user(ctx), Integer.valueOf(id));
-
+            Professional professional = professionalBO.remove(user(ctx), extId);
 
             ServerMessage msg = new ServerMessage();
             msg.setCode(HttpURLConnection.HTTP_NO_CONTENT);

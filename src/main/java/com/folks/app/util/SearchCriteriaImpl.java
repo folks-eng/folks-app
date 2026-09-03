@@ -20,6 +20,7 @@ public class SearchCriteriaImpl implements SearchCriteria {
     private Boolean fetchDependency = Boolean.FALSE;
     private Boolean history = Boolean.FALSE;
     private Boolean asc = Boolean.TRUE;
+    private String operator = "and";
     private String orderBy;
     private Integer offset = 0;
     private Integer limit = 100;
@@ -36,10 +37,14 @@ public class SearchCriteriaImpl implements SearchCriteria {
             LOGGER.trace("Search params {}", params);
         }
 
+        List<String> ops = tmp.remove("operator");
         List<String> orderBy = tmp.remove("orderBy");
         List<String> asc = tmp.remove("asc");
         List<String> deps = tmp.remove("fetchDependency");
         
+        if (ops != null) {
+            this.operator = ops.get(0).toLowerCase();
+        }
         if (orderBy != null) {
             this.orderBy = orderBy.get(0);
         }
@@ -167,6 +172,11 @@ public class SearchCriteriaImpl implements SearchCriteria {
     @Override
     public Boolean fetchDependency() {
         return fetchDependency;
+    }
+
+    @Override
+    public String operator() {
+        return operator;
     }
     
 }

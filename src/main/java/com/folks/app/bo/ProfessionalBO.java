@@ -8,6 +8,9 @@ import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
+import com.folks.app.util.IdGenerator;
+import com.folks.app.util.QueryParams;
+import com.folks.app.util.SearchCriteria;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -26,36 +29,37 @@ public class ProfessionalBO extends AbstractBO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionalBO.class);
 
-    private final UserDAO userDAO;
-
     private final ProfessionalDAO professionalDAO;
 
     private final ServiceDAO serviceDAO;
 
     public ProfessionalBO() {
-        this.userDAO = DAOProxy.get(UserDAO.class);
         this.professionalDAO = DAOProxy.get(ProfessionalDAO.class);
         this.serviceDAO = DAOProxy.get(ServiceDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized Handler: {}. ProfessionalDAO: {}", getClass().getSimpleName(), professionalDAO);
+            LOGGER.debug("Initialized ProfessionalBO: {}. ProfessionalDAO: {}", getClass().getSimpleName(), professionalDAO);
         }
     }
 
     public ProfessionalProfile register(AppUser usr, ProfessionalProfile profProfile) throws IllegalAccessException {
         Validator.validateProf(profProfile);
-//        Integer userId = existingUser.getUserId();
-//        List<Professional> profList = getProfessionals(userId);
-//        if(!profList.isEmpty())
-//            throw new IllegalArgumentException("Professional already existing");
-        // TBD : Professional existing
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        /* Fetch the user entry and create the Entity objects for inserting into tables Address, Document.
-        This also checks for user not found.
-         */
-        User user = fetchUser(usr.principal().sub());
+        // Fetch the user entry and create the Entity objects for inserting into tables Address, Document.
+        Professional existing = professionalDAO.findByExtId(usr.principal().sub());
+        if (existing == null) {
+            throw new IllegalArgumentException("User has to be registered first");
+        }
+        if (existing.getProfessionalId() != null) {
+            throw new IllegalArgumentException("You have already applied as a professional");
+        }
+        // Get the underlying registered user object.
+        User user = existing.getUser();
+        if (user.getRole() == User.Role.CUSTOMER) {
+            throw new IllegalStateException("You cannot register as both customer and professional");
+        }
 
         // String applicationId = MD5HashGenerator.digest("professional", usr.principal().sub());
         String applicationId = UUID.randomUUID().toString();
@@ -126,6 +130,16 @@ public class ProfessionalBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         
+        ensureAdmin(usr);
+        validateScope(usr, "user:create");
+        
+        User user = professional.getUser();
+        if (user != null) {
+            user.setExternalId(IdGenerator.generate(user.getPhone1(), user.getEmail()));
+            user.setRole(user.getRole() != null ? user.getRole() : User.Role.PROFESSIONAL);
+            user.setStatus(User.Status.ACTIVE);
+            user.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        }
         if (professional.getCreatedAt() == null) {
             professional.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
         }        
@@ -191,12 +205,6 @@ public class ProfessionalBO extends AbstractBO {
         return existing;
     }
 
-    private void ensureAuthorized(AppUser usr, String extId) throws IllegalAccessException {
-        if (extId != null && ! usr.principal().sub().contains(extId)) {
-            throw new IllegalAccessException(UNAUTHORIZED_MSG);
-        }
-    }
-
     public Professional view(AppUser usr, String extId) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
@@ -207,14 +215,15 @@ public class ProfessionalBO extends AbstractBO {
         if(userFromDb == null)
             throw new ResourceNotFoundException("No user found for id: " + extId);
         List<Professional> profList = getProfessionals(userFromDb.getUserId());
-        if (profList.isEmpty()) {
+        Professional professional = professionalDAO.findByExtId(extId);
+        if (professional == null) {
             throw new ResourceNotFoundException("No Professional found for id: " + extId);
         }
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Fetched professional details. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
-        return profList.get(0);
+        return professional;
     }
 
     private List<Professional> getProfessionals(Integer userId) {
@@ -225,21 +234,22 @@ public class ProfessionalBO extends AbstractBO {
         return profList;
     }
 
-    public Professional remove(AppUser usr, Integer id) {
+    public Professional remove(AppUser usr, String extId) throws IllegalAccessException {
+        ensureAuthorized(usr, extId);
+
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
         // First fetch the entry, to see if this already exists.
-        Professional professional = professionalDAO.find(new Professional.ProfessionalPK(id));
-
+        Professional professional = professionalDAO.findByExtId(extId);
         if (professional == null) {
-            throw new IllegalArgumentException("No professional found for id: " + id);
+            throw new ResourceNotFoundException("No professional found for extId: " + extId);
         }
         professionalDAO.delete(professional);
         timer.stop();
 
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Deleted Professional. Id: {}. Elapsed time(ms): {}", id, timer.elapsedTimeMillis());
+            LOGGER.info("Deleted Professional with extId: {}. Elapsed time(ms): {}", extId, timer.elapsedTimeMillis());
         }
         return professional;
     }

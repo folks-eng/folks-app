@@ -36,6 +36,7 @@ public class CategoryBOTest {
 
     private static CategoryBO categoryBO;
     private static ServiceBO serviceBO;
+    private Category parent;
 
     @BeforeAll
     public static void setup() {
@@ -54,11 +55,20 @@ public class CategoryBOTest {
             AppUser usr = new AppUserImpl(new UserPrincipal(map));
 
             Category category = createSalonCategories();
-            List<Service> services = createSalonServices();
-
+            parent = category;
+            
             categoryBO.create(usr, category);
+            for (Category sub : category.getSubCategories()) {
+                sub.setParentId(category.getCategoryId());
+            }
             categoryBO.create(usr, category.getSubCategories());
+            
+            List<Service> services = createSalonServices(category.getSubCategories().get(0).getCategoryId()
+                    , category.getSubCategories().get(1).getCategoryId()
+                    , category.getSubCategories().get(2).getCategoryId());
             serviceBO.create(usr, services);
+            
+            assertEquals(3, category.getSubCategories().size());
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -102,7 +112,7 @@ public class CategoryBOTest {
 
             AppUser usr = new AppUserImpl(new UserPrincipal(map));
 
-            List<String> ids = List.of("1");
+            List<String> ids = List.of(String.valueOf(parent.getCategoryId()));
             Map<String, List<String>> params = new HashMap<>();
             params.put("id", ids);
 
@@ -180,14 +190,14 @@ public class CategoryBOTest {
         return salonMakeup;
     }
 
-    private List<Service> createSalonServices() {
+    private List<Service> createSalonServices(Integer sub1, Integer sub2, Integer sub3) {
         Timestamp now = new Timestamp(DateUtil.currentUTCDate().getTime());
 
         List<Service> services = new ArrayList<>();
 
         // 1
         Service s1 = new Service();
-        s1.setCategoryId(2);
+        s1.setCategoryId(sub1);
         s1.setName("Fruit Facial Glow");
         s1.setDescription(
                 "A refreshing fruit-based facial that brightens and hydrates tired skin."
@@ -206,7 +216,7 @@ public class CategoryBOTest {
 
         // 2
         Service s2 = new Service();
-        s2.setCategoryId(2);
+        s2.setCategoryId(sub1);
         s2.setName("Hair Spa & Care");
         s2.setDescription(
                 "A deep-conditioning hair spa that repairs damage and restores natural shine."
@@ -225,7 +235,7 @@ public class CategoryBOTest {
 
         // 3
         Service s3 = new Service();
-        s3.setCategoryId(2);
+        s3.setCategoryId(sub1);
         s3.setName("Full Arms & Legs Waxing");
         s3.setDescription(
                 "Smooth, salon-grade waxing for arms and legs using a gentle wax."
@@ -244,7 +254,7 @@ public class CategoryBOTest {
 
         // 4
         Service s4 = new Service();
-        s4.setCategoryId(2);
+        s4.setCategoryId(sub1);
         s4.setName("Threading (Eyebrows + Upper Lip)");
         s4.setDescription(
                 "Quick, precise threading for perfectly shaped brows and upper lip."
@@ -263,7 +273,7 @@ public class CategoryBOTest {
 
         // 5
         Service s5 = new Service();
-        s5.setCategoryId(2);
+        s5.setCategoryId(sub1);
         s5.setName("Manicure & Pedicure");
         s5.setDescription(
                 "A classic mani-pedi that leaves hands and feet soft, neat and polished."
@@ -282,7 +292,7 @@ public class CategoryBOTest {
 
         // 6
         Service s6 = new Service();
-        s6.setCategoryId(2);
+        s6.setCategoryId(sub1);
         s6.setName("Global Hair Colour");
         s6.setDescription(
                 "Ammonia-friendly global colour application for full, even coverage."
@@ -301,7 +311,7 @@ public class CategoryBOTest {
 
         // 7
         Service s7 = new Service();
-        s7.setCategoryId(3);
+        s7.setCategoryId(sub2);
         s7.setName("Haircut & Styling");
         s7.setDescription(
                 "A precision haircut and styling from an experienced men's stylist."
@@ -320,7 +330,7 @@ public class CategoryBOTest {
 
         // 8
         Service s8 = new Service();
-        s8.setCategoryId(3);
+        s8.setCategoryId(sub2);
         s8.setName("Beard Shape-up & Trim");
         s8.setDescription(
                 "Sharp beard shaping and trim to keep your look fresh."
@@ -339,7 +349,7 @@ public class CategoryBOTest {
 
         // 9
         Service s9 = new Service();
-        s9.setCategoryId(3);
+        s9.setCategoryId(sub2);
         s9.setName("Head & Shoulder Massage");
         s9.setDescription(
                 "A relaxing head and shoulder massage to relieve stress and tension."
@@ -358,7 +368,7 @@ public class CategoryBOTest {
 
         // 10
         Service s10 = new Service();
-        s10.setCategoryId(3);
+        s10.setCategoryId(sub2);
         s10.setName("De-Tan Facial for Men");
         s10.setDescription(
                 "A de-tan facial that clears dullness and refreshes sun-exposed skin."
@@ -377,7 +387,7 @@ public class CategoryBOTest {
 
         // 11
         Service s11 = new Service();
-        s11.setCategoryId(3);
+        s11.setCategoryId(sub2);
         s11.setName("Beard & Hair Colour");
         s11.setDescription(
                 "Natural-looking colour touch-up for greying hair and beard."
@@ -396,7 +406,7 @@ public class CategoryBOTest {
 
         // 12
         Service s12 = new Service();
-        s12.setCategoryId(4);
+        s12.setCategoryId(sub3);
         s12.setName("Party Makeup");
         s12.setDescription(
                 "Camera-ready party makeup tailored to your outfit and occasion."
@@ -415,7 +425,7 @@ public class CategoryBOTest {
 
         // 13
         Service s13 = new Service();
-        s13.setCategoryId(4);
+        s13.setCategoryId(sub3);
         s13.setName("Bridal Makeup (HD)");
         s13.setDescription(
                 "Long-lasting HD bridal makeup with draping and hairstyling included."
@@ -434,7 +444,7 @@ public class CategoryBOTest {
 
         // 14
         Service s14 = new Service();
-        s14.setCategoryId(4);
+        s14.setCategoryId(sub3);
         s14.setName("Nail Art & Manicure");
         s14.setDescription(
                 "A gel manicure with custom nail art finished by a trained nail artist."
@@ -453,7 +463,7 @@ public class CategoryBOTest {
 
         // 15
         Service s15 = new Service();
-        s15.setCategoryId(4);
+        s15.setCategoryId(sub3);
         s15.setName("Engagement Makeup");
         s15.setDescription(
                 "Soft-glam engagement makeup designed to photograph beautifully."

@@ -37,6 +37,12 @@ public interface SearchCriteria {
     Map<String, List<Object>> params();
     
     /**
+     * Return the operator (AND or OR).
+     * @return String
+     */
+    String operator();
+    
+    /**
      * Indicate if historical data needs to be fetched.
      * @return boolean
      */

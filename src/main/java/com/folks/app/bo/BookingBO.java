@@ -5,12 +5,10 @@ import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
 import com.folks.app.dao.BookingDAO;
-import com.folks.app.dao.UserDAO;
 import com.folks.app.model.Booking;
 import com.folks.app.model.User;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
-import jakarta.persistence.NoResultException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -29,11 +27,9 @@ public class BookingBO extends AbstractBO {
     private static final Logger LOGGER = LoggerFactory.getLogger(BookingBO.class);
     
     private final BookingDAO bookingDAO;
-    private final UserDAO userDAO;
-
+    
     public BookingBO() {
         this.bookingDAO = DAOProxy.get(BookingDAO.class);
-        this.userDAO = DAOProxy.get(UserDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Initialized BookingBO: {}. BookingDAO: {}. UserDAO: {}", getClass().getSimpleName(), bookingDAO, userDAO);
@@ -127,7 +123,7 @@ public class BookingBO extends AbstractBO {
         // Fetch the user.
         User user = fetchUser(usr);
 
-        // We need to fetch the addresses for the current user only.
+        // We need to fetch the bookings for the current user only.
         SearchCriteria search = SearchCriteria.from(params, "customerId", user.getUserId());
         List<Booking> bookings = bookingDAO.query(search);
 
@@ -179,34 +175,6 @@ public class BookingBO extends AbstractBO {
             LOGGER.info("Cancelled Booking. Id: {}. Elapsed time(ms): {}", id, timer.elapsedTimeMillis());
         }
         return existing;
-    }
-    
-    /**
-     * Retrieves the user associated with the authenticated application user.
-     *
-     * <p>
-     * The user's external identifier is obtained from the {@code sub} claim of the JWT principal and is used to
-     * query the user data store.
-     *
-     * <p>
-     * The user may first be looked up from a distributed cache to avoid an * unnecessary database query.
-     * If the user is not available in the cache, the persistent data store is queried as a fallback.
-     *
-     * @param usr   The authenticated application user containing the JWT principal
-     * @return User The user associated with the external identifier
-     *
-     * @throws IllegalArgumentException if no user exists for the external identifier
-     */
-    private User fetchUser(AppUser usr) {
-        try {
-            // Query the user based on external_id.
-            // external_id will be part of jwt token as 'sub'.
-            String extId = usr.principal().sub();
-            return userDAO.findByExtId(extId);
-        }
-        catch (NoResultException e) {
-            throw new IllegalArgumentException("No User found for id: " + usr.principal().sub());
-        }
     }
     
     public void assignProfessional(Booking booking) {

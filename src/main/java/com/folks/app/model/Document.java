@@ -51,7 +51,7 @@ public class Document implements Serializable, Cloneable {
     @Column(name = "document_type", nullable = false, updatable = false, length = 50)
     private String documentType;
 
-    @Column(name = "document_number", nullable = false, updatable = true, length = 50)
+    @Column(name = "document_number", nullable = false, updatable = false, length = 50)
     private String documentNumber;
 
     @Column(name = "document_url", nullable = true, updatable = true, length = 1000000000)

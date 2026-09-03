@@ -3,8 +3,12 @@ package com.folks.app.bo;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
+import com.folks.app.cache.impl.ServiceCache;
+import com.folks.app.dao.ProfessionalDAO;
 import com.folks.app.dao.ProfessionalServiceDAO;
+import com.folks.app.model.Professional;
 import com.folks.app.model.ProfessionalService;
+import com.folks.app.model.Service;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
 import java.util.List;
@@ -21,18 +25,20 @@ public class ProfessionalServiceBO extends AbstractBO {
     
     private final ProfessionalServiceDAO professionalServiceDAO;
 
+    private final ProfessionalDAO professionalDAO;
+
     public ProfessionalServiceBO() {
         this.professionalServiceDAO = DAOProxy.get(ProfessionalServiceDAO.class);
+        this.professionalDAO = DAOProxy.get(ProfessionalDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized Handler: {}. ProfessionalServiceDAO: {}", getClass().getSimpleName(), professionalServiceDAO);
+            LOGGER.debug("Initialized ProfessionalServiceBO: {}. ProfessionalServiceDAO: {}", getClass().getSimpleName(), professionalServiceDAO);
         }
     }
 
     public ProfessionalService create(AppUser usr, ProfessionalService professionalService) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-        
         
         professionalServiceDAO.insert(professionalService);
         timer.stop();
@@ -46,6 +52,7 @@ public class ProfessionalServiceBO extends AbstractBO {
     public void create(AppUser usr, List<ProfessionalService> records) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
+        
         professionalServiceDAO.insert(records);
         timer.stop();
 
@@ -81,9 +88,18 @@ public class ProfessionalServiceBO extends AbstractBO {
     public List<ProfessionalService> viewAll(AppUser usr, QueryParams params) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
+        
+        Professional existing = professionalDAO.findByExtId(usr.principal().sub());
+        if (existing == null || existing.getProfessionalId() == null) {
+            throw new IllegalArgumentException("No such professional is found with id " + usr.principal().sub());
+        }
 
-        SearchCriteria search = SearchCriteria.from(params);
+        SearchCriteria search = SearchCriteria.from(params, "professionalId", existing.getProfessionalId());
         List<ProfessionalService> rows = professionalServiceDAO.query(search);
+        for (ProfessionalService row : rows) {
+            Service service = ServiceCache.getCache().get(row.getServiceId());
+            row.setServiceName(service.getName());
+        }
 
         timer.stop();
         if (LOGGER.isInfoEnabled()) {

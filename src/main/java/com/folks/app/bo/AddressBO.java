@@ -6,12 +6,10 @@ import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
 import com.folks.app.dao.AddressDAO;
-import com.folks.app.dao.UserDAO;
 import com.folks.app.model.Address;
 import com.folks.app.model.User;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
-import jakarta.persistence.NoResultException;
 import java.sql.Timestamp;
 import java.util.List;
 import org.javalabs.decl.util.DateUtil;
@@ -27,11 +25,9 @@ public class AddressBO extends AbstractBO {
     private static final Logger LOGGER = LoggerFactory.getLogger(AddressBO.class);
     
     private final AddressDAO addressDAO;
-    private final UserDAO userDAO;
-
+    
     public AddressBO() {
         this.addressDAO = DAOProxy.get(AddressDAO.class);
-        this.userDAO = DAOProxy.get(UserDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Initialized Handler: {}. AddressDAO: {}. UserDAO: {}", getClass().getSimpleName(), addressDAO, userDAO);
@@ -180,34 +176,6 @@ public class AddressBO extends AbstractBO {
             throw new ResourceNotFoundException("No address found for id: " + id);
         }
         return address;
-    }
-    
-    /**
-     * Retrieves the user associated with the authenticated application user.
-     *
-     * <p>
-     * The user's external identifier is obtained from the {@code sub} claim of the JWT principal and is used to
-     * query the user data store.
-     *
-     * <p>
-     * The user may first be looked up from a distributed cache to avoid an * unnecessary database query.
-     * If the user is not available in the cache, the persistent data store is queried as a fallback.
-     *
-     * @param usr   The authenticated application user containing the JWT principal
-     * @return User The user associated with the external identifier
-     *
-     * @throws IllegalArgumentException if no user exists for the external identifier
-     */
-    private User fetchUser(AppUser usr) {
-        try {
-            // Query the user based on external_id.
-            // external_id will be part of jwt token as 'sub'.
-            String extId = usr.principal().sub();
-            return userDAO.findByExtId(extId);
-        }
-        catch (NoResultException e) {
-            throw new IllegalArgumentException("No User found for id: " + usr.principal().sub());
-        }
     }
     
     /**

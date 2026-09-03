@@ -95,7 +95,7 @@ public class UserBO extends AbstractBO {
         // Only the logged in user is allowed to modify the user as identified by this id.
         ensureAuthorized(usr, user.getExternalId());
         Validator.validateUser(user);
-        // Fetch the user entry.
+        // Fetch the user entry, throws ResourceNotFoundException
         User existing = fetchUser(usr);
 
         // Update attributes of existing record

@@ -126,33 +126,26 @@ public class ProfessionalBO extends AbstractBO {
         return profProfile;
     }
 
-    public Professional create(AppUser usr, Professional professional) throws IllegalAccessException {
+    public Professional view(AppUser usr, String extId) throws IllegalAccessException {
+        // Only the logged in professional is allowed to view.
+        ensureAuthorized(usr, extId);
+
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-        
-        ensureAdmin(usr);
-        validateScope(usr, "user:create");
-        
-        User user = professional.getUser();
-        if (user != null) {
-            user.setExternalId(IdGenerator.generate(user.getPhone1(), user.getEmail()));
-            user.setRole(user.getRole() != null ? user.getRole() : User.Role.PROFESSIONAL);
-            user.setStatus(User.Status.ACTIVE);
-            user.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        Professional professional = professionalDAO.findByExtId(extId);
+        // How to simulate?
+        if (professional == null) {
+            throw new ResourceNotFoundException("No Professional found for id: " + extId);
         }
-        if (professional.getCreatedAt() == null) {
-            professional.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
-        }        
-        professionalDAO.insert(professional);
         timer.stop();
-
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Professional created successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+            LOGGER.info("Fetched professional details. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
         return professional;
     }
 
-    public List<Professional> viewAll(AppUser usr, QueryParams params) {
+    public List<Professional> viewAll(AppUser usr, QueryParams params) throws IllegalAccessException {
+        ensureAdmin(usr);
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -164,6 +157,82 @@ public class ProfessionalBO extends AbstractBO {
             LOGGER.info("Fetched {} expanded professional record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
         }
         return rows;
+    }
+
+    public Professional remove(AppUser usr, String extId) throws IllegalAccessException {
+        ensureAuthorized(usr, extId);
+
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+        // First fetch the entry, to see if this already exists.
+        Professional professional = professionalDAO.findByExtId(extId);
+        if (professional == null) {
+            throw new ResourceNotFoundException("No professional found for extId: " + extId);
+        }
+        professionalDAO.delete(professional);
+        timer.stop();
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Deleted Professional with extId: {}. Elapsed time(ms): {}", extId, timer.elapsedTimeMillis());
+        }
+        return professional;
+    }
+
+    public Professional modify(AppUser usr, Professional profObj, String extId) throws IllegalAccessException {
+        ensureAuthorized(usr, extId);
+
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+        // First fetch the entry from db(prof joins user), to see if this already exists.
+        Professional existing = professionalDAO.findByExtId(extId);
+        if (existing == null) {
+            throw new IllegalArgumentException("No professional found for external id: " + profObj.getProfessionalId());
+        }
+
+        // Update attributes of existing record
+       // LOGGER.info(existing.getUser().getRole() + " FROM DB, User id : " +existing.getUser().getUserId());
+        existing.setUserId(existing.getUser().getUserId());
+        existing.setBio(profObj.getBio());
+        existing.setExperienceYears(profObj.getExperienceYears());
+        existing.setServingCities(profObj.getServingCities());
+        LOGGER.info("USER ID " +existing.getUserId());
+        // TBD:
+        // existing.setRatingAvg(profObj.getRatingAvg());
+        // existing.setIsVerified(profObj.getIsVerified());
+
+        professionalDAO.update(existing);
+        timer.stop();
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Professional record modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+        }
+        return existing;
+    }
+
+    public Professional create(AppUser usr, Professional professional) throws IllegalAccessException {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        ensureAdmin(usr);
+        validateScope(usr, "user:create");
+
+        User user = professional.getUser();
+        if (user != null) {
+            user.setExternalId(IdGenerator.generate(user.getPhone1(), user.getEmail()));
+            user.setRole(user.getRole() != null ? user.getRole() : User.Role.PROFESSIONAL);
+            user.setStatus(User.Status.ACTIVE);
+            user.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        }
+        if (professional.getCreatedAt() == null) {
+            professional.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        }
+        professionalDAO.insert(professional);
+        timer.stop();
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Professional created successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+        }
+        return professional;
     }
 
     public void create(AppUser usr, List<Professional> records) throws IllegalAccessException {
@@ -180,104 +249,13 @@ public class ProfessionalBO extends AbstractBO {
         }
     }
 
-    public Professional modify(AppUser usr, Professional professional) {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        // First fetch the entry, to see if this already exists.
-        Professional existing = professionalDAO.find(new Professional.ProfessionalPK(professional.getProfessionalId()));
-        if (existing == null) {
-            throw new IllegalArgumentException("No professional found for identifier: " + professional.getProfessionalId());
-        }
-        // Update attributes of existing record
-        existing.setUserId(professional.getUserId());
-        existing.setBio(professional.getBio());
-        existing.setExperienceYears(professional.getExperienceYears());
-        existing.setRatingAvg(professional.getRatingAvg());
-        existing.setIsVerified(professional.getIsVerified());
-
-        professionalDAO.update(professional);
-        timer.stop();
-
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Professional record modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
-        }
-        return existing;
-    }
-
-    public Professional view(AppUser usr, String extId) throws IllegalAccessException {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        // Only the logged in professional is allowed to view.
-        ensureAuthorized(usr, extId);
-        User userFromDb = userDAO.findByExtId(extId);
-        if(userFromDb == null)
-            throw new ResourceNotFoundException("No user found for id: " + extId);
-        List<Professional> profList = getProfessionals(userFromDb.getUserId());
-        Professional professional = professionalDAO.findByExtId(extId);
-        if (professional == null) {
-            throw new ResourceNotFoundException("No Professional found for id: " + extId);
-        }
-        timer.stop();
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched professional details. Elapsed time(ms): {}", timer.elapsedTimeMillis());
-        }
-        return professional;
-    }
-
-    private List<Professional> getProfessionals(Integer userId) {
-        Map<String, List<String>> param = new HashMap<>();
-        param.put("userId", List.of(String.valueOf(userId)));
-        SearchCriteria search = SearchCriteria.from(new QueryParams(param));
-        List<Professional> profList = professionalDAO.query(search);
-        return profList;
-    }
-
-    public Professional remove(AppUser usr, String extId) throws IllegalAccessException {
-        ensureAuthorized(usr, extId);
-
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        // First fetch the entry, to see if this already exists.
-        Professional professional = professionalDAO.findByExtId(extId);
-        if (professional == null) {
-            throw new ResourceNotFoundException("No professional found for extId: " + extId);
-        }
-        professionalDAO.delete(professional);
-        timer.stop();
-
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Deleted Professional with extId: {}. Elapsed time(ms): {}", extId, timer.elapsedTimeMillis());
-        }
-        return professional;
-    }
-
-    /**
-     * Retrieves the user associated with the authenticated application user.
-     *
-     * <p>
-     * The user's external identifier is obtained from the {@code sub} claim of the JWT principal and is used to
-     * query the user data store.
-     *
-     * <p>
-     * The user may first be looked up from a distributed cache to avoid an * unnecessary database query.
-     * If the user is not available in the cache, the persistent data store is queried as a fallback.
-     *
-     * @param extUserId   The authenticated application user containing the JWT principal
-     * @return User The user associated with the external identifier
-     *
-     * @throws ResourceNotFoundException if no user exists for the external identifier
-     */
-    private User fetchUser(String extUserId) {
-        try {
-            return userDAO.findByExtId(extUserId);
-        }
-        catch (NoResultException e) {
-            throw new ResourceNotFoundException("No User found for id: " + extUserId);
-        }
-    }
+//    private List<Professional> getProfessionals(Integer userId) {
+//        Map<String, List<String>> param = new HashMap<>();
+//        param.put("userId", List.of(String.valueOf(userId)));
+//        SearchCriteria search = SearchCriteria.from(new QueryParams(param));
+//        List<Professional> profList = professionalDAO.query(search);
+//        return profList;
+//    }
 
     private List<Service> fetchServices(List<Integer> expertise) {
         try {

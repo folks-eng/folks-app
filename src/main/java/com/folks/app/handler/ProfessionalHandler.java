@@ -119,16 +119,14 @@ public class ProfessionalHandler extends AbstractHandler {
      * @param ctx   Vertx {@link RoutingContext} object.
      */
     public void modify(RoutingContext ctx) {
-        final String id = ctx.pathParam("id");
+        final String extId = ctx.pathParam("id");
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             Professional professional = MapperUtil.decode(ctx.body().buffer().getBytes(), Professional.class);
-            professional.setProfessionalId(Integer.valueOf(id));
-
 
             // First fetch the entry, to see if this already exists.
-            Professional rs = professionalBO.modify(user(ctx), professional);
+            Professional rs = professionalBO.modify(user(ctx), professional, extId);
 
             ServerMessage msg = new ServerMessage();
             msg.setCode(HttpURLConnection.HTTP_OK);

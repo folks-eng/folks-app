@@ -1,13 +1,14 @@
 ## Admin Operations
 
-Create User
-CRUD on Category
-CRUD on Service
+- Create User
+- View all user filtered by Professional/Customer
+- CRUD(except view) on Category, Service
 
-## User-specific operations on User entities like address, Booking
-Become a Professional
-Address CRUD operations
-Booking CRUD operations
+
+## User-specific operations on entities like Professional, Address, Booking
+- CRUD operation on PRofessional (Register, View, Delete, Modify)
+- CRUD operations on Address
+- CRUD operations on Booking
 
 
 

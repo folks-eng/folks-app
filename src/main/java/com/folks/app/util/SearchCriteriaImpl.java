@@ -23,7 +23,7 @@ public class SearchCriteriaImpl implements SearchCriteria {
     private String operator = "and";
     private String orderBy;
     private Integer offset = 0;
-    private Integer limit = 100;
+    private Integer limit = Constants.DEFAULT_SEARCH_LIMIT;
     
     private final Map<String, List<Object>> params = new HashMap<>();
 

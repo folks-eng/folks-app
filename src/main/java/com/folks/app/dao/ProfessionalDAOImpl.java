@@ -41,7 +41,6 @@ public class ProfessionalDAOImpl extends AbstractDAO implements ProfessionalDAO 
     public void insertProfile(Professional professional) {
         // User record is already present, no need to insert it again.
         // Maintain the below insertion order.
-        
         addressDAO.insert(professional.getUser().getAddresses());
         documentDAO.insert(professional.getUser().getDocuments());
 
@@ -51,7 +50,7 @@ public class ProfessionalDAOImpl extends AbstractDAO implements ProfessionalDAO 
         em.persist(professional);
         em.flush();
         
-        // Assign this professional_id to all the professional service objects.
+        // Assign this professional idd to all the professional service objects.
         for (ProfessionalService pService: professional.getProfServices()) {
             pService.setProfessionalId(professional.getProfessionalId());
         }

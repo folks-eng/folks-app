@@ -156,11 +156,11 @@ public class ProfessionalHandler extends AbstractHandler {
      * @param ctx   Vertx {@link RoutingContext} object.
      */
     public void view(RoutingContext ctx) {
-        final String id = ctx.pathParam("id");
+        final String extId = ctx.pathParam("id");
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Professional professional = professionalBO.view(user(ctx), Integer.valueOf(id));
+            Professional professional = professionalBO.view(user(ctx), extId);
 
             return professional;
             

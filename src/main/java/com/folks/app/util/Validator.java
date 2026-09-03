@@ -1,6 +1,7 @@
 package com.folks.app.util;
 
 import com.folks.app.model.Address;
+import com.folks.app.model.Document;
 import com.folks.app.model.ProfessionalProfile;
 import com.folks.app.model.User;
 
@@ -69,37 +70,46 @@ public class Validator {
         if (pinCode == null || pinCode.toString().isEmpty()) {
             throw new IllegalArgumentException("PinCode is required.");
         }
-        String label = addr.getLabel();
-        if (label == null || label.toString().isEmpty()) {
-            throw new IllegalArgumentException("Label is required.");
-        }
+        // TBD
+//        String label = addr.getLabel();
+//        if (label == null || label.toString().isEmpty()) {
+//            throw new IllegalArgumentException("Label is required.");
+//        }
     }
 
-    public static void validate(ProfessionalProfile profMaster) {
-        Short exp = profMaster.getExperienceYears();
-
+    public static void validateProf(ProfessionalProfile profProfile) {
+        Short exp = profProfile.getExperienceYears();
         if (exp == null || exp.toString().isEmpty()) {
             throw new IllegalArgumentException("Experience is years is required.");
         }
-
-        //Document
-        if (profMaster.getDocuments() == null || profMaster.getDocuments().isEmpty()) {
-            throw new IllegalArgumentException("Document type is required.");
-        }
-        if (profMaster.getDocuments().get(0).getDocumentNumber() == null || profMaster.getDocuments().get(0).getDocumentNumber().isEmpty()) {
-            throw new IllegalArgumentException("Document number is required.");
-        }
-
-        //Address
-        if (profMaster.getAddress().getAddressLine1() == null || profMaster.getAddress().getAddressLine1().isEmpty()) {
-            throw new IllegalArgumentException("Address line is required.");
-        }
-        if (profMaster.getAddress().getPincode() == null || profMaster.getAddress().getPincode() == 0) {
-            throw new IllegalArgumentException("Pin code is required.");
-        }
-
-        if (profMaster.getExpertise() == null || profMaster.getExpertise().isEmpty()) {
+        if (profProfile.getExpertise() == null || profProfile.getExpertise().isEmpty()) {
             throw new IllegalArgumentException("Expertise is required.");
+        }
+        //Document
+        List<Document> docList = profProfile.getDocuments();
+        if (docList == null || docList.isEmpty()) {
+            throw new IllegalArgumentException("At least one document is needed.");
+        }
+        for(Document doc : docList) {
+            Validator.validateDocument(doc);
+        }
+        //Address
+        Address addr = profProfile.getAddress();
+        if (addr == null ) {
+            throw new IllegalArgumentException("Address is required.");
+        }
+        Validator.validateAddress(addr);
+    }
+
+    private static void validateDocument(Document doc) {
+        if (doc.getDocumentNumber() == null || doc.getDocumentNumber().isEmpty()) {
+            throw new IllegalArgumentException("Document number is needed.");
+        }
+        if (doc.getDocumentType() == null || doc.getDocumentType().isEmpty()) {
+            throw new IllegalArgumentException("Document type is needed.");
+        }
+        if (doc.getNameOnDocument() == null || doc.getNameOnDocument().isEmpty()) {
+            throw new IllegalArgumentException("Name on the document is needed.");
         }
     }
 }

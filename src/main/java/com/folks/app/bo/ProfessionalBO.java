@@ -2,15 +2,12 @@ package com.folks.app.bo;
 
 import com.folks.app.dao.*;
 import com.folks.app.model.*;
-import com.folks.app.util.Constants;
-import com.folks.app.util.ResourceNotFoundException;
+import com.folks.app.util.*;
 import jakarta.persistence.NoResultException;
 import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
-import com.folks.app.util.QueryParams;
-import com.folks.app.util.SearchCriteria;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -46,11 +43,18 @@ public class ProfessionalBO extends AbstractBO {
     }
 
     public ProfessionalProfile register(AppUser usr, ProfessionalProfile profProfile) throws IllegalAccessException {
+        Validator.validateProf(profProfile);
+//        Integer userId = existingUser.getUserId();
+//        List<Professional> profList = getProfessionals(userId);
+//        if(!profList.isEmpty())
+//            throw new IllegalArgumentException("Professional already existing");
+        // TBD : Professional existing
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        //Validator.validate(profMaster);
-        // Fetch the user entry and create the Entity objects for inserting into tables Address, Document.
+        /* Fetch the user entry and create the Entity objects for inserting into tables Address, Document.
+        This also checks for user not found.
+         */
         User user = fetchUser(usr.principal().sub());
 
         // String applicationId = MD5HashGenerator.digest("professional", usr.principal().sub());
@@ -187,19 +191,38 @@ public class ProfessionalBO extends AbstractBO {
         return existing;
     }
 
-    public Professional view(AppUser usr, Integer id) {
+    private void ensureAuthorized(AppUser usr, String extId) throws IllegalAccessException {
+        if (extId != null && ! usr.principal().sub().contains(extId)) {
+            throw new IllegalAccessException(UNAUTHORIZED_MSG);
+        }
+    }
+
+    public Professional view(AppUser usr, String extId) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        Professional professional = professionalDAO.find(new Professional.ProfessionalPK(id));
-        if (professional == null) {
-            throw new IllegalArgumentException("No Professional found for id: " + id);
+        // Only the logged in professional is allowed to view.
+        ensureAuthorized(usr, extId);
+        User userFromDb = userDAO.findByExtId(extId);
+        if(userFromDb == null)
+            throw new ResourceNotFoundException("No user found for id: " + extId);
+        List<Professional> profList = getProfessionals(userFromDb.getUserId());
+        if (profList.isEmpty()) {
+            throw new ResourceNotFoundException("No Professional found for id: " + extId);
         }
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Fetched professional details. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
-        return professional;
+        return profList.get(0);
+    }
+
+    private List<Professional> getProfessionals(Integer userId) {
+        Map<String, List<String>> param = new HashMap<>();
+        param.put("userId", List.of(String.valueOf(userId)));
+        SearchCriteria search = SearchCriteria.from(new QueryParams(param));
+        List<Professional> profList = professionalDAO.query(search);
+        return profList;
     }
 
     public Professional remove(AppUser usr, Integer id) {
@@ -235,7 +258,7 @@ public class ProfessionalBO extends AbstractBO {
      * @param extUserId   The authenticated application user containing the JWT principal
      * @return User The user associated with the external identifier
      *
-     * @throws IllegalArgumentException if no user exists for the external identifier
+     * @throws ResourceNotFoundException if no user exists for the external identifier
      */
     private User fetchUser(String extUserId) {
         try {

@@ -3,8 +3,8 @@ package com.folks.app.bo;
 import com.folks.app.auth.AppUser;
 import com.folks.app.dao.UserDAO;
 import com.folks.app.model.User;
-import com.folks.app.util.ResourceNotFoundException;
 import jakarta.persistence.NoResultException;
+import org.javalabs.decl.vertx.container.ResourceNotFoundException;
 import org.javalabs.jpa.DAOProxy;
 
 /**
@@ -45,7 +45,6 @@ public abstract class AbstractBO {
         }
         catch (NoResultException e) {
             throw new ResourceNotFoundException("No User found for id: " + usr.principal().sub());
-            //throw new IllegalArgumentException("No User found for id: " + usr.principal().sub());
         }
     }
  

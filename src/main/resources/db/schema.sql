@@ -144,11 +144,14 @@ CREATE TABLE fks_payments (
 
 CREATE TABLE fks_coupons (
     coupon_id           INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
-    code                VARCHAR(50)     NOT NULL,
+    code                VARCHAR(16)     NOT NULL,
+    title               VARCHAR(48)     NOT NULL,
+    description         VARCHAR(128)    NOT NULL,
+    terms               VARCHAR(128)    NOT NULL,
     discount_type       VARCHAR(16)     NOT NULL,
     discount_value      NUMERIC(7, 2)   ,
     max_discount        NUMERIC(7, 2)   ,
-    expiry_date         DATE            NOT NULL,
+    expiry_date         DATE            ,
     usage_limit         SMALLINT        ,
     created_at          TIMESTAMP       NOT NULL,
     updated_at          TIMESTAMP     
@@ -268,6 +271,7 @@ CREATE TABLE fks_audit_logs (
     updated_at          TIMESTAMP     
 );
 
+
 -- Primary Key Constraint --
 
 ALTER TABLE fks_payments
@@ -365,6 +369,11 @@ REFERENCES fks_users (user_id);
 
 ALTER TABLE fks_professionals
 ADD CONSTRAINT fks_professionals_fk1
+FOREIGN KEY (user_id)
+REFERENCES fks_users (user_id);
+
+ALTER TABLE fks_documents
+ADD CONSTRAINT fks_documents_fk1
 FOREIGN KEY (user_id)
 REFERENCES fks_users (user_id);
 

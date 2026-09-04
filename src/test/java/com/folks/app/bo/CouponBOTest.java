@@ -47,17 +47,23 @@ public class CouponBOTest {
     public static void setup() {
         Map<String, Object> map = new HashMap<>();
         map.put("sub", UUID.randomUUID().toString());
+        map.put("name", "Admin User");
+        map.put("priv", "admin");
+        map.put("scope", "user:create|user:query");
         map.put("jti", UUID.randomUUID().toString());
-
+        
         usr = new AppUserImpl(new UserPrincipal(map));
         couponBO = new CouponBO();
     }
 
     @Test
     @Order(1)
-    public void testCreate() {
+    public void testCreate() throws IllegalAccessException {
         Coupon coupon = new Coupon();
         coupon.setCode("SAVE10");
+        coupon.setTitle("Tile 1");
+        coupon.setDescription("Title 1 Desc");
+        coupon.setTerms("Title 1 Terms");
         coupon.setDiscountType("PERCENTAGE");
         coupon.setDiscountValue(new BigDecimal("10.00"));
         coupon.setMaxDiscount(new BigDecimal("100.00"));
@@ -73,9 +79,12 @@ public class CouponBOTest {
 
     @Test
     @Order(2)
-    public void testCreateBulk() {
+    public void testCreateBulk() throws IllegalAccessException {
         Coupon c1 = new Coupon();
         c1.setCode("WELCOME50");
+        c1.setTitle("Tile 1");
+        c1.setDescription("Title 1 Desc");
+        c1.setTerms("Title 1 Terms");
         c1.setDiscountType("FLAT");
         c1.setDiscountValue(new BigDecimal("50.00"));
         c1.setExpiryDate(Date.valueOf("2027-06-30"));
@@ -83,6 +92,9 @@ public class CouponBOTest {
 
         Coupon c2 = new Coupon();
         c2.setCode("FESTIVE20");
+        c2.setTitle("Tile 1");
+        c2.setDescription("Title 1 Desc");
+        c2.setTerms("Title 1 Terms");
         c2.setDiscountType("PERCENTAGE");
         c2.setDiscountValue(new BigDecimal("20.00"));
         c2.setExpiryDate(Date.valueOf("2027-11-15"));
@@ -126,10 +138,13 @@ public class CouponBOTest {
 
     @Test
     @Order(6)
-    public void testModify() {
+    public void testModify() throws IllegalAccessException {
         Coupon update = new Coupon();
         update.setCouponId(couponId);
         update.setCode("SAVE15");
+        update.setTitle("Tile 11");
+        update.setDescription("Title 1 Desc");
+        update.setTerms("Title 1 Terms");
         update.setDiscountType("PERCENTAGE");
         update.setDiscountValue(new BigDecimal("15.00"));
         update.setMaxDiscount(new BigDecimal("150.00"));
@@ -156,7 +171,7 @@ public class CouponBOTest {
 
     @Test
     @Order(8)
-    public void testRemove() {
+    public void testRemove() throws IllegalAccessException {
         Coupon removed = couponBO.remove(usr, couponId);
         assertEquals(couponId, removed.getCouponId());
 

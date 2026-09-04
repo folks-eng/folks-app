@@ -1,7 +1,6 @@
 package com.folks.app.bo;
 
 import com.folks.app.util.Constants;
-import com.folks.app.util.ResourceNotFoundException;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
@@ -13,6 +12,7 @@ import com.folks.app.util.SearchCriteria;
 import java.sql.Timestamp;
 import java.util.List;
 import org.javalabs.decl.util.DateUtil;
+import org.javalabs.decl.vertx.container.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,7 +172,6 @@ public class AddressBO extends AbstractBO {
     private Address fetchAddress(Integer id) {
         Address address = addressDAO.find(new Address.AddressPK(id));
         if (address == null) {
-            //throw new IllegalArgumentException("No address found for id: " + id);
             throw new ResourceNotFoundException("No address found for id: " + id);
         }
         return address;

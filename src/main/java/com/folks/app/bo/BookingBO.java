@@ -7,6 +7,7 @@ import com.folks.app.auth.AppUser;
 import com.folks.app.dao.BookingDAO;
 import com.folks.app.model.Booking;
 import com.folks.app.model.User;
+import com.folks.app.util.IdGenerator;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
 import java.sql.Timestamp;
@@ -14,7 +15,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.javalabs.jpa.util.MD5HashGenerator;
+import org.javalabs.decl.vertx.container.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +51,8 @@ public class BookingBO extends AbstractBO {
         if (booking.getCreatedAt() == null) {
             booking.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
         }
-        // 
-        booking.setBookingId(MD5HashGenerator.digest(
+        // Booking id must be unique
+        booking.setBookingId(IdGenerator.generate(
                 String.valueOf(booking.getCustomerId())
                 , String.valueOf(booking.getServiceId())
                 , String.valueOf(booking.getAddressId())
@@ -122,9 +123,20 @@ public class BookingBO extends AbstractBO {
         
         // Fetch the user.
         User user = fetchUser(usr);
+        if (user == null) {
+            throw new ResourceNotFoundException("No user found for " + usr.principal().sub());
+        }
+        String field = null;
+        
+        if (user.getRole() == User.Role.CUSTOMER) {
+            field = "customerId";
+        }
+        else if (user.getRole() == User.Role.PROFESSIONAL) {
+            field = "professionalId";
+        }
 
         // We need to fetch the bookings for the current user only.
-        SearchCriteria search = SearchCriteria.from(params, "customerId", user.getUserId());
+        SearchCriteria search = SearchCriteria.from(params, field, user.getUserId());
         List<Booking> bookings = bookingDAO.query(search);
 
         timer.stop();

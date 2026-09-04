@@ -1,7 +1,6 @@
 package com.folks.app.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.folks.app.util.ResourceNotFoundException;
 import org.javalabs.decl.util.MapperUtil;
 import org.javalabs.decl.vertx.config.model.ServerMessage;
 import com.folks.app.bo.AddressBO;
@@ -13,6 +12,7 @@ import io.vertx.ext.web.RoutingContext;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.NoSuchElementException;
+import org.javalabs.decl.vertx.container.ResourceNotFoundException;
 
 /**
  * Example REST handler.
@@ -104,21 +104,16 @@ public class AddressHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            try {
-                Address address = MapperUtil.decode(ctx.body().buffer().getBytes(), Address.class);
-                address.setAddressId(Integer.valueOf(id));
-                // First fetch the entry, to see if this already exists.
-                Address result = addressBO.modify(user(ctx), address);
-                ServerMessage msg = new ServerMessage();
-                msg.setCode(HttpURLConnection.HTTP_OK);
-                msg.setMessage("Address modified successfully.");
-                return msg;
-            } catch (ResourceNotFoundException ex) {
-                    ServerMessage msg = new ServerMessage();
-                    msg.setCode(HttpURLConnection.HTTP_NOT_FOUND);
-                    msg.setMessage(ex.getMessage());
-                    return msg;
-            }
+            Address address = MapperUtil.decode(ctx.body().buffer().getBytes(), Address.class);
+            address.setAddressId(Integer.valueOf(id));
+            
+            Address result = addressBO.modify(user(ctx), address);
+            
+            ServerMessage msg = new ServerMessage();
+            msg.setCode(HttpURLConnection.HTTP_OK);
+            msg.setMessage("Address modified successfully.");
+            
+            return msg;
         }).onComplete(result -> {
             if (result.succeeded()) {
                 if(result.result().getCode() == HttpURLConnection.HTTP_NOT_FOUND) {

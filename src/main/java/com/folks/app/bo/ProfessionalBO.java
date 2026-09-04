@@ -2,15 +2,16 @@ package com.folks.app.bo;
 
 import com.folks.app.dao.*;
 import com.folks.app.model.*;
-import com.folks.app.util.*;
 import jakarta.persistence.NoResultException;
 import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
+import com.folks.app.util.Constants;
 import com.folks.app.util.IdGenerator;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
+import com.folks.app.util.Validator;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.javalabs.decl.vertx.container.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -146,6 +148,7 @@ public class ProfessionalBO extends AbstractBO {
 
     public List<Professional> viewAll(AppUser usr, QueryParams params) throws IllegalAccessException {
         ensureAdmin(usr);
+        
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -183,6 +186,7 @@ public class ProfessionalBO extends AbstractBO {
 
         StopWatch timer = StopWatch.newTimer();
         timer.start();
+        
         // First fetch the entry from db(prof joins user), to see if this already exists.
         Professional existing = professionalDAO.findByExtId(extId);
         if (existing == null) {
@@ -195,7 +199,7 @@ public class ProfessionalBO extends AbstractBO {
         existing.setBio(profObj.getBio());
         existing.setExperienceYears(profObj.getExperienceYears());
         existing.setServingCities(profObj.getServingCities());
-        LOGGER.info("USER ID " +existing.getUserId());
+
         // TBD:
         // existing.setRatingAvg(profObj.getRatingAvg());
         // existing.setIsVerified(profObj.getIsVerified());
@@ -248,15 +252,7 @@ public class ProfessionalBO extends AbstractBO {
             LOGGER.info("Created {} Professional record(s) successfully. Elapsed time(ms): {}", records.size(), timer.elapsedTimeMillis());
         }
     }
-
-//    private List<Professional> getProfessionals(Integer userId) {
-//        Map<String, List<String>> param = new HashMap<>();
-//        param.put("userId", List.of(String.valueOf(userId)));
-//        SearchCriteria search = SearchCriteria.from(new QueryParams(param));
-//        List<Professional> profList = professionalDAO.query(search);
-//        return profList;
-//    }
-
+    
     private List<Service> fetchServices(List<Integer> expertise) {
         try {
             List<String> subCategoryIds = new ArrayList<>(expertise.size());

@@ -57,7 +57,7 @@ public class CouponUsageBOTest {
     private static Integer usageId;
 
     @BeforeAll
-    public static void setup() {
+    public static void setup() throws IllegalAccessException {
         Map<String, Object> adminMap = new HashMap<>();
         adminMap.put("sub", UUID.randomUUID().toString());
         adminMap.put("name", "Admin User");
@@ -121,6 +121,9 @@ public class CouponUsageBOTest {
 
         Coupon coupon = new Coupon();
         coupon.setCode("SAVE10");
+        coupon.setTitle("Tile 1");
+        coupon.setDescription("Title 1 Desc");
+        coupon.setTerms("Title 1 Terms");
         coupon.setDiscountType("PERCENTAGE");
         coupon.setExpiryDate(Date.valueOf("2027-12-31"));
         coupon.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));

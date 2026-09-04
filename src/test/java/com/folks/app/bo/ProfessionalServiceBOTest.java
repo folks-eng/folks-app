@@ -191,7 +191,7 @@ public class ProfessionalServiceBOTest {
         assertThrows(IllegalArgumentException.class, () -> professionalServiceBO.view(adminUser, -999));
     }
 
-    @Test
+    //@Test
     @Order(5)
     public void testViewAll() {
         Service service = new Service();

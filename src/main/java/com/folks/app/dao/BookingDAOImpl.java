@@ -169,6 +169,7 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
 
             for (Availability availability : availabilities) {
                 availability.setIsBooked((short)1);
+                availability.setUpdatedAt(booking.getUpdatedAt());
             }
             availabilityDAO.update(availabilities);
             return Boolean.TRUE;
@@ -183,6 +184,7 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
         if (! availabilities.isEmpty()) {
             for (Availability availability : availabilities) {
                 availability.setIsBooked((short)0);
+                booking.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
             }
             availabilityDAO.update(availabilities);
             return Boolean.TRUE;

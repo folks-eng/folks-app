@@ -29,10 +29,12 @@ public class CouponBO extends AbstractBO {
         }
     }
 
-    public Coupon create(AppUser usr, Coupon coupon) {
+    public Coupon create(AppUser usr, Coupon coupon) throws IllegalAccessException {
+        // Only admin has the privilege to create user.
+        ensureAdmin(usr);
+        
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-        
         
         couponDAO.insert(coupon);
         timer.stop();
@@ -43,10 +45,12 @@ public class CouponBO extends AbstractBO {
         return coupon;
     }
 
-    public void create(AppUser usr, List<Coupon> records) {
+    public void create(AppUser usr, List<Coupon> records) throws IllegalAccessException {
+        // Only admin has the privilege to create user.
+        ensureAdmin(usr);
+        
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-
         
         couponDAO.insert(records);
         timer.stop();
@@ -56,7 +60,10 @@ public class CouponBO extends AbstractBO {
         }
     }
 
-    public Coupon modify(AppUser usr, Coupon coupon) {
+    public Coupon modify(AppUser usr, Coupon coupon) throws IllegalAccessException {
+        // Only admin has the privilege to create user.
+        ensureAdmin(usr);
+        
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -111,7 +118,10 @@ public class CouponBO extends AbstractBO {
         return coupon;
     }
 
-    public Coupon remove(AppUser usr, Integer id) {
+    public Coupon remove(AppUser usr, Integer id) throws IllegalAccessException {
+        // Only admin has the privilege to create user.
+        ensureAdmin(usr);
+        
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

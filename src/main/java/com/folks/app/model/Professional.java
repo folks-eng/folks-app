@@ -21,10 +21,9 @@ import java.util.Objects;
     @NamedNativeQuery(name = "Professional.selectAll", query = "SELECT * FROM fks_professionals"),
     @NamedNativeQuery(name = "Professional.selectByExtId"
             , query = """
-                      SELECT a.professional_id, a.bio, a.experience_years, a.serving_cities, a.rating_avg, a.is_verified, a.created_at, a.updated_at,
-                        b.user_id, b.external_id, b.full_name, b.email, b.phone1, b.phone2, b.password_hash, b.role, b.status, b.created_at
+                      SELECT a.*, b.*
                         FROM fks_professionals a
-                       RIGHT OUTER JOIN fks_users b ON (a.user_id = b.user_id)
+                       RIGHT OUTER JOIN fks_users b ON (a.user_id = b.user_id AND b.role = ?)
                        WHERE b.external_id = ?
                 """)
 })

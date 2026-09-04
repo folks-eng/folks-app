@@ -35,8 +35,17 @@ public class Coupon implements Serializable, Cloneable {
     @Column(name = "coupon_id", nullable = false, updatable = false, precision = 32)
     private Integer couponId;
 
-    @Column(name = "code", nullable = false, updatable = true, length = 50)
+    @Column(name = "code", nullable = false, updatable = true, length = 16)
     private String code;
+
+    @Column(name = "title", nullable = false, updatable = true, length = 48)
+    private String title;
+
+    @Column(name = "description", nullable = false, updatable = true, length = 128)
+    private String description;
+
+    @Column(name = "terms", nullable = false, updatable = true, length = 128)
+    private String terms;
 
     @Column(name = "discount_type", nullable = false, updatable = true, length = 16)
     private String discountType;
@@ -75,6 +84,30 @@ public class Coupon implements Serializable, Cloneable {
 
     public String getCode() {
         return this.code;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getTerms() {
+        return terms;
+    }
+
+    public void setTerms(String terms) {
+        this.terms = terms;
     }
 
     public void setDiscountType(String discountType) {

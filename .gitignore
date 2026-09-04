@@ -7,3 +7,4 @@
 *.rdb
 log4j2.xml
 app.json
+*.cer

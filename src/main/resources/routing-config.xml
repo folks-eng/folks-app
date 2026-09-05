@@ -13,10 +13,11 @@
     <resource-mapping name="User" path="/users" resource="com.folks.app.handler.UserHandler" schema="com.folks.app.model.User">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
-        <mapping uri="/:id" method="PUT" api="modify"/>
         <mapping uri="/:id" method="GET" api="view"/>
-        <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="PATCH" api="patchModify"/>
+        <!--mapping uri="/:id" method="DELETE" api="remove"/-->
     </resource-mapping>
     
     <resource-mapping name="Address" path="/addresses" resource="com.folks.app.handler.AddressHandler" schema="com.folks.app.model.Address">
@@ -34,7 +35,7 @@
         <mapping uri="/:id" method="PUT" api="modify"/>
         <mapping uri="/hierarchy" method="GET" api="viewHierarchy"/>
         <mapping uri="/:id" method="GET" api="view"/>
-        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <!--mapping uri="/:id" method="DELETE" api="remove"/-->
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
     
@@ -53,8 +54,8 @@
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
         <mapping uri="/:id" method="GET" api="view"/>
-        <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
+        <!--mapping uri="/:id" method="DELETE" api="remove"/-->
     </resource-mapping>
     
     <resource-mapping name="ProfessionalService" path="/professionalServices" resource="com.folks.app.handler.ProfessionalServiceHandler" schema="com.folks.app.model.ProfessionalService">

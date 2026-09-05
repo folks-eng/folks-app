@@ -128,6 +128,7 @@ public class ProfessionalBO extends AbstractBO {
         return profProfile;
     }
 
+    // User-specific operation
     public Professional view(AppUser usr, String extId) throws IllegalAccessException {
         // Only the logged in professional is allowed to view.
         ensureAuthorized(usr, extId);
@@ -135,7 +136,7 @@ public class ProfessionalBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         Professional professional = professionalDAO.findByExtId(extId);
-        // How to simulate?
+        // How to simulate TBD
         if (professional == null) {
             throw new ResourceNotFoundException("No Professional found for id: " + extId);
         }
@@ -146,6 +147,7 @@ public class ProfessionalBO extends AbstractBO {
         return professional;
     }
 
+    // Admin operation to view all Professionals of the system
     public List<Professional> viewAll(AppUser usr, QueryParams params) throws IllegalAccessException {
         ensureAdmin(usr);
         
@@ -160,25 +162,6 @@ public class ProfessionalBO extends AbstractBO {
             LOGGER.info("Fetched {} expanded professional record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
         }
         return rows;
-    }
-
-    public Professional remove(AppUser usr, String extId) throws IllegalAccessException {
-        ensureAuthorized(usr, extId);
-
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-        // First fetch the entry, to see if this already exists.
-        Professional professional = professionalDAO.findByExtId(extId);
-        if (professional == null) {
-            throw new ResourceNotFoundException("No professional found for extId: " + extId);
-        }
-        professionalDAO.delete(professional);
-        timer.stop();
-
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Deleted Professional with extId: {}. Elapsed time(ms): {}", extId, timer.elapsedTimeMillis());
-        }
-        return professional;
     }
 
     public Professional modify(AppUser usr, Professional profObj, String extId) throws IllegalAccessException {
@@ -211,6 +194,25 @@ public class ProfessionalBO extends AbstractBO {
             LOGGER.info("Professional record modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
         return existing;
+    }
+
+    public Professional remove(AppUser usr, String extId) throws IllegalAccessException {
+        ensureAuthorized(usr, extId);
+
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+        // First fetch the entry, to see if this already exists.
+        Professional professional = professionalDAO.findByExtId(extId);
+        if (professional == null) {
+            throw new ResourceNotFoundException("No professional found for extId: " + extId);
+        }
+        professionalDAO.delete(professional);
+        timer.stop();
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Deleted Professional with extId: {}. Elapsed time(ms): {}", extId, timer.elapsedTimeMillis());
+        }
+        return professional;
     }
 
     public Professional create(AppUser usr, Professional professional) throws IllegalAccessException {

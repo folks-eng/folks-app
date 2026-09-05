@@ -5,6 +5,4 @@
 *.log.swp
 .DS_Store
 *.rdb
-log4j2.xml
-app.json
 *.cer

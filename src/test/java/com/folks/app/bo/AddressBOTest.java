@@ -95,6 +95,7 @@ public class AddressBOTest {
         Address address = new Address();
         address.setAddressLine1("221B Baker Street");
         address.setCity("Bengaluru");
+        address.setLocality("JP Nagar");
         address.setState("Karnataka");
         address.setPincode(560001);
         address.setLabel("HOME");
@@ -115,6 +116,7 @@ public class AddressBOTest {
         address.setUserId(userId);
         address.setAddressLine1("Bulk Street");
         address.setCity("Pune");
+        address.setLocality("Baner");
         address.setState("Maharashtra");
         address.setPincode(411001);
         address.setLabel("OFFICE");
@@ -132,6 +134,7 @@ public class AddressBOTest {
         a1.setUserId(userId);
         a1.setAddressLine1("MG Road");
         a1.setCity("Bengaluru");
+        a1.setLocality("JP Nagar");
         a1.setState("Karnataka");
         a1.setPincode(560002);
         a1.setLabel("OFFICE");
@@ -188,6 +191,7 @@ public class AddressBOTest {
         update.setUserId(userId);
         update.setAddressLine1("221B Baker Street, Apt 4");
         update.setAddressLine2("Near Central Park");
+        update.setLocality("JP Nagar");
         update.setCity("Bengaluru");
         update.setState("Karnataka");
         update.setPincode(560003);
@@ -209,6 +213,7 @@ public class AddressBOTest {
         update.setUserId(userId);
         update.setAddressLine1("Hijacked");
         update.setCity("Bengaluru");
+        update.setLocality("JP Nagar");
         update.setState("Karnataka");
         update.setPincode(560004);
 

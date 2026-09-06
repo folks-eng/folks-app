@@ -28,6 +28,8 @@ public class ProfessionalProfile implements Serializable, Cloneable {
     
     // Nearby cities that this professional is willing to travel
     private String servingCities;
+    
+    private List<Integer> neighbourhoods;
 
     // Areas of expertise (at the sub-category level).
     // It essentially contains the sub-category-ids.
@@ -81,6 +83,14 @@ public class ProfessionalProfile implements Serializable, Cloneable {
 
     public void setServingCities(String servingCities) {
         this.servingCities = servingCities;
+    }
+
+    public List<Integer> getNeighbourhoods() {
+        return neighbourhoods;
+    }
+
+    public void setNeighbourhoods(List<Integer> neighbourhoods) {
+        this.neighbourhoods = neighbourhoods;
     }
 
     public List<Integer> getExpertise() {

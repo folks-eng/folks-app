@@ -115,6 +115,18 @@ public class ProfessionalBO extends AbstractBO {
         }
         professional.setProfServices(pServices);
         
+        // Build the professional serving localities.
+        List<ProfessionalNeighbourhood> profLocalities = new ArrayList<>(profProfile.getNeighbourhoods().size());
+        for (Integer locality : profProfile.getNeighbourhoods()) {
+            ProfessionalNeighbourhood profLocality = new ProfessionalNeighbourhood();
+            profLocality.setNeighbourhoodId(locality);
+            profLocality.setStatus(ProfessionalNeighbourhood.Status.PACTIVE);
+            profLocality.setCreatedAt(createdAt);
+            
+            profLocalities.add(profLocality);
+        }
+        professional.setProfNeighbourhoods(profLocalities);
+        
         professionalDAO.insertProfile(professional);
         timer.stop();
 

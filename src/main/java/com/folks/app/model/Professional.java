@@ -63,7 +63,10 @@ public class Professional implements Serializable, Cloneable {
     
     @Transient
     private List<ProfessionalService> profServices;
-
+    
+    @Transient
+    private List<ProfessionalNeighbourhood> profNeighbourhoods;
+    
     public Professional() {}
 
     public void setProfessionalId(Integer professionalId) {
@@ -152,6 +155,14 @@ public class Professional implements Serializable, Cloneable {
 
     public void setProfServices(List<ProfessionalService> profServices) {
         this.profServices = profServices;
+    }
+
+    public List<ProfessionalNeighbourhood> getProfNeighbourhoods() {
+        return profNeighbourhoods;
+    }
+
+    public void setProfNeighbourhoods(List<ProfessionalNeighbourhood> profNeighbourhoods) {
+        this.profNeighbourhoods = profNeighbourhoods;
     }
 
     public static class ProfessionalPK {

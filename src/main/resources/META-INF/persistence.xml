@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.2" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence           http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+  <persistence-unit name="com.folks.app_folks-app_jar_0.0.1-SNAPSHOTPU" transaction-type="RESOURCE_LOCAL">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>com.folks.app.model.ServiceArea</class>
+    <class>com.folks.app.model.ProfessionalServiceArea</class>
+    <class>com.folks.app.model.City</class>
+    <class>com.folks.app.model.FksCities</class>
+    <class>com.folks.app.model.FksProvinces</class>
+    <class>com.folks.app.model.FksNeighbourhoods</class>
+    <class>com.folks.app.model.FksProfessionalNeighbourhoods</class>
+    <class>com.folks.app.model.Country</class>
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/folksdb"/>
+      <property name="javax.persistence.jdbc.user" value="folks"/>
+      <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+      <property name="javax.persistence.jdbc.password" value="p@$$word"/>
+    </properties>
+  </persistence-unit>
+</persistence>

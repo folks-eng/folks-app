@@ -39,6 +39,9 @@ public class ProfessionalDAOImpl extends AbstractDAO implements ProfessionalDAO 
     @Dao
     private ProfessionalServiceDAO profServiceDAO;
     
+    @Dao
+    private ProfessionalNeighbourhoodDAO professionalNeighbourhoodDAO;
+    
     @Override
     public void insertProfile(Professional professional) {
         // User record is already present, no need to insert it again.
@@ -53,10 +56,16 @@ public class ProfessionalDAOImpl extends AbstractDAO implements ProfessionalDAO 
         em.flush();
         
         // Assign this professional idd to all the professional service objects.
-        for (ProfessionalService pService: professional.getProfServices()) {
+        for (ProfessionalService pService : professional.getProfServices()) {
             pService.setProfessionalId(professional.getProfessionalId());
         }
         profServiceDAO.insert(professional.getProfServices());
+        
+        // Assign this professional idd to all the professional neighbourhood objects.
+        for (ProfessionalNeighbourhood pLocality : professional.getProfNeighbourhoods()) {
+            pLocality.setProfessionalId(professional.getProfessionalId());
+        }
+        professionalNeighbourhoodDAO.insert(professional.getProfNeighbourhoods());
     }
 
     @Override

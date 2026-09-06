@@ -97,10 +97,10 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
                         , a.payment_method
                         , a.total_amount
                         , a.created_at
-                        , b.service_id
+                        , a.service_id
                         , b.name
                         , c.address_line1
-                        , c.address_line2
+                        , COALESCE(c.address_line2, '') AS address_line2
                         , c.city
                         , c.pincode
                         , a.professional_id
@@ -112,7 +112,8 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
                  LEFT OUTER JOIN fks_professionals d ON (a.professional_id = d.professional_id)
                  LEFT OUTER JOIN fks_users e ON (d.user_id = e.user_id AND e.role = ?)
                  WHERE a.customer_id = ?
-                 ORDER BY a.created_at DESC;""";
+                 ORDER BY a.created_at DESC;
+                       """;
         
         List<Object> val = search.params().get("customer_id");
         

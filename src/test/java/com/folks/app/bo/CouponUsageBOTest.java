@@ -87,6 +87,7 @@ public class CouponUsageBOTest {
         Address address = new Address();
         address.setAddressLine1("14 Lake View Road");
         address.setCity("Bengaluru");
+        address.setLocality("JP Nagar");
         address.setState("Karnataka");
         address.setPincode(560037);
         address.setLabel("HOME");

@@ -83,6 +83,7 @@ public class PaymentBOTest {
         Address address = new Address();
         address.setAddressLine1("7 Church Street");
         address.setCity("Bengaluru");
+        address.setLocality("JP Nagar");
         address.setState("Karnataka");
         address.setPincode(560001);
         address.setLabel("HOME");

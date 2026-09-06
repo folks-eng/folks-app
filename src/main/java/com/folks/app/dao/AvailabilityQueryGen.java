@@ -70,7 +70,7 @@ public class AvailabilityQueryGen {
             prof_eligibility AS (
                 SELECT c.professional_id, c.date, p.work_start, p.work_end, MIN(c.start_time) AS start_time, MAX(c.end_time) AS end_time, COUNT(*) AS slot_count
                   FROM fks_professional_services a
-                 INNER JOIN fks_professionals b ON (a.professional_id = b.professional_id AND b.is_verified = 1)
+                 INNER JOIN fks_professionals b ON (a.professional_id = b.professional_id AND b.is_verified = ?)
                  INNER JOIN fks_availabilities c ON (b.professional_id = c.professional_id AND a.service_id = ?)
                  CROSS JOIN params p
                 WHERE date = p.booking_date
@@ -111,7 +111,7 @@ public class AvailabilityQueryGen {
             prof_eligibility AS (
                 SELECT c.professional_id, c.date, p.work_start, p.work_end, MIN(c.start_time) AS start_time, MAX(c.end_time) AS end_time, COUNT(*) AS slot_count
                   FROM fks_professional_services a
-                 INNER JOIN fks_professionals b ON (a.professional_id = b.professional_id AND b.is_verified = 1)
+                 INNER JOIN fks_professionals b ON (a.professional_id = b.professional_id AND b.is_verified = ?)
                  INNER JOIN fks_availabilities c ON (b.professional_id = c.professional_id AND a.service_id = ?)
                  CROSS JOIN params p
                 WHERE date = c.booking_date

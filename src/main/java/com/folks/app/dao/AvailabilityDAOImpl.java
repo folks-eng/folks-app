@@ -174,7 +174,7 @@ public class AvailabilityDAOImpl extends AbstractDAO implements AvailabilityDAO 
         String query = queryGen.matchingProfessionalQuery(fair);
         
         TypedQuery q = em.createNativeQuery(query, Availability.class);
-        List<Object> binds = List.of(date, startTime, endTime, serviceId, 0, 1);
+        List<Object> binds = List.of(date, startTime, endTime, 1, serviceId, 0, 1);
         
         Integer idx = 1;
         for (Object bind : binds) {

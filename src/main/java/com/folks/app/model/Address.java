@@ -49,6 +49,9 @@ public class Address implements Serializable, Cloneable {
     @Column(name = "address_line2", nullable = true, updatable = true, length = 128)
     private String addressLine2;
 
+    @Column(name = "locality", nullable = false, updatable = true, length = 80)
+    private String locality;
+
     @Column(name = "city", nullable = false, updatable = true, length = 64)
     private String city;
 
@@ -116,6 +119,14 @@ public class Address implements Serializable, Cloneable {
 
     public String getCity() {
         return this.city;
+    }
+
+    public String getLocality() {
+        return locality;
+    }
+
+    public void setLocality(String locality) {
+        this.locality = locality;
     }
 
     public void setState(String state) {

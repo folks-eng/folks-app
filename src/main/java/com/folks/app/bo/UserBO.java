@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.javalabs.decl.vertx.container.ResourceAlreadyExistsException;
+import org.javalabs.decl.vertx.container.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,33 +89,6 @@ public class UserBO extends AbstractBO {
         }
     }
 
-    public User modify(AppUser usr, User user) throws IllegalAccessException {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        // Only the logged in user is allowed to modify the user as identified by this id.
-        ensureAuthorized(usr, user.getExternalId());
-        Validator.validateUser(user);
-        // Fetch the user entry, throws ResourceNotFoundException
-        User existing = fetchUser(usr);
-
-        // Update attributes of existing record
-        existing.setFullName(user.getFullName());
-        existing.setEmail(user.getEmail());
-        existing.setPhone1(user.getPhone1());
-        existing.setPhone2(user.getPhone2());
-        existing.setStatus(user.getStatus());
-        existing.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
-
-        userDAO.update(existing);
-        timer.stop();
-
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("User record modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
-        }
-        return existing;
-    }
-
     public List<User> viewAll(AppUser usr, QueryParams params) throws IllegalAccessException {
         // Only admin has the privilege to view all users.
         ensureAdmin(usr);
@@ -150,6 +124,79 @@ public class UserBO extends AbstractBO {
         return user;
     }
 
+    /* Update all the attributes for the resource from payload. If you leave something out, that part of the resource will be
+    erased or set to default.
+     */
+    public User modify(AppUser usr, User user) throws IllegalAccessException {
+        // Only the logged in user is allowed to modify the user as identified by this id.
+        ensureAuthorized(usr, user.getExternalId());
+        Validator.validateUser(user);
+
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+        // How to simulate ResourceNotFoundException, TBD
+        User existing = userDAO.find(new User.UserPK(user.getUserId()));
+        if (existing == null) {
+            throw new ResourceNotFoundException("No user found for identifier: " + user.getUserId());
+        }
+
+        existing.setFullName(user.getFullName());
+        existing.setEmail(user.getEmail());
+        existing.setPhone1(user.getPhone1());
+        existing.setPhone2(user.getPhone2());
+        // TBD: existing.setStatus(user.getStatus());
+        //existing.setRole(user.getRole());
+        existing.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+
+        userDAO.update(existing);
+        timer.stop();
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("User record modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+        }
+        return existing;
+    }
+
+    // Update only the attributes given in input
+    public User patchUp(AppUser usr, User user) throws IllegalAccessException {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        // Only the logged in user is allowed to modify the user as identified by this id.
+        ensureAuthorized(usr, user.getExternalId());
+        Validator.validateUser(user);
+
+        // First fetch the entry, to see if this already exists.
+        User existing = userDAO.find(new User.UserPK(user.getUserId()));
+        if (existing == null) {
+            throw new ResourceNotFoundException("No user found for identifier: " + user.getUserId());
+        }
+        if(user.getFullName() != null && !user.getFullName().trim().isEmpty())
+            existing.setFullName(user.getFullName());
+        if(user.getEmail() != null && !user.getEmail().trim().isEmpty())
+            existing.setEmail(user.getEmail());
+        if(user.getPhone1() != null && !user.getPhone1().trim().isEmpty())
+            existing.setPhone1(user.getPhone1());
+        if( user.getPhone2() != null && ! user.getPhone2().trim().isEmpty())
+            existing.setPhone2( user.getPhone2());
+
+        String attr = user.getRole().name();
+        if(attr != null && !attr.trim().isEmpty())
+            existing.setRole(user.getRole());
+        attr = user.getStatus().name();
+        if(attr != null && !attr.trim().isEmpty())
+            existing.setStatus(user.getStatus());
+        existing.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+
+        userDAO.update(existing);
+        timer.stop();
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("User record patched up successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+        }
+        return existing;
+    }
+
     public User remove(AppUser usr, String id) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
@@ -166,46 +213,5 @@ public class UserBO extends AbstractBO {
             LOGGER.info("Deleted User. Id: {}. Elapsed time(ms): {}", id, timer.elapsedTimeMillis());
         }
         return user;
-    }
-
-    public User patchUp(AppUser usr, User user) {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        // First fetch the entry, to see if this already exists.
-        User existing = userDAO.find(new User.UserPK(user.getUserId()));
-        if (existing == null) {
-            throw new IllegalArgumentException("No user found for identifier: " + user.getUserId());
-        }
-        // Update only the attributes given in input
-        String attr = user.getFullName();
-        if(attr != null && !attr.trim().isEmpty())
-            existing.setFullName(attr);
-        attr = user.getEmail();
-        if(attr != null && !attr.trim().isEmpty())
-            existing.setEmail(attr);
-        attr = user.getPhone1();
-        if(attr != null && !attr.trim().isEmpty())
-            existing.setPhone1(attr);
-        attr = user.getPhone2();
-        if(attr != null && !attr.trim().isEmpty())
-            existing.setPhone2(attr);
-        attr = user.getPasswordHash();
-        if(attr != null && !attr.trim().isEmpty())
-            existing.setPasswordHash(attr);
-        attr = user.getRole().name();
-        if(attr != null && !attr.trim().isEmpty())
-            existing.setRole(user.getRole());
-        attr = user.getStatus().name();
-        if(attr != null && !attr.trim().isEmpty())
-            existing.setStatus(user.getStatus());
-
-        userDAO.update(existing);
-        timer.stop();
-
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("User record patched up successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
-        }
-        return existing;
     }
 }

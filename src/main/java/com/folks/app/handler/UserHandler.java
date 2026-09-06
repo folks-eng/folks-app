@@ -89,7 +89,7 @@ public class UserHandler extends AbstractHandler {
      * Modify an existing resource by it's id (PUT request).
      * 
      * <p>
-     * If no corresponding resource is found then this method will throw {@link NoSuchElementException}
+     * If no corresponding resource is found then this method will throw {@link ResourceNotFoundException}
      * resulting a <code>404</code> response.
      * 
      * <p>
@@ -100,13 +100,13 @@ public class UserHandler extends AbstractHandler {
      * @param ctx   Vertx {@link RoutingContext} object.
      */
     public void modify(RoutingContext ctx) {
-        final String id = ctx.pathParam("id");
+        final String extId = ctx.pathParam("id");
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
             try {
                 User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
-                user.setExternalId(id);
+                user.setExternalId(extId);
                 // First fetch the entry, to see if this already exists.
                 User result = userBO.modify(user(ctx), user);
 
@@ -135,6 +135,54 @@ public class UserHandler extends AbstractHandler {
             }
         });
     }
+
+    /**
+     * Modify an existing resource by it's id (PATCH request).
+     *
+     * <p>
+     * If no corresponding resource is found then this method will throw {@link ResourceNotFoundException}
+     * resulting a <code>404</code> response.
+     *
+     * <p>
+     * For a PATCH request, the server expects you to send  only those attribute(s) that needs to be updated.
+     *
+     * @param ctx   Vertx {@link RoutingContext} object.
+     */
+    public void patchModify(RoutingContext ctx) {
+        final String extId = ctx.pathParam("id");
+
+        // If you use a remote store, this method will safely execute the blocking code.
+        vertx().executeBlocking(() -> {
+            try {
+                User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
+                user.setExternalId(extId);
+                User result = userBO.patchUp(user(ctx), user);
+
+                ServerMessage msg = new ServerMessage();
+                msg.setCode(HttpURLConnection.HTTP_OK);
+                msg.setMessage("User modified successfully.");
+                return msg;
+            } catch (RuntimeException ex) {
+                ServerMessage msg = new ServerMessage();
+                msg.setCode(HttpURLConnection.HTTP_BAD_REQUEST);
+                msg.setMessage(ex.getMessage());
+                return msg;
+            }
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                if(result.result().getCode() == HttpURLConnection.HTTP_BAD_REQUEST) {
+                    sendResponse(ctx, HttpURLConnection.HTTP_BAD_REQUEST, result.result());
+                }
+                else {
+                    sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+                }
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+
     
     /**
      * View a specific resource by it's id.

@@ -1,12 +1,9 @@
 package com.folks.app.core;
 
-import com.folks.app.cache.impl.CategoryCache;
-import com.folks.app.cache.impl.ServiceCache;
+import com.folks.app.cache.ReferenceDataLoader;
 import com.folks.app.cache.impl.UserRoleCache;
 import org.javalabs.decl.vertx.container.VertxContainer;
 import com.folks.app.config.ApplicationConfiguration;
-import com.folks.app.model.Category;
-import com.folks.app.model.Service;
 import com.folks.app.model.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -29,6 +26,8 @@ public class AppContainer extends VertxContainer {
     
     private static final String DEFAULT_CONFIG = "app.json";
     private static final String PERSISTENCE_UNIT = "folks-app-pu";
+    
+    private final ReferenceDataLoader loader = new ReferenceDataLoader();
     
     public AppContainer() {
         super();
@@ -130,27 +129,8 @@ public class AppContainer extends VertxContainer {
                 LOGGER.info("Loaded {} admin user(s)", adminUsers.size());
             }
             
-            // 2. Load categories.
-            List<Category> categories = em.createNamedQuery("Category.selectAll", Category.class)
-                    .getResultList();
-            
-            for (Category category : categories) {
-                CategoryCache.getCache().add(category.getCategoryId(), category);
-            }
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Loaded {} category(s)", categories.size());
-            }
-            
-            // 3. Load services.
-            List<Service> services = em.createNamedQuery("Service.selectAll", Service.class)
-                    .getResultList();
-            
-            for (Service service : services) {
-                ServiceCache.getCache().add(service.getServiceId(), service);
-            }
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Loaded {} service(s)", services.size());
-            }
+            // Cache the reference/static data.
+            loader.loadCache(emf);
         }
         catch (JdbcException e) {
             LOGGER.error("Error loading startup cache", e);

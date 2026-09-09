@@ -1,7 +1,7 @@
 {
     "db.config": {
-        "url": "jdbc:postgresql://localhost:5432/folksdb_v1",
-        "user": "folks_v1",
+        "url": "jdbc:postgresql://localhost:5432/folksdb",
+        "user": "folks",
         "password": "p@$$word"
     },
     "testing" : {

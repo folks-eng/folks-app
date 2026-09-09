@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<reference-data-cache>
+    
+    <!-- cache
+        class="com.folks.app.cache.impl.CountryCache"
+        entity="com.folks.app.model.Country"
+        query="Country.selectAll"
+        idProperty="countryId"/-->
+    
+    <cache class="com.folks.app.cache.impl.CountryCache"/>
+
+    <cache class="com.folks.app.cache.impl.ProvinceCache"/>
+
+    <cache class="com.folks.app.cache.impl.CityCache"/>
+
+    <cache class="com.folks.app.cache.impl.NeighbourhoodCache"/>
+    
+    <cache class="com.folks.app.cache.impl.CategoryCache"/>
+
+    <cache class="com.folks.app.cache.impl.ServiceCache"/>
+    
+</reference-data-cache>

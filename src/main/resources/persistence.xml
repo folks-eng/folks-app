@@ -3,20 +3,25 @@
     <persistence-unit name="folks-app-pu">
         <description>Persistence Unit for folks-app</description>
         <provider>org.javalabs.jpa.LitePersistenceProvider</provider>
-        <class>com.folks.app.model.Payment</class>
-        <class>com.folks.app.model.User</class>
-        <class>com.folks.app.model.Address</class>
+        <class>com.folks.app.model.Country</class>
+        <class>com.folks.app.model.Province</class>
+        <class>com.folks.app.model.City</class>
+        <class>com.folks.app.model.Neighbourhood</class>
         <class>com.folks.app.model.Category</class>
         <class>com.folks.app.model.Service</class>
+        <class>com.folks.app.model.User</class>
+        <class>com.folks.app.model.Address</class>
         <class>com.folks.app.model.Professional</class>
+        <class>com.folks.app.model.Document</class>
         <class>com.folks.app.model.ProfessionalService</class>
-        <class>com.folks.app.model.Booking</class>
+        <class>com.folks.app.model.ProfessionalNeighbourhood</class>
         <class>com.folks.app.model.Availability</class>
+        <class>com.folks.app.model.Booking</class>
+        <class>com.folks.app.model.Payment</class>
         <class>com.folks.app.model.Review</class>
         <class>com.folks.app.model.Conversation</class>
         <class>com.folks.app.model.Message</class>
         <class>com.folks.app.model.JobStatus</class>
-        <class>com.folks.app.model.Document</class>
         <class>com.folks.app.model.AuditLog</class>
         <class>com.folks.app.model.PricingRule</class>
         <class>com.folks.app.model.Wallet</class>

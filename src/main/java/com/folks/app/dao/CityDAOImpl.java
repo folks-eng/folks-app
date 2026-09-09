@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class CityDAOImpl extends AbstractDAO implements CityDAO {
     
-    private final String TABLE = "fks_wallets";
+    private final String TABLE = "fks_cities";
     
     @PersistenceContext(name = "folks-app-pu")
     private EntityManager em;

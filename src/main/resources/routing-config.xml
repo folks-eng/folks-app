@@ -9,6 +9,43 @@
         <mapping uri="/login" method="POST" api="authenticate" consume="application/x-www-form-urlencoded"/>
         <mapping uri="/token" method="POST" api="getToken" consume="application/x-www-form-urlencoded"/>
     </resource-mapping>
+    
+    
+    <resource-mapping name="Country" path="/countries" resource="com.folks.app.handler.CountryHandler" schema="com.folks.app.model.Country">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+
+    <resource-mapping name="Province" path="/provinces" resource="com.folks.app.handler.ProvinceHandler" schema="com.folks.app.model.Province">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+
+    <resource-mapping name="City" path="/cities" resource="com.folks.app.handler.CityHandler" schema="com.folks.app.model.City">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+
+    <resource-mapping name="Neighbourhood" path="/neighbourhoods" resource="com.folks.app.handler.NeighbourhoodHandler" schema="com.folks.app.model.Neighbourhood">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
 
     <resource-mapping name="User" path="/users" resource="com.folks.app.handler.UserHandler" schema="com.folks.app.model.User">
         <mapping uri="" method="POST" api="create"/>

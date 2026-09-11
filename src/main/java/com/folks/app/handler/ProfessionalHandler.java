@@ -52,57 +52,6 @@ public class ProfessionalHandler extends AbstractHandler {
             }
         });
     }
-    /**
-     * Create a new resource element in the system.
-     * 
-     * <p>
-     * The newly created resource is stored in the memory. If you intend to use a database, the 
-     * {@link Vertx#executeBlocking(java.util.concurrent.Callable, io.vertx.core.Handler) } will ensure the
-     * request is processed in a non-blocking fashion.
-     * 
-     * <p>
-     * The <code>COUNTER</code> will create a unique id to identify the element.
-     * 
-     * @param ctx   Vertx {@link RoutingContext} object.
-     */
-    public void create(RoutingContext ctx) {
-        // If you use a remote store, this method will safely execute the blocking code.
-        vertx().executeBlocking(() -> {
-            Professional professional = MapperUtil.decode(ctx.body().buffer().getBytes(), Professional.class);
-            professional = professionalBO.create(user(ctx), professional);
-            
-            return professional;
-            
-        }).onComplete(result -> {
-            if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
-            }
-            else {
-                ctx.fail(result.cause());
-            }
-        });
-    }
-
-    public void batchCreate(RoutingContext ctx) {
-        // If you use a remote store, this method will safely execute the blocking code.
-        vertx().executeBlocking(() -> {
-            List<Professional> list = MapperUtil.mapper().readValue(ctx.body().buffer().getBytes(), new TypeReference<List<Professional>>() {});
-            professionalBO.create(user(ctx), list);
-            
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_CREATED);
-            msg.setMessage("Inserted " + list.size() + " record(s)");
-            
-            return msg;
-        }).onComplete(result -> {
-            if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
-            }
-            else {
-                ctx.fail(result.cause());
-            }
-        });
-    }
     
     /**
      * Modify an existing resource by it's id (PUT request).
@@ -123,10 +72,10 @@ public class ProfessionalHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Professional professional = MapperUtil.decode(ctx.body().buffer().getBytes(), Professional.class);
+            ProfessionalProfile profProfile = MapperUtil.decode(ctx.body().buffer().getBytes(), ProfessionalProfile.class);
 
             // First fetch the entry, to see if this already exists.
-            Professional rs = professionalBO.modify(user(ctx), professional, extId);
+            ProfessionalProfile modified = professionalBO.modify(user(ctx), profProfile, extId);
 
             ServerMessage msg = new ServerMessage();
             msg.setCode(HttpURLConnection.HTTP_OK);
@@ -189,6 +138,58 @@ public class ProfessionalHandler extends AbstractHandler {
         }).onComplete(result -> {
             if (result.succeeded()) {
                 sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+
+    /**
+     * Create a new resource element in the system.
+     *
+     * <p>
+     * The newly created resource is stored in the memory. If you intend to use a database, the
+     * {@link Vertx#executeBlocking(java.util.concurrent.Callable, io.vertx.core.Handler) } will ensure the
+     * request is processed in a non-blocking fashion.
+     *
+     * <p>
+     * The <code>COUNTER</code> will create a unique id to identify the element.
+     *
+     * @param ctx   Vertx {@link RoutingContext} object.
+     */
+    public void create(RoutingContext ctx) {
+        // If you use a remote store, this method will safely execute the blocking code.
+        vertx().executeBlocking(() -> {
+            Professional professional = MapperUtil.decode(ctx.body().buffer().getBytes(), Professional.class);
+            professional = professionalBO.create(user(ctx), professional);
+
+            return professional;
+
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+
+    public void batchCreate(RoutingContext ctx) {
+        // If you use a remote store, this method will safely execute the blocking code.
+        vertx().executeBlocking(() -> {
+            List<Professional> list = MapperUtil.mapper().readValue(ctx.body().buffer().getBytes(), new TypeReference<List<Professional>>() {});
+            professionalBO.create(user(ctx), list);
+
+            ServerMessage msg = new ServerMessage();
+            msg.setCode(HttpURLConnection.HTTP_CREATED);
+            msg.setMessage("Inserted " + list.size() + " record(s)");
+
+            return msg;
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
             }
             else {
                 ctx.fail(result.cause());

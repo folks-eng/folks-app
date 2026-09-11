@@ -2,6 +2,8 @@ package com.folks.app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -36,6 +38,8 @@ public class User implements Serializable, Cloneable {
         INACTIVE,
         BLOCKED;
     };
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(User.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -192,6 +196,19 @@ public class User implements Serializable, Cloneable {
         this.documents = documents;
     }
 
+    public void printPrivateFields() {
+        LOGGER.debug("--- User Fields ---");
+        for (java.lang.reflect.Field field : User.class.getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(this);
+                LOGGER.debug(field.getName() + " = " + value);
+            } catch (IllegalAccessException e) {
+                LOGGER.error("Could not access field: " + field.getName());
+            }
+        }
+    }
+
     public static class UserPK {
 
         private Integer userId;
@@ -234,6 +251,5 @@ public class User implements Serializable, Cloneable {
             }
             return true;
         }
-
     }
 }

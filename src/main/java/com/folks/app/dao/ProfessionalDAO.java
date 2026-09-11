@@ -1,5 +1,6 @@
 package com.folks.app.dao;
 
+import com.folks.app.model.ProfessionalService;
 import org.javalabs.jpa.annotation.Dao;
 import org.javalabs.jpa.annotation.NotSupported;
 import com.folks.app.model.Professional;
@@ -23,7 +24,9 @@ import java.util.List;
 @Dao
 public interface ProfessionalDAO {
     
-    void insertProfile(Professional professional);
+    void insertProfessional(Professional professional);
+
+    void updateProfessional(Professional professional, List<ProfessionalService> existingPSList);
     
     /**
      * Insert a new record in the designated table.

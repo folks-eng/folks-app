@@ -1,5 +1,6 @@
 package com.folks.app.bo;
 
+import com.folks.app.model.Booking;
 import com.folks.app.util.Constants;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
@@ -91,7 +92,8 @@ public class AddressBO extends AbstractBO {
         existing.setPincode(address.getPincode());
         existing.setLatitude(address.getLatitude());
         existing.setLongitude(address.getLongitude());
-        // existing.setIsDefault(address.getIsDefault());       // The UI is not sending it today.
+        existing.setLabel(address.getLabel());
+        existing.setIsDefault(address.getIsDefault());       // The UI is not sending it today.
         existing.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
 
         addressDAO.update(existing);

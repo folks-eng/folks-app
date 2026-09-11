@@ -35,22 +35,28 @@ public class ProfessionalBO extends AbstractBO {
 
     private final ServiceDAO serviceDAO;
 
+    private final ProfessionalServiceDAO profServiceDAO;
+
     public ProfessionalBO() {
         this.professionalDAO = DAOProxy.get(ProfessionalDAO.class);
         this.serviceDAO = DAOProxy.get(ServiceDAO.class);
+        this.profServiceDAO = DAOProxy.get(ProfessionalServiceDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Initialized ProfessionalBO: {}. ProfessionalDAO: {}", getClass().getSimpleName(), professionalDAO);
         }
     }
 
-    public ProfessionalProfile register(AppUser usr, ProfessionalProfile profProfile) throws IllegalAccessException {
-        Validator.validateProf(profProfile);
+    public ProfessionalProfile register(AppUser usr, ProfessionalProfile profProfile) {
+        Validator.validateProf(profProfile, false);
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        // Fetch the user entry and create the Entity objects for inserting into tables Address, Document.
+        /* First fetch the entry from db (prof joins user), to see if Prof already exists.
+        and create the Entity objects for inserting into tables Address, Document.
+         */
         Professional existing = professionalDAO.findByExtId(usr.principal().sub());
+        // TBD : how to simulate this error?
         if (existing == null) {
             throw new IllegalArgumentException("User has to be registered first");
         }
@@ -62,6 +68,7 @@ public class ProfessionalBO extends AbstractBO {
         if (user.getRole() == User.Role.CUSTOMER) {
             throw new IllegalStateException("You cannot register as both customer and professional");
         }
+        LOGGER.debug("Registered User identifier " +user.getUserId());
 
         // String applicationId = MD5HashGenerator.digest("professional", usr.principal().sub());
         String applicationId = UUID.randomUUID().toString();
@@ -115,7 +122,7 @@ public class ProfessionalBO extends AbstractBO {
         }
         professional.setProfServices(pServices);
         
-        professionalDAO.insertProfile(professional);
+        professionalDAO.insertProfessional(professional);
         timer.stop();
 
         if (LOGGER.isInfoEnabled()) {
@@ -164,36 +171,58 @@ public class ProfessionalBO extends AbstractBO {
         return rows;
     }
 
-    public Professional modify(AppUser usr, Professional profObj, String extId) throws IllegalAccessException {
+    public ProfessionalProfile modify(AppUser usr, ProfessionalProfile profObj, String extId) throws IllegalAccessException {
         ensureAuthorized(usr, extId);
+        Validator.validateProf(profObj, true);
 
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         
         // First fetch the entry from db(prof joins user), to see if this already exists.
-        Professional existing = professionalDAO.findByExtId(extId);
-        if (existing == null) {
-            throw new IllegalArgumentException("No professional found for external id: " + profObj.getProfessionalId());
+        Professional existingProf = professionalDAO.findByExtId(extId);
+        if (existingProf == null) {
+            throw new ResourceNotFoundException("No professional found for external id: " +extId);
         }
+        List<ProfessionalService> psListToBeDel = fetchProfServices(existingProf.getProfessionalId());
+        LOGGER.debug("Professional services existing with this professional " +psListToBeDel.size());
 
-        // Update attributes of existing record
-       // LOGGER.info(existing.getUser().getRole() + " FROM DB, User id : " +existing.getUser().getUserId());
-        existing.setUserId(existing.getUser().getUserId());
-        existing.setBio(profObj.getBio());
-        existing.setExperienceYears(profObj.getExperienceYears());
-        existing.setServingCities(profObj.getServingCities());
+        // Properties modifiable
+        existingProf.setBio(profObj.getBio());
+        existingProf.setExperienceYears(profObj.getExperienceYears());
+        existingProf.setServingCities(profObj.getServingCities());
+        existingProf.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
 
-        // TBD:
-        // existing.setRatingAvg(profObj.getRatingAvg());
-        // existing.setIsVerified(profObj.getIsVerified());
+        //Create the new list of Professional Services to be set to the Professional during modify
+        List<ProfessionalService> newPSList = buildNewProfServices(existingProf.getProfessionalId(),
+                                                                    existingProf.getUpdatedAt(), profObj.getExpertise());
+        existingProf.setProfServices(newPSList);
 
-        professionalDAO.update(existing);
+        professionalDAO.updateProfessional(existingProf, psListToBeDel);
         timer.stop();
 
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Professional record modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+            LOGGER.info("Professional updated successfully with Id {}, Elapsed time(ms): {}"
+                    , existingProf.getProfessionalId(), timer.elapsedTimeMillis());
         }
-        return existing;
+        return profObj;
+    }
+
+    private List<ProfessionalService> buildNewProfServices(Integer profID, Timestamp profUpdatedAt, List<Integer> newExpertise) {
+        List<Service> newServiceList = fetchServices(newExpertise);
+
+        // Assign individual services to this professional's profile
+        List<ProfessionalService> newPSList = new ArrayList<>(newServiceList.size());
+        for(Service service: newServiceList) {
+            ProfessionalService pService = new ProfessionalService();
+            pService.setProfessionalId(profID);
+            pService.setServiceId(service.getServiceId());
+            pService.setPrice(service.getBasePrice());
+            pService.setIsActive(Constants.PROF_SERVICE_ACTIVE);
+            pService.setCreatedAt(profUpdatedAt);
+
+            newPSList.add(pService);
+        }
+        return newPSList;
     }
 
     public Professional remove(AppUser usr, String extId) throws IllegalAccessException {
@@ -254,7 +283,18 @@ public class ProfessionalBO extends AbstractBO {
             LOGGER.info("Created {} Professional record(s) successfully. Elapsed time(ms): {}", records.size(), timer.elapsedTimeMillis());
         }
     }
-    
+
+    private List<ProfessionalService> fetchProfServices(Integer profId) {
+        Map<String, List<String>> params = new HashMap<>();
+        List<String> idList = new ArrayList<>(1);
+        idList.add(String.valueOf(profId));
+        params.put("professionalId", idList);
+
+        SearchCriteria search = SearchCriteria.from(new QueryParams(params));
+        List<ProfessionalService> psList = profServiceDAO.query(search);
+        return psList;
+    }
+
     private List<Service> fetchServices(List<Integer> expertise) {
         try {
             List<String> subCategoryIds = new ArrayList<>(expertise.size());

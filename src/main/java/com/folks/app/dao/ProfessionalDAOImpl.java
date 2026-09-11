@@ -14,6 +14,8 @@ import java.util.List;
 import org.javalabs.jpa.annotation.Dao;
 import org.javalabs.jpa.descriptor.QueryCache;
 import org.javalabs.jpa.util.QueryHints;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Concrete DAO class to handle database operations related.
@@ -23,6 +25,8 @@ import org.javalabs.jpa.util.QueryHints;
 public class ProfessionalDAOImpl extends AbstractDAO implements ProfessionalDAO {
 
     private final String TABLE = "fks_professionals";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionalDAOImpl.class);
     
     @PersistenceContext(name = "folks-app-pu")
     private EntityManager em;
@@ -40,7 +44,7 @@ public class ProfessionalDAOImpl extends AbstractDAO implements ProfessionalDAO 
     private ProfessionalServiceDAO profServiceDAO;
     
     @Override
-    public void insertProfile(Professional professional) {
+    public void insertProfessional(Professional professional) {
         // User record is already present, no need to insert it again.
         // Maintain the below insertion order.
         addressDAO.insert(professional.getUser().getAddresses());
@@ -57,6 +61,24 @@ public class ProfessionalDAOImpl extends AbstractDAO implements ProfessionalDAO 
             pService.setProfessionalId(professional.getProfessionalId());
         }
         profServiceDAO.insert(professional.getProfServices());
+    }
+
+    @Override
+    public void updateProfessional(Professional modProf, List<ProfessionalService> psListToBeDel){
+        // Delete existing Professional Services and Insert Professional Services
+        for (ProfessionalService existingPS : psListToBeDel) {
+            profServiceDAO.delete(existingPS);
+        }
+        em.flush();
+        LOGGER.info("Professional services deleted and flushed " +psListToBeDel.size());
+
+        for (ProfessionalService newPS : modProf.getProfServices()) {
+            profServiceDAO.insert(newPS);    //modProf.getProfServices());
+        }
+        LOGGER.info("Professional services inserted " +modProf.getProfServices().size());
+        // Assuming Address, Document will not be modified in this flow.
+        em.merge(modProf);
+        LOGGER.debug("Completed merge or update in Professional table");
     }
 
     @Override
@@ -108,6 +130,7 @@ public class ProfessionalDAOImpl extends AbstractDAO implements ProfessionalDAO 
             .setParameter(1, User.Role.PROFESSIONAL.name())
             .setParameter(2, externalId)
             .setHint(QueryHints.ALLOW_NATIVE_QUERY, Boolean.TRUE)
+            .setHint(QueryHints.RETRIEVAL_STRATEGY, QueryHints.RetrievalStrategy.INDEX)
             .setHint(QueryHints.QUERY_TYPE, QueryCache.QueryType.SELECT_REL)
             .setHint(QueryHints.FETCH_DEF, "OneToOne")
             .setHint(QueryHints.FETCH_FIELD, "user")

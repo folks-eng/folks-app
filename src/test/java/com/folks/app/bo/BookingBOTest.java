@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.javalabs.decl.util.DateUtil;
+import org.javalabs.decl.vertx.container.ResourceNotFoundException;
 import org.javalabs.jpa.util.MD5HashGenerator;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -146,7 +147,7 @@ public class BookingBOTest {
 
     @Test
     @Order(2)
-    public void testCreateBulk() {
+    public void testCreateBulk() throws IllegalAccessException {
         Timestamp scheduledAt = new Timestamp(DateUtil.currentUTCDate().getTime());
 
         Booking b1 = new Booking();
@@ -180,7 +181,12 @@ public class BookingBOTest {
     @Test
     @Order(3)
     public void testView() {
-        Booking booking = bookingBO.view(customerUsr, bookingId);
+        Booking booking = null;
+        try {
+            booking = bookingBO.view(customerUsr, bookingId);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         assertEquals(bookingId, booking.getBookingId());
         assertEquals(serviceId, booking.getServiceId());
@@ -191,7 +197,7 @@ public class BookingBOTest {
     @Test
     @Order(4)
     public void testViewNotFound() {
-        assertThrows(IllegalArgumentException.class, () -> bookingBO.view(customerUsr, "no-such-booking"));
+        assertThrows(ResourceNotFoundException.class, () -> bookingBO.view(customerUsr, "no-such-booking"));
     }
 
     @Test
@@ -223,7 +229,12 @@ public class BookingBOTest {
         assertEquals(Booking.Status.CONFIRMED, modified.getStatus());
         assertEquals(599.0, modified.getTotalAmount());
 
-        Booking reloaded = bookingBO.view(customerUsr, bookingId);
+        Booking reloaded = null;
+        try {
+            reloaded = bookingBO.view(customerUsr, bookingId);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
         assertEquals(Booking.Status.CONFIRMED, reloaded.getStatus());
     }
 
@@ -284,7 +295,12 @@ public class BookingBOTest {
         assertEquals(Booking.Status.CANCELLED, removed.getStatus());
         assertEquals("Cancelled by user", removed.getStatusMsg());
 
-        Booking reloaded = bookingBO.view(customerUsr, bookingId);
+        Booking reloaded = null;
+        try {
+            reloaded = bookingBO.view(customerUsr, bookingId);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
         assertEquals(Booking.Status.CANCELLED, reloaded.getStatus());
     }
 

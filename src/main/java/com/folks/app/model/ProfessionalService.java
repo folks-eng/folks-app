@@ -51,7 +51,10 @@ public class ProfessionalService implements Serializable, Cloneable {
 
     @Column(name = "updated_at", nullable = true, updatable = true)
     private Timestamp updatedAt;
-    
+
+    @Transient
+    private String subCategoryName;
+
     @Transient
     private String serviceName;
 
@@ -119,6 +122,14 @@ public class ProfessionalService implements Serializable, Cloneable {
 
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
+    }
+
+    public String getSubCategoryName() {
+        return subCategoryName;
+    }
+
+    public void setSubCategoryName(String subCategoryName) {
+        this.subCategoryName = subCategoryName;
     }
 
     public static class ProfessionalServicePK {

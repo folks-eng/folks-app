@@ -1,5 +1,7 @@
 package com.folks.app.bo;
 
+import com.folks.app.cache.impl.CategoryCache;
+import com.folks.app.model.Category;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
@@ -98,6 +100,8 @@ public class ProfessionalServiceBO extends AbstractBO {
         List<ProfessionalService> rows = professionalServiceDAO.query(search);
         for (ProfessionalService row : rows) {
             Service service = ServiceCache.getCache().get(row.getServiceId());
+            Category cat = CategoryCache.getCache().get(service.getCategoryId());
+            row.setSubCategoryName(cat.getName());
             row.setServiceName(service.getName());
         }
 

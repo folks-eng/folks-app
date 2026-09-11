@@ -117,28 +117,27 @@ public class BookingBO extends AbstractBO {
         return existing;
     }
 
+
     public List<Booking> viewAll(AppUser usr, QueryParams params) {
+        String extId = usr.principal().sub();
+        List<Booking> bookings = null;
+
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-        
         // Fetch the user.
         User user = fetchUser(usr);
         if (user == null) {
             throw new ResourceNotFoundException("No user found for " + usr.principal().sub());
         }
-        String field = null;
-        
         if (user.getRole() == User.Role.CUSTOMER) {
-            field = "customerId";
+            SearchCriteria search = SearchCriteria.from(params, "customerId", user.getUserId());
+            bookings = bookingDAO.query(search);
         }
         else if (user.getRole() == User.Role.PROFESSIONAL) {
-            field = "professionalId";
+            bookings = getAllBookingsForProfessional(params, user);
+            LOGGER.debug("Fetched {} booking record(s) for Professional {}", bookings.size(), user.getUserId());
         }
-
-        // We need to fetch the bookings for the current user only.
-        SearchCriteria search = SearchCriteria.from(params, field, user.getUserId());
-        List<Booking> bookings = bookingDAO.query(search);
-
+        // We need to fetch the bookings for the current user only
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Fetched {} expanded booking record(s). Elapsed time(ms): {}", bookings.size(), timer.elapsedTimeMillis());
@@ -146,19 +145,40 @@ public class BookingBO extends AbstractBO {
         return bookings;
     }
 
-    public Booking view(AppUser usr, String id) {
+    private List<Booking> getAllBookingsForProfessional(QueryParams params, User user) {
+        // SELECT b.* FROM fks_professionals p, fks_bookings b where p.professional_id = b.professional_id AND
+        // p.user_id = ?
+        SearchCriteria search = SearchCriteria.from(params);
+        List<Booking> rows = bookingDAO.query(search);
+        return rows;
+    }
+
+    // Only the customer who is owner of this booking is allowed to view.
+    public Booking view(AppUser usr, String bookingId) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        Booking booking = bookingDAO.find(new Booking.BookingPK(id));
+        Booking booking = bookingDAO.find(new Booking.BookingPK(bookingId));
         if (booking == null) {
-            throw new IllegalArgumentException("No Booking found for id: " + id);
+            throw new ResourceNotFoundException("No Booking found for id: " + bookingId);
         }
+        // Check if this booking is associated with the customer.
+        ensureAuthorized(usr, booking.getCustomerId());
+
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Fetched booking details. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
         return booking;
+    }
+
+    private void ensureAuthorized(AppUser usr, Integer bookingOwnerId) throws IllegalAccessException {
+        String extId = usr.principal().sub();
+
+        User bookingOwner = userDAO.find(new User.UserPK(bookingOwnerId));
+        if (! extId.equals(bookingOwner.getExternalId())) {
+            throw new IllegalAccessException(UNAUTHORIZED_MSG);
+        }
     }
 
     public Booking remove(AppUser usr, String id) {

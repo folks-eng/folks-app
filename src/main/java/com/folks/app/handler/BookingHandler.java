@@ -139,12 +139,11 @@ public class BookingHandler extends AbstractHandler {
      * @param ctx   Vertx {@link RoutingContext} object.
      */
     public void view(RoutingContext ctx) {
-        final String id = ctx.pathParam("id");
+        final String bookingID = ctx.pathParam("id");
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            Booking booking = bookingBO.view(user(ctx), id);
-
+            Booking booking = bookingBO.view(user(ctx), bookingID);
             return booking;
             
         }).onComplete(result -> {
@@ -158,7 +157,7 @@ public class BookingHandler extends AbstractHandler {
     }
     
     /**
-     * View all the elements from the store.
+     * View all the bookings for the specific user(Professional/ Customer)
      * 
      * @param ctx   Vertx {@link RoutingContext} object.
      */

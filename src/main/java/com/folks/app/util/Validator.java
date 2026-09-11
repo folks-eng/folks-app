@@ -77,7 +77,7 @@ public class Validator {
 //        }
     }
 
-    public static void validateProf(ProfessionalProfile profProfile) {
+    public static void validateProf(ProfessionalProfile profProfile, boolean modOpr) {
         Short exp = profProfile.getExperienceYears();
         if (exp == null || exp.toString().isEmpty()) {
             throw new IllegalArgumentException("Experience is years is required.");
@@ -86,19 +86,26 @@ public class Validator {
             throw new IllegalArgumentException("Expertise is required.");
         }
         //Document
-        List<Document> docList = profProfile.getDocuments();
-        if (docList == null || docList.isEmpty()) {
-            throw new IllegalArgumentException("At least one document is needed.");
+        if(!modOpr) {
+            List<Document> docList = profProfile.getDocuments();
+            if (docList == null || docList.isEmpty()) {
+                throw new IllegalArgumentException("At least one document is needed.");
+            }
+            for (Document doc : docList) {
+                Validator.validateDocument(doc);
+            }
+            //Address
+            Address addr = profProfile.getAddress();
+            if (addr == null) {
+                throw new IllegalArgumentException("Address is required.");
+            }
+            Validator.validateAddress(addr);
         }
-        for(Document doc : docList) {
-            Validator.validateDocument(doc);
+        List<Integer> subCatIdList = profProfile.getExpertise();
+        if (subCatIdList == null || subCatIdList.isEmpty()) {
+            throw new IllegalArgumentException("At least one Category is required.");
         }
-        //Address
-        Address addr = profProfile.getAddress();
-        if (addr == null ) {
-            throw new IllegalArgumentException("Address is required.");
-        }
-        Validator.validateAddress(addr);
+
     }
 
     private static void validateDocument(Document doc) {

@@ -6,6 +6,7 @@ import com.folks.app.auth.UserPrincipal;
 import com.folks.app.ext.DBExtension;
 import com.folks.app.model.Address;
 import com.folks.app.model.User;
+import com.folks.app.util.Constants;
 import com.folks.app.util.QueryParams;
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -191,6 +192,8 @@ public class AddressBOTest {
         update.setCity("Bengaluru");
         update.setState("Karnataka");
         update.setPincode(560003);
+        update.setIsDefault((short) 0);
+        update.setLabel(Constants.DEFAULT_LABEL);
 
         Address modified = addressBO.modify(customerUsr, update);
         assertEquals("221B Baker Street, Apt 4", modified.getAddressLine1());

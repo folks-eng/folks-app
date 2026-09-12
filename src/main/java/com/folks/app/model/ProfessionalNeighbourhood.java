@@ -32,7 +32,7 @@ import java.util.Objects;
 public class ProfessionalNeighbourhood implements Serializable, Cloneable {
 
     public static enum Status {
-        PACTIVE,
+        ACTIVE,
         INACTIVE;
     };
 

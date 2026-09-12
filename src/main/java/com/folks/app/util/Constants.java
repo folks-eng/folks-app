@@ -9,7 +9,7 @@ public class Constants {
     public static final long OTP_EXPIRY_TIME_MSEC = 300000; //5 mins
 
     // Viewing records from db
-    public static final int DEFAULT_SEARCH_LIMIT = 100;
+    public static final int DEFAULT_SEARCH_LIMIT = 1000;
 
     // Address
     public static final String DEFAULT_LABEL = "HOME";

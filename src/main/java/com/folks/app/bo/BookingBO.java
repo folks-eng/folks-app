@@ -4,8 +4,12 @@ import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
+import com.folks.app.dao.AddressDAO;
 import com.folks.app.dao.BookingDAO;
+import com.folks.app.dao.ProfessionalDAO;
+import com.folks.app.model.Address;
 import com.folks.app.model.Booking;
+import com.folks.app.model.Professional;
 import com.folks.app.model.User;
 import com.folks.app.util.IdGenerator;
 import com.folks.app.util.QueryParams;
@@ -28,12 +32,17 @@ public class BookingBO extends AbstractBO {
     private static final Logger LOGGER = LoggerFactory.getLogger(BookingBO.class);
     
     private final BookingDAO bookingDAO;
+    private final AddressDAO addressDAO;
+    private final ProfessionalDAO professionalDAO;
     
     public BookingBO() {
         this.bookingDAO = DAOProxy.get(BookingDAO.class);
+        this.addressDAO = DAOProxy.get(AddressDAO.class);
+        this.professionalDAO = DAOProxy.get(ProfessionalDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized BookingBO: {}. BookingDAO: {}. UserDAO: {}", getClass().getSimpleName(), bookingDAO, userDAO);
+            LOGGER.debug("Initialized BookingBO: {}. BookingDAO: {}. UserDAO: {}, AddressDAO: {}. ProfessionalDAO: {}"
+                    , getClass().getSimpleName(), bookingDAO, userDAO, addressDAO, professionalDAO);
         }
     }
 
@@ -72,10 +81,23 @@ public class BookingBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
+        // Fetch the user.
+        User user = fetchUser(usr);
+
         for (Booking booking : records) {
+            booking.setCustomerId(user.getUserId());
+            booking.setProfessionalId(-1);              // A dummy professional id. Professional will be added later a cron job
+            booking.setStatus(Booking.Status.PENDING);
             if (booking.getCreatedAt() == null) {
                 booking.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
             }
+
+            booking.setBookingId(IdGenerator.generate(
+                    String.valueOf(booking.getCustomerId())
+                    , String.valueOf(booking.getServiceId())
+                    , String.valueOf(booking.getAddressId())
+                    , String.valueOf(booking.getScheduledAt())
+                    , String.valueOf(booking.getTimeSlot())));
         }
         bookingDAO.insert(records);
         timer.stop();
@@ -85,9 +107,12 @@ public class BookingBO extends AbstractBO {
         }
     }
 
-    public Booking modify(AppUser usr, Booking booking) {
+    public Booking modify(AppUser usr, Booking booking) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
+
+        // Fetch the user.
+        User user = fetchUser(usr);
 
         // First fetch the entry, to see if this already exists.
         Booking existing = bookingDAO.find(new Booking.BookingPK(booking.getBookingId()));
@@ -96,6 +121,9 @@ public class BookingBO extends AbstractBO {
         }
         if (existing.getStatus() == Booking.Status.CONFIRMED) {
             throw new IllegalArgumentException("Cannot modify a booking once it is confirmed and professional is assigned");
+        }
+        if (! existing.getCustomerId().equals(user.getUserId())) {
+            throw new IllegalAccessException("You do not have permission to modify this booking");
         }
 
         // Update attributes of existing record
@@ -107,6 +135,8 @@ public class BookingBO extends AbstractBO {
         existing.setTimeSlot(booking.getTimeSlot());
         existing.setStatus(booking.getStatus());
         existing.setTotalAmount(booking.getTotalAmount());
+        existing.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        existing.setUpdatedBy(user.getUserId() + " - " + user.getFullName());
 
         bookingDAO.update(existing);
         timer.stop();
@@ -115,6 +145,48 @@ public class BookingBO extends AbstractBO {
             LOGGER.info("Booking record modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
         return existing;
+    }
+    
+    public Booking patch(AppUser usr, Booking booking) throws IllegalAccessException {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        // Fetch the professional.
+        Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+        if (professional == null) {
+            throw new IllegalArgumentException("No professional found for id: " + usr.principal().sub());
+        }
+        
+        // First fetch the entry, to see if this already exists.
+        Booking current = bookingDAO.find(new Booking.BookingPK(booking.getBookingId()));
+        if (current == null) {
+            throw new IllegalArgumentException("No booking found for id: " + booking.getBookingId());
+        }
+        if (! current.getProfessionalId().equals(professional.getProfessionalId())) {
+            throw new IllegalAccessException("You do not have permission to update status of this booking");
+        }
+        
+        // Check the status. It should be updated sequentially.
+        if (booking.getStatus() == null 
+                || (current.getStatus() == Booking.Status.PENDING && booking.getStatus() != Booking.Status.IN_PROGRESS)
+                || (current.getStatus() == Booking.Status.IN_PROGRESS && booking.getStatus() != Booking.Status.COMPLETED)) {
+            
+            throw new IllegalArgumentException("Invalid status specified");
+        }
+    
+        // This API is supposed to be called by the professional to update the status, when ...
+        // 1. The work is started => IN_PROGRESS
+        // 2. The work is completed => COMPLETED
+        booking.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+        booking.setUpdatedBy(professional.getProfessionalId() + " - " + professional.getUser().getFullName());
+        bookingDAO.updateStatus(booking);
+        
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Updated status to {} for booking {}. Elapsed time(ms): {}"
+                    , booking.getStatus(), booking.getBookingId(), timer.elapsedTimeMillis());
+        }
+        return booking;
     }
 
     public List<Booking> viewAll(AppUser usr, QueryParams params) {
@@ -201,6 +273,16 @@ public class BookingBO extends AbstractBO {
         if (existing.getStatus() != Booking.Status.PENDING) {
             throw new IllegalArgumentException("Cannot add a professional to a booking which is already " + existing.getStatus());
         }
+        
+        // Find the neighbourhood
+        Address address = addressDAO.find(new Address.AddressPK(booking.getAddressId()));
+        if (address == null) {
+            throw new IllegalArgumentException("No address found for identifier: " + booking.getAddressId()
+                    + " that is associated with booking: " + booking.getBookingId());
+        }
+        booking.setNeighbourhoodId(address.getNeighbourhoodId());
+        
+        // All good. Proceed with assign professional ...
         Boolean flag = bookingDAO.assignProfessional(booking);
         timer.stop();
 
@@ -210,7 +292,7 @@ public class BookingBO extends AbstractBO {
                         , booking.getProfessionalId(), booking.getBookingId(), timer.elapsedTimeMillis());
             }
             else {
-                LOGGER.info("Unable to assign any professional to booking {}. Elapsed time(ms): {}"
+                LOGGER.info("Unable to assign any professional to booking {}. Will assign later. Elapsed time(ms): {}"
                         , booking.getBookingId(), timer.elapsedTimeMillis());
             }
         }
@@ -250,5 +332,9 @@ public class BookingBO extends AbstractBO {
             LOGGER.warn("Inconsistent data in database. Cannot free-up professional {} from booking {}"
                     , booking.getProfessionalId(), booking.getBookingId());
         }
+    }
+    
+    public List<Booking> pendingBookings() {
+        return bookingDAO.pendingBooking();
     }
 }

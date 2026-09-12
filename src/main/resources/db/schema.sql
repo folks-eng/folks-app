@@ -76,10 +76,7 @@ CREATE TABLE fks_addresses (
     user_id             INT             NOT NULL,
     address_line1       VARCHAR(128)    NOT NULL,
     address_line2       VARCHAR(128)    ,
-    city                VARCHAR(64)     NOT NULL,
-    locality            VARCHAR(80)     NOT NULL,
-    pincode             INT             NOT NULL,
-    state               VARCHAR(64)     NOT NULL,
+    neighbourhood_id    INT             NOT NULL,
     latitude            NUMERIC(20, 6)  ,
     longitude           NUMERIC(20, 6)  ,
     is_default          SMALLINT        NOT NULL,
@@ -148,7 +145,7 @@ CREATE TABLE fks_professional_neighbourhoods (
     id                  INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
     professional_id     INT             NOT NULL,
     neighbourhood_id    INT             NOT NULL,
-    status              VARCHAR(20)     NOT NULL CHECK (status IN ('PACTIVE', 'INACTIVE')),
+    status              VARCHAR(20)     NOT NULL CHECK (status IN ('ACTIVE', 'INACTIVE')),
     created_at          TIMESTAMP       NOT NULL,
     updated_at          TIMESTAMP       
 );
@@ -184,7 +181,8 @@ CREATE TABLE fks_bookings (
     total_amount        NUMERIC(20, 6)  NOT NULL,
     payment_method      VARCHAR(16)     CHECK (payment_method IN ('CARD', 'UPI', 'WALLET', 'COD')),
     created_at          TIMESTAMP       NOT NULL,
-    updated_at          TIMESTAMP       
+    updated_at          TIMESTAMP       ,
+    updated_by          VARCHAR(50)
 );
 
 -- 5. Payments & Pricing
@@ -451,6 +449,10 @@ ALTER TABLE fks_cities
 ADD CONSTRAINT fks_cities_uk
 UNIQUE (province_id, city_name);
 
+ALTER TABLE fks_neighbourhoods
+ADD CONSTRAINT fks_neighbourhoods_uk
+UNIQUE (locality, pincode);
+
 ALTER TABLE fks_users
 ADD CONSTRAINT fks_users_uk1
 UNIQUE (external_id);
@@ -484,6 +486,11 @@ ALTER TABLE fks_addresses
 ADD CONSTRAINT fks_addresses_fk1
 FOREIGN KEY (user_id)
 REFERENCES fks_users (user_id);
+
+ALTER TABLE fks_addresses
+ADD CONSTRAINT fks_addresses_fk2
+FOREIGN KEY (neighbourhood_id)
+REFERENCES fks_neighbourhoods (neighbourhood_id);
 
 ALTER TABLE fks_professionals
 ADD CONSTRAINT fks_professionals_fk1

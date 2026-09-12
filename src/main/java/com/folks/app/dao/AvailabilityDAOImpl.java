@@ -145,7 +145,7 @@ public class AvailabilityDAOImpl extends AbstractDAO implements AvailabilityDAO 
         String query = queryGen.availabilityQuery(serviceId, durationMin, date);
         
         Query q = em.createNativeQuery(query);
-        List<Object> binds = List.of(date, serviceId);
+        List<Object> binds = List.of(1, date, 0, serviceId);
         
         Integer idx = 1;
         for (Object bind : binds) {
@@ -162,19 +162,46 @@ public class AvailabilityDAOImpl extends AbstractDAO implements AvailabilityDAO 
     }
 
     @Override
-    public List<Availability> findProfessional(Integer serviceId, String date, String startTime, String endTime) {
-        List<Availability> availabilities = internalFind(serviceId, date, startTime, endTime, Boolean.TRUE);
+    public List<Availability> findProfessional(Integer serviceId
+            , Integer neighbourhoodId
+            , String date
+            , String startTime
+            , String endTime) {
+        
+        List<Availability> availabilities = internalFind(
+                serviceId
+                , neighbourhoodId
+                , date
+                , startTime
+                , endTime
+                , Boolean.TRUE);
+        
         if (availabilities.isEmpty()) {
-            availabilities = internalFind(serviceId, date, startTime, endTime, Boolean.FALSE);
+            availabilities = internalFind(serviceId
+                    , neighbourhoodId
+                    , date
+                    , startTime
+                    , endTime
+                    , Boolean.FALSE);
         }
         return availabilities;
     }
     
-    private List<Availability> internalFind(Integer serviceId, String date, String startTime, String endTime, Boolean fair) {
+    private List<Availability> internalFind(Integer serviceId
+            , Integer neighbourhoodId
+            , String date
+            , String startTime
+            , String endTime
+            , Boolean fair) {
+        
         String query = queryGen.matchingProfessionalQuery(fair);
         
         TypedQuery q = em.createNativeQuery(query, Availability.class);
-        List<Object> binds = List.of(date, startTime, endTime, 1, serviceId, 0, 1);
+        List<Object> binds = new ArrayList<>(List.of(date, startTime, endTime, 1, neighbourhoodId, serviceId, 0));
+        
+        if (fair) {
+            binds.add(1);
+        }
         
         Integer idx = 1;
         for (Object bind : binds) {

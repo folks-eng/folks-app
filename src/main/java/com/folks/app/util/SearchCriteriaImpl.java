@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.Map;
 public class SearchCriteriaImpl implements SearchCriteria {
     
     private Boolean fetchDependency = Boolean.FALSE;
+    private List<String> fields = Collections.EMPTY_LIST;
     private Boolean history = Boolean.FALSE;
     private Boolean asc = Boolean.TRUE;
     private String operator = "and";
@@ -37,10 +39,15 @@ public class SearchCriteriaImpl implements SearchCriteria {
             LOGGER.trace("Search params {}", params);
         }
 
+        List<String> fields = tmp.remove("fields");
         List<String> ops = tmp.remove("operator");
         List<String> orderBy = tmp.remove("orderBy");
         List<String> asc = tmp.remove("asc");
         List<String> deps = tmp.remove("fetchDependency");
+        
+        if (fields != null) {
+            this.fields = fields;
+        }
         
         if (ops != null) {
             this.operator = ops.get(0).toLowerCase();
@@ -177,6 +184,11 @@ public class SearchCriteriaImpl implements SearchCriteria {
     @Override
     public String operator() {
         return operator;
+    }
+
+    @Override
+    public List<String> fields() {
+        return fields;
     }
     
 }

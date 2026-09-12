@@ -107,21 +107,12 @@ public class AddressHandler extends AbstractHandler {
             Address address = MapperUtil.decode(ctx.body().buffer().getBytes(), Address.class);
             address.setAddressId(Integer.valueOf(id));
             
-            Address result = addressBO.modify(user(ctx), address);
+            Address modified = addressBO.modify(user(ctx), address);
+            return modified;
             
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_OK);
-            msg.setMessage("Address modified successfully.");
-            
-            return msg;
         }).onComplete(result -> {
             if (result.succeeded()) {
-                if(result.result().getCode() == HttpURLConnection.HTTP_NOT_FOUND) {
-                    sendResponse(ctx, HttpURLConnection.HTTP_NOT_FOUND, result.result());
-                }
-                else {
-                    sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
-                }
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
             }
             else {
                 ctx.fail(result.cause());

@@ -101,6 +101,7 @@ public interface AvailabilityDAO {
      * Find the availability of slots for a given service and on a specific day.
      * 
      * @param serviceId
+     * @param neighbourhoodId
      * @param startTime
      * @param endTime
      * @param date
@@ -109,6 +110,7 @@ public interface AvailabilityDAO {
      */
     @NotSupported
     List<Availability> findProfessional(Integer serviceId
+            , Integer neighbourhoodId
             , String date
             , String startTime
             , String endTime);

@@ -45,7 +45,7 @@ public abstract class AbstractDAO {
      * @return  The constructed {@link Criteria} query
      */
     protected Criteria getQuery(String table, SearchCriteria search) {
-        return getQuery(table, ALL, search);
+        return getQuery(table, search.fields(), search);
     }
     
     /**
@@ -91,7 +91,7 @@ public abstract class AbstractDAO {
      */
     protected Criteria getQuery(String table, List<String> columns, SearchCriteria search) {
         Criteria query = new Criteria()
-                .select(columns != null ? columns : Arrays.asList("*"))
+                .select(columns != null && ! columns.isEmpty() ? columns : ALL)
                 .from(table);
 
         String operator = search.operator();

@@ -2,11 +2,13 @@ package com.folks.app.bo;
 
 import com.folks.app.dao.*;
 import com.folks.app.model.*;
-import jakarta.persistence.NoResultException;
 import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
+import com.folks.app.cache.impl.NeighbourhoodCache;
+import com.folks.app.cache.impl.ServiceCache;
+import com.folks.app.util.AddressUtil;
 import com.folks.app.util.Constants;
 import com.folks.app.util.IdGenerator;
 import com.folks.app.util.QueryParams;
@@ -15,10 +17,7 @@ import com.folks.app.util.Validator;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import org.javalabs.decl.vertx.container.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +32,8 @@ public class ProfessionalBO extends AbstractBO {
 
     private final ProfessionalDAO professionalDAO;
 
-    private final ServiceDAO serviceDAO;
-
     public ProfessionalBO() {
         this.professionalDAO = DAOProxy.get(ProfessionalDAO.class);
-        this.serviceDAO = DAOProxy.get(ServiceDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Initialized ProfessionalBO: {}. ProfessionalDAO: {}", getClass().getSimpleName(), professionalDAO);
@@ -45,10 +41,11 @@ public class ProfessionalBO extends AbstractBO {
     }
 
     public ProfessionalProfile register(AppUser usr, ProfessionalProfile profProfile) throws IllegalAccessException {
-        Validator.validateProf(profProfile);
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
+        Validator.validateProfessional(profProfile);
+        
         // Fetch the user entry and create the Entity objects for inserting into tables Address, Document.
         Professional existing = professionalDAO.findByExtId(usr.principal().sub());
         if (existing == null) {
@@ -64,7 +61,7 @@ public class ProfessionalBO extends AbstractBO {
         }
 
         // String applicationId = MD5HashGenerator.digest("professional", usr.principal().sub());
-        String applicationId = UUID.randomUUID().toString();
+        String applicationId = IdGenerator.generate(usr.principal().sub(), profProfile.getDocuments().get(0).getDocumentNumber());
         Timestamp createdAt = new Timestamp(DateUtil.currentUTCDate().getTime());
 
         // Build the professional details.
@@ -86,7 +83,10 @@ public class ProfessionalBO extends AbstractBO {
             localAddress.setIsDefault(Constants.IS_DEFAULT_ADDR);     // All addresses are set to default.
         }
         localAddress.setCreatedAt(createdAt);
+        AddressUtil.enrich(localAddress);
+        
         user.setAddresses(List.of(localAddress));
+        
         
         // Build the document parts.
         List<Document> documents = profProfile.getDocuments();
@@ -116,13 +116,25 @@ public class ProfessionalBO extends AbstractBO {
         professional.setProfServices(pServices);
         
         // Build the professional serving localities.
-        List<ProfessionalNeighbourhood> profLocalities = new ArrayList<>(profProfile.getNeighbourhoods().size());
-        for (Integer locality : profProfile.getNeighbourhoods()) {
+        List<Integer> nbhoodIds = profProfile.getNeighbourhoodIds();
+        
+        // -1 indicates "ALl Localities", in which case fetch all localities based on the city id.
+        if (nbhoodIds.get(0).equals(-1)) {
+            nbhoodIds = new ArrayList<>(250);
+            for (Neighbourhood nbhood : NeighbourhoodCache.getCache().getAllValues()) {
+                if (nbhood.getCityId().equals(nbhood.getCityId())) {
+                    nbhoodIds.add(nbhood.getNeighbourhoodId());
+                }
+            }
+        }
+        List<ProfessionalNeighbourhood> profLocalities = new ArrayList<>(nbhoodIds.size());
+
+        for (Integer nbhoodId : nbhoodIds) {
             ProfessionalNeighbourhood profLocality = new ProfessionalNeighbourhood();
-            profLocality.setNeighbourhoodId(locality);
-            profLocality.setStatus(ProfessionalNeighbourhood.Status.PACTIVE);
+            profLocality.setNeighbourhoodId(nbhoodId);
+            profLocality.setStatus(ProfessionalNeighbourhood.Status.ACTIVE);
             profLocality.setCreatedAt(createdAt);
-            
+
             profLocalities.add(profLocality);
         }
         professional.setProfNeighbourhoods(profLocalities);
@@ -268,24 +280,15 @@ public class ProfessionalBO extends AbstractBO {
     }
     
     private List<Service> fetchServices(List<Integer> expertise) {
-        try {
-            List<String> subCategoryIds = new ArrayList<>(expertise.size());
-            for (Integer subCategoryId : expertise) {
-                subCategoryIds.add(String.valueOf(subCategoryId));
+        List<Service> services = new ArrayList<>();
+        
+        for (Service service : ServiceCache.getCache().getAllValues()) {
+            for (Integer subCategory : expertise) {
+                if (service.getCategoryId().equals(subCategory)) {
+                    services.add(service);
+                }
             }
-            Map<String, List<String>> param = new HashMap<>();
-            param.put("categoryId", subCategoryIds);
-
-            SearchCriteria search = SearchCriteria.from(new QueryParams(param));
-            List<Service> services = serviceDAO.query(search);
-            
-            if (services.size() < subCategoryIds.size()) {
-                throw new IllegalArgumentException("Invalid non-existent sub-categories provided.");
-            }
-            return services;
         }
-        catch (NoResultException e) {
-            throw new ResourceNotFoundException("No Service found for the sub-categories: " + expertise);
-        }
+        return services;
     }
 }

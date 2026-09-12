@@ -109,15 +109,43 @@ public class BookingHandler extends AbstractHandler {
             Booking booking = MapperUtil.decode(ctx.body().buffer().getBytes(), Booking.class);
             booking.setBookingId(id);
 
+            Booking res = bookingBO.modify(user(ctx), booking);
+            return res;
+            
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+    
+    /**
+     * Patch an existing resource by it's id (PUT request).
+     * 
+     * <p>
+     * If no corresponding resource is found then this method will throw {@link NoSuchElementException}
+     * resulting a <code>404</code> response.
+     * 
+     * <p>
+     * For a PUT request, the server expects you to include all the information for the resource, even if
+     * you only want to update a small part of it. If you leave something out, that part of the resource
+     * will be erased or set to default.
+     * 
+     * @param ctx   Vertx {@link RoutingContext} object.
+     */
+    public void patch(RoutingContext ctx) {
+        final String id = ctx.pathParam("id");
+        
+        // If you use a remote store, this method will safely execute the blocking code.
+        vertx().executeBlocking(() -> {
+            Booking booking = MapperUtil.decode(ctx.body().buffer().getBytes(), Booking.class);
+            booking.setBookingId(id);
 
-            // First fetch the entry, to see if this already exists.
-            Booking rs = bookingBO.modify(user(ctx), booking);
-
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_OK);
-            msg.setMessage("Booking modified successfully");
-
-            return msg;
+            Booking res = bookingBO.patch(user(ctx), booking);
+            return res;
             
         }).onComplete(result -> {
             if (result.succeeded()) {

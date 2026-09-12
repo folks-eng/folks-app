@@ -39,7 +39,7 @@ public class ProfessionalNeighbourhoodBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         
-        professionalNeighbourhood.setStatus(ProfessionalNeighbourhood.Status.PACTIVE);
+        professionalNeighbourhood.setStatus(ProfessionalNeighbourhood.Status.ACTIVE);
         if (professionalNeighbourhood.getCreatedAt() == null) {
             professionalNeighbourhood.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
         }
@@ -62,7 +62,7 @@ public class ProfessionalNeighbourhoodBO extends AbstractBO {
         timer.start();
         
         for (ProfessionalNeighbourhood professionalNeighbourhood : records) {
-            professionalNeighbourhood.setStatus(ProfessionalNeighbourhood.Status.PACTIVE);
+            professionalNeighbourhood.setStatus(ProfessionalNeighbourhood.Status.ACTIVE);
             if (professionalNeighbourhood.getCreatedAt() == null) {
                 professionalNeighbourhood.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
             }

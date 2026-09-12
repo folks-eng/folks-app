@@ -29,7 +29,11 @@ public class ProfessionalProfile implements Serializable, Cloneable {
     // Nearby cities that this professional is willing to travel
     private String servingCities;
     
-    private List<Integer> neighbourhoods;
+    // City
+    private Integer cityId;
+    
+    // Localities the professional serves.
+    private List<Integer> neighbourhoodIds;
 
     // Areas of expertise (at the sub-category level).
     // It essentially contains the sub-category-ids.
@@ -85,14 +89,6 @@ public class ProfessionalProfile implements Serializable, Cloneable {
         this.servingCities = servingCities;
     }
 
-    public List<Integer> getNeighbourhoods() {
-        return neighbourhoods;
-    }
-
-    public void setNeighbourhoods(List<Integer> neighbourhoods) {
-        this.neighbourhoods = neighbourhoods;
-    }
-
     public List<Integer> getExpertise() {
         return expertise;
     }
@@ -101,30 +97,20 @@ public class ProfessionalProfile implements Serializable, Cloneable {
         this.expertise = expertise;
     }
 
+    public Integer getCityId() {
+        return cityId;
+    }
 
-//    @Override
-//    public int hashCode() {
-//        int hash = 7;
-//        hash = 71 * hash + Objects.hashCode(this.professionalId);
-//        return hash;
-//    }
-//
-//    @Override
-//    public boolean equals(Object obj) {
-//        if (this == obj) {
-//            return true;
-//        }
-//        if (obj == null) {
-//            return false;
-//        }
-//        if (getClass() != obj.getClass()) {
-//            return false;
-//        }
-//        Integer id = ((Professional)obj).getProfessionalId();
-//        if (!this.professionalId.equals(id)) {
-//            return false;
-//        }
-//        return true;
-//    }
+    public void setCityId(Integer cityId) {
+        this.cityId = cityId;
+    }
+
+    public List<Integer> getNeighbourhoodIds() {
+        return neighbourhoodIds;
+    }
+
+    public void setNeighbourhoodIds(List<Integer> neighbourhoodIds) {
+        this.neighbourhoodIds = neighbourhoodIds;
+    }
 
 }

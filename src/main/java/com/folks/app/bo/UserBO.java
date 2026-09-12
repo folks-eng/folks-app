@@ -134,18 +134,20 @@ public class UserBO extends AbstractBO {
 
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-        // How to simulate ResourceNotFoundException, TBD
+
         User existing = userDAO.find(new User.UserPK(user.getUserId()));
         if (existing == null) {
-            throw new ResourceNotFoundException("No user found for identifier: " + user.getUserId());
+            throw new ResourceNotFoundException("No user found for identifier: " + user.getExternalId());
         }
 
         existing.setFullName(user.getFullName());
         existing.setEmail(user.getEmail());
         existing.setPhone1(user.getPhone1());
         existing.setPhone2(user.getPhone2());
-        // TBD: existing.setStatus(user.getStatus());
-        //existing.setRole(user.getRole());
+        
+        // User cannot change the status or role.
+        // existing.setStatus(user.getStatus());
+        // existing.setRole(user.getRole());
         existing.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
 
         userDAO.update(existing);
@@ -169,7 +171,7 @@ public class UserBO extends AbstractBO {
         // First fetch the entry, to see if this already exists.
         User existing = userDAO.find(new User.UserPK(user.getUserId()));
         if (existing == null) {
-            throw new ResourceNotFoundException("No user found for identifier: " + user.getUserId());
+            throw new ResourceNotFoundException("No user found for identifier: " + user.getExternalId());
         }
         if(user.getFullName() != null && !user.getFullName().trim().isEmpty())
             existing.setFullName(user.getFullName());

@@ -13,6 +13,7 @@ import io.vertx.ext.web.RoutingContext;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.NoSuchElementException;
+import org.javalabs.decl.vertx.container.ResourceNotFoundException;
 
 /**
  * Example REST handler.
@@ -104,31 +105,15 @@ public class UserHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            try {
-                User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
-                user.setExternalId(extId);
-                // First fetch the entry, to see if this already exists.
-                User result = userBO.modify(user(ctx), user);
+            User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
+            user.setExternalId(extId);
 
-                ServerMessage msg = new ServerMessage();
-                msg.setCode(HttpURLConnection.HTTP_OK);
-                msg.setMessage("User modified successfully.");
-                return msg;
-            } catch (RuntimeException ex) {
-                ServerMessage msg = new ServerMessage();
-                msg.setCode(HttpURLConnection.HTTP_BAD_REQUEST);
-                msg.setMessage(ex.getMessage());
-                return msg;
-            }
+            User modified = userBO.modify(user(ctx), user);
+            return modified;
             
         }).onComplete(result -> {
             if (result.succeeded()) {
-                if(result.result().getCode() == HttpURLConnection.HTTP_BAD_REQUEST) {
-                    sendResponse(ctx, HttpURLConnection.HTTP_BAD_REQUEST, result.result());
-                }
-                else {
-                    sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
-                }
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
             }
             else {
                 ctx.fail(result.cause());
@@ -153,29 +138,15 @@ public class UserHandler extends AbstractHandler {
 
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            try {
-                User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
-                user.setExternalId(extId);
-                User result = userBO.patchUp(user(ctx), user);
-
-                ServerMessage msg = new ServerMessage();
-                msg.setCode(HttpURLConnection.HTTP_OK);
-                msg.setMessage("User modified successfully.");
-                return msg;
-            } catch (RuntimeException ex) {
-                ServerMessage msg = new ServerMessage();
-                msg.setCode(HttpURLConnection.HTTP_BAD_REQUEST);
-                msg.setMessage(ex.getMessage());
-                return msg;
-            }
+            User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
+            user.setExternalId(extId);
+            
+            User modified = userBO.patchUp(user(ctx), user);
+            return modified;
+            
         }).onComplete(result -> {
             if (result.succeeded()) {
-                if(result.result().getCode() == HttpURLConnection.HTTP_BAD_REQUEST) {
-                    sendResponse(ctx, HttpURLConnection.HTTP_BAD_REQUEST, result.result());
-                }
-                else {
-                    sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
-                }
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
             }
             else {
                 ctx.fail(result.cause());

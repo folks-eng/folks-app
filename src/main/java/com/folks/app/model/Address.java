@@ -10,6 +10,7 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -49,17 +50,8 @@ public class Address implements Serializable, Cloneable {
     @Column(name = "address_line2", nullable = true, updatable = true, length = 128)
     private String addressLine2;
 
-    @Column(name = "city", nullable = false, updatable = true, length = 64)
-    private String city;
-
-    @Column(name = "locality", nullable = false, updatable = true, length = 80)
-    private String locality;
-
-    @Column(name = "state", nullable = false, updatable = true, length = 64)
-    private String state;
-
-    @Column(name = "pincode", nullable = false, updatable = true, precision = 16)
-    private Integer pincode;
+    @Column(name = "neighbourhood_id", nullable = false, updatable = true, length = 64)
+    private Integer neighbourhoodId;
 
     @Column(name = "latitude", nullable = true, updatable = true, precision = 20, scale = 6)
     private BigDecimal latitude;
@@ -78,6 +70,18 @@ public class Address implements Serializable, Cloneable {
 
     @Column(name = "updated_at", nullable = true, updatable = true)
     private Timestamp updatedAt;
+    
+    @Transient
+    private String province;
+    
+    @Transient
+    private String city;
+
+    @Transient
+    private String locality;
+    
+    @Transient
+    private Integer pincode;
 
     public Address() {}
 
@@ -113,36 +117,12 @@ public class Address implements Serializable, Cloneable {
         return this.addressLine2;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public Integer getNeighbourhoodId() {
+        return neighbourhoodId;
     }
 
-    public String getCity() {
-        return this.city;
-    }
-
-    public String getLocality() {
-        return locality;
-    }
-
-    public void setLocality(String locality) {
-        this.locality = locality;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public String getState() {
-        return this.state;
-    }
-
-    public void setPincode(Integer pincode) {
-        this.pincode = pincode;
-    }
-
-    public Integer getPincode() {
-        return this.pincode;
+    public void setNeighbourhoodId(Integer neighbourhoodId) {
+        this.neighbourhoodId = neighbourhoodId;
     }
 
     public void setLatitude(BigDecimal latitude) {
@@ -191,6 +171,38 @@ public class Address implements Serializable, Cloneable {
 
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getLocality() {
+        return locality;
+    }
+
+    public void setLocality(String locality) {
+        this.locality = locality;
+    }
+
+    public Integer getPincode() {
+        return pincode;
+    }
+
+    public void setPincode(Integer pincode) {
+        this.pincode = pincode;
     }
 
     public static class AddressPK {

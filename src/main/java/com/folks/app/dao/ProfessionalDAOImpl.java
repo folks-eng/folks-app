@@ -118,6 +118,7 @@ public class ProfessionalDAOImpl extends AbstractDAO implements ProfessionalDAO 
             .setParameter(2, externalId)
             .setHint(QueryHints.ALLOW_NATIVE_QUERY, Boolean.TRUE)
             .setHint(QueryHints.QUERY_TYPE, QueryCache.QueryType.SELECT_REL)
+            .setHint(QueryHints.RETRIEVAL_STRATEGY, QueryHints.RetrievalStrategy.INDEX)
             .setHint(QueryHints.FETCH_DEF, "OneToOne")
             .setHint(QueryHints.FETCH_FIELD, "user")
             .getResultList();

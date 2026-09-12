@@ -27,8 +27,8 @@ public class AvailabilityQueryGen {
         }
         buff.append("      FROM fks_services a").append("\n")
                 .append("     INNER JOIN fks_professional_services b ON (a.service_id = b.service_id)").append("\n")
-                .append("     INNER JOIN fks_professionals c ON (b.professional_id = c.professional_id AND c.is_verified = 1)").append("\n")
-                .append("     INNER JOIN fks_availabilities d ON (c.professional_id = d.professional_id AND d.date = ? AND d.is_booked = 0)").append("\n")
+                .append("     INNER JOIN fks_professionals c ON (b.professional_id = c.professional_id AND c.is_verified = ?)").append("\n")
+                .append("     INNER JOIN fks_availabilities d ON (c.professional_id = d.professional_id AND d.date = ? AND d.is_booked = ?)").append("\n")
                 .append("     WHERE a.service_id = ?").append("\n");
 
         buff.append("    WINDOW w AS (").append("\n")
@@ -68,64 +68,67 @@ public class AvailabilityQueryGen {
                     CAST (? AS TIME) AS work_end
             ),
             prof_eligibility AS (
-                SELECT c.professional_id, c.date, p.work_start, p.work_end, MIN(c.start_time) AS start_time, MAX(c.end_time) AS end_time, COUNT(*) AS slot_count
+                SELECT d.professional_id, d.date, p.work_start, p.work_end, MIN(d.start_time) AS start_time, MAX(d.end_time) AS end_time, COUNT(*) AS slot_count
                   FROM fks_professional_services a
                  INNER JOIN fks_professionals b ON (a.professional_id = b.professional_id AND b.is_verified = ?)
-                 INNER JOIN fks_availabilities c ON (b.professional_id = c.professional_id AND a.service_id = ?)
+                 INNER JOIN fks_professional_neighbourhoods c ON (b.professional_id = c.professional_id AND c.neighbourhood_id = ?)
+                 INNER JOIN fks_availabilities d ON (b.professional_id = d.professional_id)
                  CROSS JOIN params p
-                WHERE date = p.booking_date
-                  AND c.start_time >= p.work_start
-                  AND c.end_time <= p.work_end
-                  AND c.is_booked = ?
-                  AND NOT EXISTS (
-                    SELECT 1
-                      FROM fks_availabilities d
-                     WHERE c.professional_id = d.professional_id
-                       AND c.date = d.date
-                       AND d.is_booked = ?
-                  )
-                GROUP BY c.professional_id, c.date, p.work_start, p.work_end
+                 WHERE a.service_id = ?
+                   AND d.date = p.booking_date
+                   AND d.start_time >= p.work_start
+                   AND d.end_time <= p.work_end
+                   AND d.is_booked = ?
+                   AND NOT EXISTS (
+                       SELECT 1
+                         FROM fks_availabilities e
+                        WHERE d.professional_id = e.professional_id
+                          AND d.date = e.date
+                          AND e.is_booked = ?)
+                 GROUP BY d.professional_id, d.date, p.work_start, p.work_end
                 HAVING COUNT(*) = EXTRACT (HOUR FROM (p.work_end - p.work_start))
-                   AND MIN(c.start_time) = p.work_start
-                   AND MAX(c.end_time) = p.work_end
+                   AND MIN(d.start_time) = p.work_start
+                   AND MAX(d.end_time) = p.work_end
             )
             SELECT a.*
               FROM fks_availabilities a
-             INNER JOIN prof_eligibility e ON (e.professional_id = a.professional_id AND e.date = a.date)
+             INNER JOIN prof_eligibility f ON (f.professional_id = a.professional_id AND f.date = a.date)
              CROSS JOIN params p
              WHERE a.start_time >= p.work_start
                AND a.end_time <= p.work_end
              ORDER BY a.professional_id, a.start_time
              LIMIT (SELECT EXTRACT(HOUR FROM (work_end - work_start))
                       FROM params)
-             FOR UPDATE;
+               FOR UPDATE;
             """;
         
         String query = """
             WITH params AS (
                 SELECT
-                    DATE ? AS booking_date,
-                    TIME ? AS work_start,
-                    TIME ? AS work_end
+                    CAST (? AS DATE) AS booking_date,
+                    CAST (? AS TIME) AS work_start,
+                    CAST (? AS TIME) AS work_end
             ),
             prof_eligibility AS (
-                SELECT c.professional_id, c.date, p.work_start, p.work_end, MIN(c.start_time) AS start_time, MAX(c.end_time) AS end_time, COUNT(*) AS slot_count
+                SELECT d.professional_id, d.date, p.work_start, p.work_end, MIN(d.start_time) AS start_time, MAX(d.end_time) AS end_time, COUNT(*) AS slot_count
                   FROM fks_professional_services a
                  INNER JOIN fks_professionals b ON (a.professional_id = b.professional_id AND b.is_verified = ?)
-                 INNER JOIN fks_availabilities c ON (b.professional_id = c.professional_id AND a.service_id = ?)
+                 INNER JOIN fks_professional_neighbourhoods c ON (b.professional_id = c.professional_id AND c.neighbourhood_id = ?)
+                 INNER JOIN fks_availabilities d ON (b.professional_id = d.professional_id)
                  CROSS JOIN params p
-                WHERE date = c.booking_date
-                  AND c.start_time >= p.work_start
-                  AND c.end_time <= p.work_end
-                  AND c.is_booked = ?
-                GROUP BY c.professional_id, c.date, p.work_start, p.work_end
+                 WHERE a.service_id = ?
+                   AND d.date = p.booking_date
+                   AND d.start_time >= p.work_start
+                   AND d.end_time <= p.work_end
+                   AND d.is_booked = ?
+                 GROUP BY d.professional_id, d.date, p.work_start, p.work_end
                 HAVING COUNT(*) = EXTRACT (HOUR FROM (p.work_end - p.work_start))
-                   AND MIN(c.start_time) = p.work_start
-                   AND MAX(c.end_time) = p.work_end
+                   AND MIN(d.start_time) = p.work_start
+                   AND MAX(d.end_time) = p.work_end
             )
             SELECT a.*
               FROM fks_availabilities a
-             INNER JOIN prof_eligibility e ON (e.professional_id = a.professional_id AND e.date = a.date)
+             INNER JOIN prof_eligibility f ON (f.professional_id = a.professional_id AND f.date = a.date)
              CROSS JOIN params p
              WHERE a.start_time >= p.work_start
                AND a.end_time <= p.work_end

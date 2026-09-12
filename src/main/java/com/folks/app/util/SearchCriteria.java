@@ -37,6 +37,12 @@ public interface SearchCriteria {
     Map<String, List<Object>> params();
     
     /**
+     * Return the requested field(s).
+     * @return List
+     */
+    List<String> fields();
+    
+    /**
      * Return the operator (AND or OR).
      * @return String
      */

@@ -164,11 +164,12 @@ public class AuthBO extends AbstractBO {
         if (rows.isEmpty()) {
             throw new IllegalArgumentException("No user found with " + type + " as " + input);
         }
-        // User found. Procedd with token generation ...
+        // User found. Proceed with token generation ...
         User user = rows.get(0);
         
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", user.getExternalId());
+        claims.put("name", user.getFullName());
         claims.put("iss", issuer);
         claims.put("aud", audience);
         claims.put("jti", UUID.randomUUID().toString());

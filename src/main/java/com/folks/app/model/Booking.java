@@ -26,7 +26,13 @@ import java.util.Objects;
 @Table(name = "fks_bookings")
 @IdClass(Booking.BookingPK.class)
 @NamedNativeQueries({
-    @NamedNativeQuery(name = "Booking.selectAll", query = "SELECT * FROM fks_bookings")
+    @NamedNativeQuery(name = "Booking.selectAll", query = "SELECT * FROM fks_bookings"),
+    @NamedNativeQuery(name = "Booking.pendingBookings"
+            , query = """
+                      SELECT *
+                        FROM fks_bookings
+                       WHERE status = ? AND scheduled_at > CURRENT_TIMESTAMP
+                      """)
 })
 public class Booking implements Serializable, Cloneable {
 
@@ -79,6 +85,12 @@ public class Booking implements Serializable, Cloneable {
 
     @Column(name = "updated_at", nullable = true, updatable = true)
     private Timestamp updatedAt;
+    
+    @Column(name = "updated_by", nullable = true, updatable = true, length = 50)
+    private String updatedBy;
+
+    @Transient
+    private Integer neighbourhoodId;
     
     @Transient
     private String address;
@@ -196,6 +208,22 @@ public class Booking implements Serializable, Cloneable {
 
     public Timestamp getUpdatedAt() {
         return this.updatedAt;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Integer getNeighbourhoodId() {
+        return neighbourhoodId;
+    }
+
+    public void setNeighbourhoodId(Integer neighbourhoodId) {
+        this.neighbourhoodId = neighbourhoodId;
     }
 
     public String getAddress() {

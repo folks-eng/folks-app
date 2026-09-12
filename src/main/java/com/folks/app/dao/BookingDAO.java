@@ -67,6 +67,8 @@ public interface BookingDAO {
     @NotSupported
     Booking find(Booking.BookingPK pk);
     
+    int updateStatus(Booking booking);
+    
     /**
      * Query all the entries from the underlying db.
      * This is an extension of the {@link #query(SearchCriteria)} method, just that this method
@@ -77,6 +79,9 @@ public interface BookingDAO {
      */
     @NotSupported
     List<Booking> query(SearchCriteria search);
+    
+    @NotSupported
+    List<Booking> pendingBooking();
     
     Boolean assignProfessional(Booking booking);
     

@@ -41,6 +41,7 @@ public class BookingEventConsumer implements Handler<Message<Booking>> {
 
     private void assignProfessional(Booking booking) {
         try {
+            booking.setUpdatedBy("System - BookingEventConsumer");
             bookingBO.assignProfessional(booking);
         }
         catch (RuntimeException e) {

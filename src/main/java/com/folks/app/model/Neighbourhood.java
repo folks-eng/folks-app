@@ -9,6 +9,7 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -57,6 +58,12 @@ public class Neighbourhood implements Serializable, Cloneable {
 
     @Column(name = "updated_at", nullable = true, updatable = true)
     private Timestamp updatedAt;
+    
+    @Transient
+    private String province;
+    
+    @Transient
+    private String city;
 
     public Neighbourhood() {}
 
@@ -130,6 +137,22 @@ public class Neighbourhood implements Serializable, Cloneable {
 
     public Timestamp getUpdatedAt() {
         return this.updatedAt;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public static class NeighbourhoodPK {

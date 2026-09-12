@@ -1,40 +1,22 @@
 package com.folks.app.util;
 
+import com.folks.app.cache.impl.CategoryCache;
+import com.folks.app.cache.impl.CityCache;
+import com.folks.app.cache.impl.NeighbourhoodCache;
 import com.folks.app.model.Address;
 import com.folks.app.model.Document;
 import com.folks.app.model.ProfessionalProfile;
 import com.folks.app.model.User;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class Validator {
 
     public static void validateUser(User user) {
-
-        String name = user.getFullName();
         String mandatoryContact = user.getPhone1();
-        String optionalContact = user.getPhone1();
+        String optionalContact = user.getPhone2();
         String email = user.getEmail();
-        User.Status status = user.getStatus();
-        User.Role role = user.getRole();
-
-        if (status != null) {
-            String statusStr = status.name();
-            //System.out.println("Status in validate " +status.name());
-            List<String> validStatusList = Arrays.asList("ACTIVE", "INACTIVE", "BLOCKED");
-            if (!validStatusList.contains(statusStr)) {
-                throw new IllegalArgumentException("Status entered is invalid.");
-            }
-        }
-        if (role != null) {
-            String roleStr = role.name();
-            //System.out.println("Status in validate " +status.name());
-            List<String> validRoleList = Arrays.asList("CUSTOMER", "PROFESSIONAL", "ADMIN");
-            if (!validRoleList.contains(roleStr)) {
-                throw new IllegalArgumentException("Role entered is invalid.");
-            }
-        }
+        
         if (mandatoryContact == null || mandatoryContact.trim().isEmpty()) {
             throw new IllegalArgumentException("Primary mobile number is required.");
         }
@@ -54,22 +36,16 @@ public class Validator {
     }
 
     public static void validateAddress(Address addr) {
-        String line1 = addr.getAddressLine1();
-        if (line1 == null || line1.trim().isEmpty()) {
+        if (addr.getAddressLine1() == null || addr.getAddressLine1().trim().isEmpty()) {
             throw new IllegalArgumentException("Address line1 is required.");
         }
-        String city = addr.getCity();
-        if (city == null || city.trim().isEmpty()) {
-            throw new IllegalArgumentException("City is required.");
+        if (addr.getNeighbourhoodId() == null) {
+            throw new IllegalArgumentException("neighbourhoodId is required.");
         }
-        String state = addr.getState();
-        if (state == null || state.trim().isEmpty()) {
-            throw new IllegalArgumentException("State is required.");
+        if (! NeighbourhoodCache.getCache().contains(addr.getNeighbourhoodId())) {
+            throw new IllegalArgumentException("Invalid neighbourhood specified");
         }
-        Integer pinCode = addr.getPincode();
-        if (pinCode == null || pinCode.toString().isEmpty()) {
-            throw new IllegalArgumentException("PinCode is required.");
-        }
+        
         // TBD
 //        String label = addr.getLabel();
 //        if (label == null || label.toString().isEmpty()) {
@@ -77,15 +53,8 @@ public class Validator {
 //        }
     }
 
-    public static void validateProf(ProfessionalProfile profProfile) {
-        Short exp = profProfile.getExperienceYears();
-        if (exp == null || exp.toString().isEmpty()) {
-            throw new IllegalArgumentException("Experience is years is required.");
-        }
-        if (profProfile.getExpertise() == null || profProfile.getExpertise().isEmpty()) {
-            throw new IllegalArgumentException("Expertise is required.");
-        }
-        //Document
+    public static void validateProfessional(ProfessionalProfile profProfile) {
+        // Validate Document
         List<Document> docList = profProfile.getDocuments();
         if (docList == null || docList.isEmpty()) {
             throw new IllegalArgumentException("At least one document is needed.");
@@ -93,12 +62,45 @@ public class Validator {
         for(Document doc : docList) {
             Validator.validateDocument(doc);
         }
-        //Address
+        // Validate Address
         Address addr = profProfile.getAddress();
         if (addr == null ) {
             throw new IllegalArgumentException("Address is required.");
         }
-        Validator.validateAddress(addr);
+        validateAddress(addr);
+        
+        // Validate Experience and expertise
+        Short exp = profProfile.getExperienceYears();
+        if (exp == null || exp <= 0) {
+            throw new IllegalArgumentException("Valid experience in years is required.");
+        }
+        if (profProfile.getExpertise() == null || profProfile.getExpertise().isEmpty()) {
+            throw new IllegalArgumentException("Expertise is required.");
+        }
+        for (Integer id : profProfile.getExpertise()) {
+            if (! CategoryCache.getCache().contains(id)) {
+                throw new IllegalArgumentException("Invalid category specified");
+            }
+        }
+        
+        // Validate serving areas for professional
+        if (profProfile.getNeighbourhoodIds() == null || profProfile.getNeighbourhoodIds().isEmpty()) {
+            throw new IllegalArgumentException("Serving localities are required");
+        }
+        for (Integer id : profProfile.getNeighbourhoodIds()) {
+            if (id != -1 && ! NeighbourhoodCache.getCache().contains(id)) {
+                throw new IllegalArgumentException("Invalid neighbourhood specified");
+            }
+            if (id == -1 && profProfile.getNeighbourhoodIds().size() > 1) {
+                throw new IllegalArgumentException("You have already selected All Localities. No additional selection is required");
+            }
+            if (id == -1 && profProfile.getCityId() == null) {
+                throw new IllegalArgumentException("Must provide city when selecting All Localities");
+            }
+        }
+        if (profProfile.getCityId() != null && ! CityCache.getCache().contains(profProfile.getCityId())) {
+            throw new IllegalArgumentException("Must provide a valid city");
+        }
     }
 
     private static void validateDocument(Document doc) {

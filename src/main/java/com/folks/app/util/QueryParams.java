@@ -15,7 +15,7 @@ public final class QueryParams {
     
     private Boolean expand = Boolean.FALSE;
     private Integer offset = 0;
-    private Integer limit = 100;
+    private Integer limit = Constants.DEFAULT_SEARCH_LIMIT;
     
     public QueryParams(Map<String, List<String>> params) {
         this.params = params;

@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.TimeZone;
 import org.javalabs.decl.util.DateUtil;
 import org.javalabs.jpa.annotation.Dao;
+import org.javalabs.jpa.query.CriteriaUpdate;
+import org.javalabs.jpa.util.QueryHints;
 
 /**
  * Concrete DAO class to handle database operations related.
@@ -66,6 +68,26 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
     public Booking find(Booking.BookingPK pk) {
         return em.find(Booking.class, pk);
     }
+    
+    @Override
+    public int updateStatus(Booking booking) {
+        CriteriaUpdate criteria = new CriteriaUpdate()
+                .update(TABLE)
+                .set("status").eq(booking.getStatus())
+                .set("status_msg").eq(booking.getStatusMsg())
+                .set("updated_at").eq(booking.getUpdatedAt())
+                .set("updated_by").eq(booking.getUpdatedBy())
+                .where("booking_id").eq(booking.getBookingId());
+        
+        Query q = em.createQuery(criteria.toQuery());
+        List<Object> binds = criteria.params();
+        
+        int idx = 1;
+        for (Object bind : binds) {
+            q.setParameter(idx ++, bind);
+        }
+        return q.executeUpdate();
+    }
 
     @Override
     public List<Booking> query(SearchCriteria search) {
@@ -101,16 +123,18 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
                         , b.name
                         , c.address_line1
                         , COALESCE(c.address_line2, '') AS address_line2
-                        , c.city
-                        , c.pincode
-                        , a.professional_id
-                        , COALESCE(e.full_name, 'Professional not assigned') AS professional_name
-                        , COALESCE(e.phone1, '') AS phone1
+                        , e.city_name
+                        , d.pincode
+                        , f.professional_id
+                        , COALESCE(g.full_name, 'Professional not assigned') AS professional_name
+                        , COALESCE(g.phone1, '') AS phone1
                   FROM fks_bookings a
                  INNER JOIN fks_services b ON (a.service_id = b.service_id)
                  INNER JOIN fks_addresses c ON (a.address_id = c.address_id)
-                 LEFT OUTER JOIN fks_professionals d ON (a.professional_id = d.professional_id)
-                 LEFT OUTER JOIN fks_users e ON (d.user_id = e.user_id AND e.role = ?)
+                 INNER JOIN fks_neighbourhoods d ON (c.neighbourhood_id = d.neighbourhood_id)
+                 INNER JOIN fks_cities e ON (d.city_id = e.city_id)
+                 LEFT OUTER JOIN fks_professionals f ON (a.professional_id = f.professional_id)
+                 LEFT OUTER JOIN fks_users g ON (f.user_id = g.user_id AND g.role = ?)
                  WHERE a.customer_id = ?
                  ORDER BY a.created_at DESC;
                        """;
@@ -156,6 +180,7 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
         
         List<Availability> availabilities = availabilityDAO.findProfessional(
                 booking.getServiceId()
+                , booking.getNeighbourhoodId()
                 , String.valueOf(cal.get(Calendar.YEAR))
                         + "-" + String.format("%02d", (cal.get(Calendar.MONTH) + 1))
                         + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH))
@@ -166,6 +191,8 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
             booking.setProfessionalId(availabilities.get(0).getProfessionalId());
             booking.setStatus(Booking.Status.CONFIRMED);
             booking.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
+            booking.setUpdatedBy(booking.getUpdatedBy());
+            
             em.merge(booking);
 
             for (Availability availability : availabilities) {
@@ -191,6 +218,14 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
             return Boolean.TRUE;
         }
         return Boolean.FALSE;
+    }
+
+    @Override
+    public List<Booking> pendingBooking() {
+        return em.createNamedQuery("Booking.pendingBookings", Booking.class)
+            .setParameter(1, Booking.Status.PENDING)
+            .setHint(QueryHints.ALLOW_NATIVE_QUERY, Boolean.TRUE)
+            .getResultList();
     }
     
 }

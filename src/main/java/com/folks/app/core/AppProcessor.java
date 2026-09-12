@@ -41,13 +41,13 @@ public class AppProcessor extends AbstractVerticle {
     
     private void initTimer() {
         long delay = 0L;
-        long interval = 30 * 60 * 1000L;
+        long interval = 60 * 1000L;
         
-        Long timerId = getVertx().setPeriodic(delay, interval, new DefaultTimer());
+        Long timerId = getVertx().setPeriodic(delay, interval, new BookingTimer());
         timerIds.add(timerId);
         
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Scheduled default timer. Initial Delay: {}. Pause Time (ms): {}", delay, interval);
+            LOGGER.info("Scheduled booking timer. Initial Delay: {}. Pause Time (ms): {}", delay, interval);
         }
     }
 

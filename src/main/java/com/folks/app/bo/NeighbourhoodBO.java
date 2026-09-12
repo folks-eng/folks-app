@@ -3,6 +3,8 @@ package com.folks.app.bo;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
+import com.folks.app.cache.impl.CityCache;
+import com.folks.app.cache.impl.ProvinceCache;
 import com.folks.app.model.Neighbourhood;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
@@ -12,6 +14,8 @@ import org.javalabs.decl.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.folks.app.dao.NeighbourhoodDAO;
+import com.folks.app.model.City;
+import com.folks.app.model.Province;
 
 /**
  *
@@ -109,13 +113,20 @@ public class NeighbourhoodBO extends AbstractBO {
         timer.start();
 
         SearchCriteria search = SearchCriteria.from(params);
-        List<Neighbourhood> rows = neighbourhoodDAO.query(search);
+        List<Neighbourhood> records = neighbourhoodDAO.query(search);
+        
+        for (Neighbourhood record : records) {
+            City city = CityCache.getCache().get(record.getCityId());
+            Province province = ProvinceCache.getCache().get(city.getProvinceId());
+            record.setProvince(province.getProvinceName());
+            record.setCity(city.getCityName());
+        }
 
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched {} expanded neighbourhood record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
+            LOGGER.info("Fetched {} expanded neighbourhood record(s). Elapsed time(ms): {}", records.size(), timer.elapsedTimeMillis());
         }
-        return rows;
+        return records;
     }
 
     public Neighbourhood view(AppUser usr, Integer id) {

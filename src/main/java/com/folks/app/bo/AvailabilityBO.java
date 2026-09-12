@@ -199,6 +199,7 @@ public class AvailabilityBO extends AbstractBO {
         timer.start();
 
         Integer serviceId = Integer.valueOf(params.param("serviceId"));
+        Integer neighbourhoodId = Integer.valueOf(params.param("neighbourhoodId"));
         
         Service service = serviceDAO.find(new ServicePK(serviceId));
         if (service == null) {
@@ -210,6 +211,7 @@ public class AvailabilityBO extends AbstractBO {
         
         List<Availability> records = availabilityDAO.findProfessional(
                 serviceId
+                , neighbourhoodId
                 , date
                 , start
                 , end);

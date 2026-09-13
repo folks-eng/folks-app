@@ -233,7 +233,7 @@ public class BookingBO extends AbstractBO {
         return booking;
     }
 
-    public Booking remove(AppUser usr, String id) {
+    public Booking remove(AppUser usr, String id) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
@@ -243,6 +243,12 @@ public class BookingBO extends AbstractBO {
         Booking existing = bookingDAO.find(new Booking.BookingPK(id));
         if (existing == null) {
             throw new IllegalArgumentException("No booking found for identifier: " + id);
+        }
+        
+        // Fetch the user.
+        User user = fetchUser(usr);
+        if (! existing.getCustomerId().equals(user.getUserId())) {
+            throw new IllegalAccessException("You do not have permission to cancel this booking");
         }
         // if (existing.getStatus() == Booking.Status.CONFIRMED) {
         //     throw new IllegalArgumentException("Cannot modify a booking once it is confirmed and professional is assigned");

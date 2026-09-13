@@ -1,6 +1,5 @@
-package com.folks.app.core;
+package com.folks.app.event;
 
-import com.folks.app.model.Booking;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.MessageCodec;
 import io.vertx.core.json.Json;
@@ -9,21 +8,21 @@ import io.vertx.core.json.Json;
  *
  * @author schan280
  */
-public class BookingCodec implements MessageCodec<Booking, Booking> {
+public class AvailabilityGenCodec implements MessageCodec<AvailabilityGenEvent, AvailabilityGenEvent> {
 
     @Override
-    public void encodeToWire(Buffer buffer, Booking s) {
+    public void encodeToWire(Buffer buffer, AvailabilityGenEvent s) {
         Buffer tmp = Json.encodeToBuffer(s);
         buffer.appendBuffer(tmp);
     }
 
     @Override
-    public Booking decodeFromWire(int pos, Buffer buffer) {
-        return Json.decodeValue(buffer, Booking.class);
+    public AvailabilityGenEvent decodeFromWire(int pos, Buffer buffer) {
+        return Json.decodeValue(buffer, AvailabilityGenEvent.class);
     }
 
     @Override
-    public Booking transform(Booking s) {
+    public AvailabilityGenEvent transform(AvailabilityGenEvent s) {
         return s;
     }
 

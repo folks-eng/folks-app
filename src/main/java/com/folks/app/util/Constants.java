@@ -26,5 +26,7 @@ public class Constants {
 
     //Booking
     public static final String BOOKING_ADDRESS = "booking.event.address";
+    
+    public static final String AVAIL_GEN_ADDRESS = "availability.gen.address";
 }
 

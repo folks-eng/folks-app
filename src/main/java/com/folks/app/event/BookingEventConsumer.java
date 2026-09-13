@@ -1,4 +1,4 @@
-package com.folks.app.core;
+package com.folks.app.event;
 
 import com.folks.app.bo.BookingBO;
 import com.folks.app.model.Booking;
@@ -27,15 +27,19 @@ public class BookingEventConsumer implements Handler<Message<Booking>> {
         Booking booking = event.body();
         if (booking.getStatus() == Booking.Status.PENDING) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Received new booking creation event. Booking id: {}", event.body().getBookingId());
+                LOGGER.info("Received new booking creation event. Booking id: {}", booking.getBookingId());
             }
             assignProfessional(booking);
         }
         else if (booking.getStatus() == Booking.Status.CANCELLED) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Received booking cancellation event. Booking id: {}", event.body().getBookingId());
+                LOGGER.info("Received booking cancellation event. Booking id: {}", booking.getBookingId());
             }
             freeProfessional(booking);
+        }
+        else {
+            LOGGER.warn("Received a booking object with status {}. Booking id: {}."
+                    + " No action will be performed", booking.getStatus(), booking.getBookingId());
         }
     }
 

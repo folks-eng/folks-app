@@ -1,5 +1,7 @@
 package com.folks.app.core;
 
+import com.folks.app.event.BookingEventConsumer;
+import com.folks.app.event.BookingCodec;
 import com.folks.app.model.Booking;
 import com.folks.app.util.Constants;
 import io.vertx.core.AbstractVerticle;

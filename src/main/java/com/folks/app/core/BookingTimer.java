@@ -1,6 +1,6 @@
 package com.folks.app.core;
 
-import com.folks.app.bo.BookingBO;
+import com.folks.app.bo.BookingMgmtBO;
 import com.folks.app.model.Booking;
 import io.vertx.core.Handler;
 import java.util.List;
@@ -16,10 +16,10 @@ public class BookingTimer implements Handler<Long> {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(BookingTimer.class);
 
-    private final BookingBO bookingBO;
+    private final BookingMgmtBO bookingMgmtBO;
 
     public BookingTimer() {
-        this.bookingBO = new BookingBO();
+        this.bookingMgmtBO = new BookingMgmtBO();
     }
     
     @Override
@@ -28,13 +28,13 @@ public class BookingTimer implements Handler<Long> {
             LOGGER.debug("Time {} is invoked", getClass().getSimpleName());
         }
         // Add repetitive task ...
-        List<Booking> bookings = bookingBO.pendingBookings();
+        List<Booking> bookings = bookingMgmtBO.pendingBookings();
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Fetched {} pending booking(s)", bookings.size());
         }
         for (Booking booking : bookings) {
             booking.setUpdatedBy("System - BookingTimer");
-            bookingBO.assignProfessional(booking);
+            bookingMgmtBO.assignProfessional(booking);
         }
     }
     

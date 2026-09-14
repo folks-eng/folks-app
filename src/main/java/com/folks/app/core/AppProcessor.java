@@ -1,12 +1,21 @@
 package com.folks.app.core;
 
+import com.folks.app.config.ApplicationConfiguration;
+import com.folks.app.event.AvailabilityEventConsumer;
+import com.folks.app.event.AvailabilityGenCodec;
+import com.folks.app.event.AvailabilityGenEvent;
 import com.folks.app.event.BookingEventConsumer;
 import com.folks.app.event.BookingCodec;
+import com.folks.app.event.ProfessionalEventConsumer;
+import com.folks.app.event.ProfessionalRegCodec;
+import com.folks.app.event.ProfessionalRegEvent;
 import com.folks.app.model.Booking;
 import com.folks.app.util.Constants;
 import io.vertx.core.AbstractVerticle;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,17 +48,29 @@ public class AppProcessor extends AbstractVerticle {
     private void initEventBus() {
         getVertx().eventBus().consumer(Constants.BOOKING_ADDRESS, new BookingEventConsumer());
         getVertx().eventBus().registerDefaultCodec(Booking.class, new BookingCodec());
+        
+        getVertx().eventBus().consumer(Constants.AVAIL_GEN_ADDRESS, new AvailabilityEventConsumer());
+        getVertx().eventBus().registerDefaultCodec(AvailabilityGenEvent.class, new AvailabilityGenCodec());
+        
+        getVertx().eventBus().consumer(Constants.PROF_REG_ADDRESS, new ProfessionalEventConsumer());
+        getVertx().eventBus().registerDefaultCodec(ProfessionalRegEvent.class, new ProfessionalRegCodec());
+        
     }
     
     private void initTimer() {
-        long delay = 0L;
-        long interval = 60 * 1000L;
+        Map<String, Object> config = ApplicationConfiguration.getInstance().get("timer.config");
+        if (config == null) {
+            config = new HashMap<>();
+        }
         
-        Long timerId = getVertx().setPeriodic(delay, interval, new BookingTimer());
+        long delay = 0L;
+        long interval = (Integer)config.getOrDefault("booking.timer.interval.s", 60);
+        
+        Long timerId = getVertx().setPeriodic(delay, interval * 1000L, new BookingTimer());
         timerIds.add(timerId);
         
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Scheduled booking timer. Initial Delay: {}. Pause Time (ms): {}", delay, interval);
+            LOGGER.info("Scheduled booking timer. Initial Delay: {}. Pause Time (s): {}", delay, interval);
         }
     }
 

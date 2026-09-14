@@ -1,6 +1,6 @@
 package com.folks.app.event;
 
-import com.folks.app.bo.AvailabilityGenBO;
+import com.folks.app.bo.AvailabilityMgmtBO;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 import org.slf4j.Logger;
@@ -14,10 +14,10 @@ public class AvailabilityEventConsumer implements Handler<Message<AvailabilityGe
     
     private static final Logger LOGGER = LoggerFactory.getLogger(AvailabilityEventConsumer.class);
     
-    private final AvailabilityGenBO availGenBO;
+    private final AvailabilityMgmtBO availMgmtBO;
 
     public AvailabilityEventConsumer() {
-        this.availGenBO = new AvailabilityGenBO();
+        this.availMgmtBO = new AvailabilityMgmtBO();
     }
 
     @Override
@@ -26,7 +26,7 @@ public class AvailabilityEventConsumer implements Handler<Message<AvailabilityGe
             LOGGER.info("Received availability generation event. Event: {}", event.body());
         }
         AvailabilityGenEvent availEvent = event.body();
-        availGenBO.generate(availEvent);
+        availMgmtBO.generate(availEvent);
     }
     
 }

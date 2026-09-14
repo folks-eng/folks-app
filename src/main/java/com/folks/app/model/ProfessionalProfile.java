@@ -1,5 +1,6 @@
 package com.folks.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 
@@ -38,6 +39,9 @@ public class ProfessionalProfile implements Serializable, Cloneable {
     // Areas of expertise (at the sub-category level).
     // It essentially contains the sub-category-ids.
     private List<Integer> expertise;
+    
+    @JsonIgnore
+    private User user;
 
     public ProfessionalProfile() {}
 
@@ -111,6 +115,14 @@ public class ProfessionalProfile implements Serializable, Cloneable {
 
     public void setNeighbourhoodIds(List<Integer> neighbourhoodIds) {
         this.neighbourhoodIds = neighbourhoodIds;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
 }

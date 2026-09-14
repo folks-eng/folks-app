@@ -114,41 +114,42 @@ SELECT slot_1, slot_6, COUNT(*) AS slots
 
 WITH params AS (
     SELECT
-        DATE '2026-08-26' AS booking_date,
-        TIME '12:00:00' AS work_start,
-        TIME '17:00:00' AS work_end
+        CAST ('2026-09-15' AS DATE) AS booking_date,
+        CAST ('12:00:00' AS TIME) AS work_start,
+        CAST ('16:00:00' AS TIME) AS work_end
 ),
 prof_eligibility AS (
-    SELECT b.professional_id, b.date, p.work_start, p.work_end, MIN(b.start_time) AS start_time, MAX(b.end_time) AS end_time, COUNT(*) AS slot_count
+    SELECT d.professional_id, d.date, p.work_start, p.work_end, MIN(d.start_time) AS start_time, MAX(d.end_time) AS end_time, COUNT(*) AS slot_count
       FROM fks_professional_services a
-     INNER JOIN fks_availabilities b ON (a.professional_id = b.professional_id AND a.service_id = 336)
+     INNER JOIN fks_professionals b ON (a.professional_id = b.professional_id AND b.is_verified = 1)
+     INNER JOIN fks_professional_neighbourhoods c ON (b.professional_id = c.professional_id AND c.neighbourhood_id = 132)
+     INNER JOIN fks_availabilities d ON (b.professional_id = d.professional_id)
      CROSS JOIN params p
-    WHERE date = p.booking_date
-      AND b.start_time >= p.work_start
-      AND b.end_time <= p.work_end
-      AND b.is_booked = 0
-      AND NOT EXISTS (
-        SELECT 1
-          FROM fks_availabilities c
-         WHERE b.professional_id = c.professional_id
-           AND b.date = c.date
-           AND c.is_booked = 1
-      )
-    GROUP BY b.professional_id, b.date, p.work_start, p.work_end
+     WHERE a.service_id = 16
+       AND d.date = p.booking_date
+       AND d.start_time >= p.work_start
+       AND d.end_time <= p.work_end
+       AND d.is_booked = 0
+       AND NOT EXISTS (
+           SELECT 1
+             FROM fks_availabilities e
+            WHERE d.professional_id = e.professional_id
+              AND d.date = e.date
+              AND e.is_booked = 1)
+     GROUP BY d.professional_id, d.date, p.work_start, p.work_end
     HAVING COUNT(*) = EXTRACT (HOUR FROM (p.work_end - p.work_start))
-       AND MIN(b.start_time) = p.work_start
-       AND MAX(b.end_time) = p.work_end
+       AND MIN(d.start_time) = p.work_start
+       AND MAX(d.end_time) = p.work_end
 )
 SELECT a.*
   FROM fks_availabilities a
- INNER JOIN prof_eligibility e ON (e.professional_id = a.professional_id AND e.date = a.date)
+ INNER JOIN prof_eligibility f ON (f.professional_id = a.professional_id AND f.date = a.date)
  CROSS JOIN params p
  WHERE a.start_time >= p.work_start
    AND a.end_time <= p.work_end
  ORDER BY a.professional_id, a.start_time
  LIMIT (SELECT EXTRACT(HOUR FROM (work_end - work_start))
           FROM params)
- FOR UPDATE;
 
 
 SELECT a.booking_id
@@ -279,4 +280,6 @@ SELECT
  CROSS JOIN generate_series(0, 8) AS h
  WHERE p.professional_id BETWEEN 1 AND 2
  ORDER BY p.professional_id, date, start_time;
+
+
 

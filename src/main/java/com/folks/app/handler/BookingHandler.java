@@ -56,7 +56,7 @@ public class BookingHandler extends AbstractHandler {
             return booking;
         }).onComplete(result -> {
             if (result.succeeded()) {
-                // Send message to message bus to add professional
+                // Send message to message bus to assign a professional
                 vertx().eventBus().send(Constants.BOOKING_ADDRESS, result.result());
                 sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
             }

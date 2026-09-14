@@ -4,6 +4,13 @@
     <api version="1.0" basePath="/api/v1" produce="application/vnd.ex+json.v1" consume="application/json"/>
     
     <resource-mapping name="error" path="/*" failure="true" resource="org.javalabs.decl.vertx.container.handler.HttpErrorHandler"/>
+
+    <!-- Admin filter (for admin related APIs) -->
+    <resource-mapping name="admin"
+                      path="/admin/*"
+                      failure="false"
+                      resource="com.folks.app.core.AdminFilter">
+    </resource-mapping>
     
     <resource-mapping name="AuthToken" path="/mgmt" resource="com.folks.app.handler.AuthenticationHandler" schema="com.folks.app.auth.AuthToken">
         <mapping uri="/login" method="POST" api="authenticate" consume="application/x-www-form-urlencoded"/>
@@ -106,7 +113,6 @@
     
     <resource-mapping name="Availability" path="/availabilities" resource="com.folks.app.handler.AvailabilityHandler" schema="com.folks.app.model.Availability">
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
-        <mapping uri="/gen" method="POST" api="generate"/>
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
         <mapping uri="/slots" method="GET" api="viewSlots"/>
@@ -223,4 +229,35 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
+    
+    <!-- Admin APIs - Start -->
+    <resource-mapping name="cache"
+                      path="/admin/caches"
+                      resource="com.folks.app.handler.CacheMgmtHandler">
+
+        <mapping uri="/config/attributes" method="GET" api="viewConfigProp"/>
+        <mapping uri="/statistics" method="GET" api="viewStats"/>
+        <mapping uri="/:cacheId/keys/:key" method="GET" api="view"/>
+        <mapping uri="/:cacheId/keys/:key" method="DELETE" api="remove"/>
+        <mapping uri="/:cacheId" method="GET" api="viewAll"/>
+        <mapping uri="/:cacheId" method="DELETE" api="removeAll"/>
+    </resource-mapping>
+
+    <resource-mapping name="logger"
+                      path="/admin/loggers"
+                      resource="com.folks.app.handler.LogMgmtHandler">
+
+        <mapping uri="" method="GET" api="viewAll"/>
+        <mapping uri="" method="PUT" api="modify"/>
+    </resource-mapping>
+
+    <resource-mapping name="AvailabilityMgmt" path="/admin/availabilities" resource="com.folks.app.handler.AvailabilityMgmtHandler">
+        <mapping uri="/calendar" method="POST" api="generate"/>
+        <mapping uri="/professionals" method="GET" api="viewProfAvailability"/>
+    </resource-mapping>
+
+    <resource-mapping name="ProfessionalMgmt" path="/admin/professionals" resource="com.folks.app.handler.ProfessionalMgmtHandler">
+        <mapping uri="" method="POST" api="approve"/>
+    </resource-mapping>
+    
 </routing-config>

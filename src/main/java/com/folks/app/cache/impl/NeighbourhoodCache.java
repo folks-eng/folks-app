@@ -25,7 +25,7 @@ public class NeighbourhoodCache extends AbstractCache<Integer, Neighbourhood> {
      * @return String
      */
     public static String name() {
-        return "city";
+        return "neighbourhood";
     }
     
     @Override

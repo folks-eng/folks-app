@@ -4,7 +4,6 @@ import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
 import com.folks.app.dao.AvailabilityDAO;
-import com.folks.app.dao.ProfessionalDAO;
 import com.folks.app.dao.ServiceDAO;
 import com.folks.app.model.AvailTimeSlot;
 import com.folks.app.model.Availability;
@@ -38,7 +37,8 @@ public class AvailabilityBO extends AbstractBO {
         this.serviceDAO = DAOProxy.get(ServiceDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized AvailabilityBO: {}. AvailabilityDAO: {}. ServiceDAO: {}", getClass().getSimpleName(), availabilityDAO, serviceDAO);
+            LOGGER.debug("Initialized AvailabilityBO: {}. AvailabilityDAO: {}. ServiceDAO: {}"
+                    , getClass().getSimpleName(), availabilityDAO, serviceDAO);
         }
     }
 
@@ -138,35 +138,6 @@ public class AvailabilityBO extends AbstractBO {
             slot.setStartHour(slot.getFromTime().toLocalTime().getHour());
         }
         return slots;
-    }
-
-    public List<Availability> viewProfessionalAvailability(AppUser usr, QueryParams params) {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        Integer serviceId = Integer.valueOf(params.param("serviceId"));
-        Integer neighbourhoodId = Integer.valueOf(params.param("neighbourhoodId"));
-        
-        Service service = serviceDAO.find(new ServicePK(serviceId));
-        if (service == null) {
-            throw new IllegalArgumentException("No service found with id " + serviceId);
-        }
-        String date = params.param("date");
-        String start = params.param("start");
-        String end = params.param("end");
-        
-        List<Availability> records = availabilityDAO.findProfessional(
-                serviceId
-                , neighbourhoodId
-                , date
-                , start
-                , end);
-
-        timer.stop();
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched {} eligible availability record(s). Elapsed time(ms): {}", records.size(), timer.elapsedTimeMillis());
-        }
-        return records;
     }
 
     public Availability view(AppUser usr, Integer id) {

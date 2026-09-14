@@ -8,27 +8,27 @@ import io.vertx.core.json.Json;
  *
  * @author schan280
  */
-public class AvailabilityGenCodec implements MessageCodec<AvailabilityGenEvent, AvailabilityGenEvent> {
+public class ProfessionalRegCodec implements MessageCodec<ProfessionalRegEvent, ProfessionalRegEvent> {
 
     @Override
-    public void encodeToWire(Buffer buffer, AvailabilityGenEvent s) {
+    public void encodeToWire(Buffer buffer, ProfessionalRegEvent s) {
         Buffer tmp = Json.encodeToBuffer(s);
         buffer.appendBuffer(tmp);
     }
 
     @Override
-    public AvailabilityGenEvent decodeFromWire(int pos, Buffer buffer) {
-        return Json.decodeValue(buffer, AvailabilityGenEvent.class);
+    public ProfessionalRegEvent decodeFromWire(int pos, Buffer buffer) {
+        return Json.decodeValue(buffer, ProfessionalRegEvent.class);
     }
 
     @Override
-    public AvailabilityGenEvent transform(AvailabilityGenEvent s) {
+    public ProfessionalRegEvent transform(ProfessionalRegEvent s) {
         return s;
     }
 
     @Override
     public String name() {
-        return "availability::codec";
+        return "professional::codec";
     }
 
     @Override

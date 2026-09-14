@@ -6,17 +6,12 @@ import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
-import com.folks.app.cache.impl.NeighbourhoodCache;
-import com.folks.app.cache.impl.ServiceCache;
-import com.folks.app.util.AddressUtil;
-import com.folks.app.util.Constants;
 import com.folks.app.util.IdGenerator;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
 import com.folks.app.util.Validator;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import org.javalabs.decl.vertx.container.ResourceNotFoundException;
 import org.slf4j.Logger;
@@ -41,9 +36,6 @@ public class ProfessionalBO extends AbstractBO {
     }
 
     public ProfessionalProfile register(AppUser usr, ProfessionalProfile profProfile) throws IllegalAccessException {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
         Validator.validateProfessional(profProfile);
         
         // Fetch the user entry and create the Entity objects for inserting into tables Address, Document.
@@ -62,93 +54,9 @@ public class ProfessionalBO extends AbstractBO {
 
         // String applicationId = MD5HashGenerator.digest("professional", usr.principal().sub());
         String applicationId = IdGenerator.generate(usr.principal().sub(), profProfile.getDocuments().get(0).getDocumentNumber());
-        Timestamp createdAt = new Timestamp(DateUtil.currentUTCDate().getTime());
-
-        // Build the professional details.
-        Professional professional = new Professional();
-        professional.setUserId(user.getUserId());
-        professional.setExperienceYears(profProfile.getExperienceYears());
-        professional.setServingCities(profProfile.getServingCities());
-        professional.setIsVerified(Constants.PROF_NOT_VERIFIED);
-        professional.setCreatedAt(createdAt);
-        professional.setUser(user);
-        
-        // Build the local address.
-        Address localAddress = profProfile.getAddress();
-        localAddress.setUserId(user.getUserId());
-        if (localAddress.getLabel() == null) {
-            localAddress.setLabel(Constants.DEFAULT_LABEL);
-        }
-        if (localAddress.getIsDefault() == null) {
-            localAddress.setIsDefault(Constants.IS_DEFAULT_ADDR);     // All addresses are set to default.
-        }
-        localAddress.setCreatedAt(createdAt);
-        AddressUtil.enrich(localAddress);
-        
-        user.setAddresses(List.of(localAddress));
-        
-        
-        // Build the document parts.
-        List<Document> documents = profProfile.getDocuments();
-        for (Document doc : documents) {
-            doc.setUserId(user.getUserId());
-            doc.setApplicationId(applicationId);
-            doc.setVerificationStatus(Document.Verificationstatus.PENDING);
-            doc.setCreatedAt(createdAt);
-        }
-        user.setDocuments(documents);
-        
-        // Build the professional vs services mapping.
-        List<Service> services = fetchServices(profProfile.getExpertise());
-        
-        // Assign individual services to this professional's profile
-        List<ProfessionalService> pServices = new ArrayList<>(services.size());
-        for(Service service: services) {
-            ProfessionalService pService = new ProfessionalService();
-            pService.setProfessionalId(professional.getProfessionalId());
-            pService.setServiceId(service.getServiceId());
-            pService.setPrice(service.getBasePrice());
-            pService.setIsActive(Constants.PROF_SERVICE_ACTIVE);
-            pService.setCreatedAt(createdAt);
-            
-            pServices.add(pService);
-        }
-        professional.setProfServices(pServices);
-        
-        // Build the professional serving localities.
-        List<Integer> nbhoodIds = profProfile.getNeighbourhoodIds();
-        
-        // -1 indicates "ALl Localities", in which case fetch all localities based on the city id.
-        if (nbhoodIds.get(0).equals(-1)) {
-            nbhoodIds = new ArrayList<>(250);
-            for (Neighbourhood nbhood : NeighbourhoodCache.getCache().getAllValues()) {
-                if (nbhood.getCityId().equals(nbhood.getCityId())) {
-                    nbhoodIds.add(nbhood.getNeighbourhoodId());
-                }
-            }
-        }
-        List<ProfessionalNeighbourhood> profLocalities = new ArrayList<>(nbhoodIds.size());
-
-        for (Integer nbhoodId : nbhoodIds) {
-            ProfessionalNeighbourhood profLocality = new ProfessionalNeighbourhood();
-            profLocality.setNeighbourhoodId(nbhoodId);
-            profLocality.setStatus(ProfessionalNeighbourhood.Status.ACTIVE);
-            profLocality.setCreatedAt(createdAt);
-
-            profLocalities.add(profLocality);
-        }
-        professional.setProfNeighbourhoods(profLocalities);
-        
-        professionalDAO.insertProfile(professional);
-        timer.stop();
-
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Professional onboarded successfully with Id {}, Elapsed time(ms): {}"
-                    , professional.getProfessionalId(), timer.elapsedTimeMillis());
-        }
-        // Set the applicationId before sending the response. Pros may use this id for further followup.
         profProfile.setApplicationId(applicationId);
-
+        profProfile.setUser(user);
+        
         return profProfile;
     }
 
@@ -277,18 +185,5 @@ public class ProfessionalBO extends AbstractBO {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Created {} Professional record(s) successfully. Elapsed time(ms): {}", records.size(), timer.elapsedTimeMillis());
         }
-    }
-    
-    private List<Service> fetchServices(List<Integer> expertise) {
-        List<Service> services = new ArrayList<>();
-        
-        for (Service service : ServiceCache.getCache().getAllValues()) {
-            for (Integer subCategory : expertise) {
-                if (service.getCategoryId().equals(subCategory)) {
-                    services.add(service);
-                }
-            }
-        }
-        return services;
     }
 }

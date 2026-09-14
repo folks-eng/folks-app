@@ -1,5 +1,6 @@
 package com.folks.app.util;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,17 @@ import java.util.Map;
  * @author schan280
  */
 public interface SearchCriteria {
+    
+    static SearchCriteria from(Map<String, List<Object>> params) {
+        SearchCriteriaImpl search = new SearchCriteriaImpl();
+        search.params(params);
+        
+        return search;
+    }
+    
+    static SearchCriteria from(Integer userId) {
+        return from(new QueryParams(new HashMap<String, List<String>>()), userId);
+    }
     
     static SearchCriteria from(QueryParams params) {
         return from(params, null);

@@ -33,6 +33,11 @@ public class SearchCriteriaImpl implements SearchCriteria {
     
     SearchCriteriaImpl() {}
     
+    public SearchCriteriaImpl params(Map<String, List<Object>> params) {
+        this.params.putAll(params);
+        return this;
+    }
+    
     public SearchCriteriaImpl params(QueryParams params, String key, Integer userId) {
         Map<String, List<String>> tmp = params.entries();
         if (LOGGER.isTraceEnabled()) {

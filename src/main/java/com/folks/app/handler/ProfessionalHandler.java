@@ -5,8 +5,10 @@ import com.folks.app.model.ProfessionalProfile;
 import org.javalabs.decl.util.MapperUtil;
 import org.javalabs.decl.vertx.config.model.ServerMessage;
 import com.folks.app.bo.ProfessionalBO;
+import com.folks.app.event.ProfessionalRegEvent;
 import com.folks.app.model.Professional;
 import com.folks.app.model.ItemList;
+import com.folks.app.util.Constants;
 import com.folks.app.util.QueryParams;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
@@ -45,6 +47,8 @@ public class ProfessionalHandler extends AbstractHandler {
             
         }).onComplete(result -> {
             if (result.succeeded()) {
+                // Send message to message bus to assign a professional
+                vertx().eventBus().send(Constants.PROF_REG_ADDRESS, new ProfessionalRegEvent(result.result()));
                 sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
             }
             else {

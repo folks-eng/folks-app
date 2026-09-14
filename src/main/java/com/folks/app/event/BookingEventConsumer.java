@@ -1,6 +1,6 @@
 package com.folks.app.event;
 
-import com.folks.app.bo.BookingBO;
+import com.folks.app.bo.BookingMgmtBO;
 import com.folks.app.model.Booking;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
@@ -15,10 +15,10 @@ public class BookingEventConsumer implements Handler<Message<Booking>> {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(BookingEventConsumer.class);
     
-    private final BookingBO bookingBO;
+    private final BookingMgmtBO bookingMgmtBO;
 
     public BookingEventConsumer() {
-        this.bookingBO = new BookingBO();
+        this.bookingMgmtBO = new BookingMgmtBO();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class BookingEventConsumer implements Handler<Message<Booking>> {
     private void assignProfessional(Booking booking) {
         try {
             booking.setUpdatedBy("System - BookingEventConsumer");
-            bookingBO.assignProfessional(booking);
+            bookingMgmtBO.assignProfessional(booking);
         }
         catch (RuntimeException e) {
             LOGGER.error("Error in assigning professional to booking {}", booking.getBookingId());
@@ -55,7 +55,7 @@ public class BookingEventConsumer implements Handler<Message<Booking>> {
 
     private void freeProfessional(Booking booking) {
         try {
-            bookingBO.freeProfessional(booking);
+            bookingMgmtBO.freeProfessional(booking);
         }
         catch (RuntimeException e) {
             LOGGER.error("Error in freeing up professional from booking {}", booking.getBookingId());

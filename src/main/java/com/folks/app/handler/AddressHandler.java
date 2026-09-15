@@ -12,7 +12,6 @@ import io.vertx.ext.web.RoutingContext;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.NoSuchElementException;
-import org.javalabs.decl.vertx.container.ResourceNotFoundException;
 
 /**
  * Example REST handler.
@@ -188,31 +187,19 @@ public class AddressHandler extends AbstractHandler {
         
         // If you use a remote store, this method will safely execute the blocking code.
         vertx().executeBlocking(() -> {
-            try {
-                Address address = addressBO.remove(user(ctx), Integer.valueOf(id));
-                ServerMessage msg = new ServerMessage();
-                msg.setCode(HttpURLConnection.HTTP_NO_CONTENT);
-                msg.setMessage("Address deleted successfully");
+            Address address = addressBO.remove(user(ctx), Integer.valueOf(id));
+            
+            ServerMessage msg = new ServerMessage();
+            msg.setCode(HttpURLConnection.HTTP_NO_CONTENT);
+            msg.setMessage("Address deleted successfully");
 
-                return msg;
-            }
-            catch (ResourceNotFoundException ex) {
-                ServerMessage msg = new ServerMessage();
-                msg.setCode(HttpURLConnection.HTTP_NOT_FOUND);
-                msg.setMessage(ex.getMessage());
-                return msg;
-            }
+            return msg;
+            
         }).onComplete(result -> {
             if (result.succeeded()) {
-                if(result.result().getCode() == HttpURLConnection.HTTP_NOT_FOUND) {
-                    sendResponse(ctx, HttpURLConnection.HTTP_NOT_FOUND, result.result());
-                }
-                else {
-                    sendResponse(ctx, HttpURLConnection.HTTP_NO_CONTENT, result.result());
-                }
+                sendResponse(ctx, HttpURLConnection.HTTP_NOT_FOUND, result.result());
             }
             else {
-                System.out.println("In ELSe " +result.cause());
                 ctx.fail(result.cause());
             }
         });

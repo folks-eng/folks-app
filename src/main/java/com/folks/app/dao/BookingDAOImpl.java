@@ -1,6 +1,7 @@
 package com.folks.app.dao;
 
 import com.folks.app.model.Availability;
+import com.folks.app.util.Constants;
 import org.javalabs.jpa.query.Criteria;
 import com.folks.app.model.Booking;
 import com.folks.app.model.Payment;
@@ -17,6 +18,8 @@ import java.util.List;
 import java.util.TimeZone;
 import org.javalabs.decl.util.DateUtil;
 import org.javalabs.jpa.annotation.Dao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Concrete DAO class to handle database operations related.
@@ -26,6 +29,8 @@ import org.javalabs.jpa.annotation.Dao;
 public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
     
     private final String TABLE = "fks_bookings";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookingDAOImpl.class);
     
     @Dao
     private AvailabilityDAO availabilityDAO;
@@ -69,11 +74,20 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
 
     @Override
     public List<Booking> query(SearchCriteria search) {
-        if (search.fetchDependency()) {
-            return expandedQuery(search);
-        }
-        Criteria query = getQuery(TABLE, search);
+        LOGGER.debug("Start of BookingDAOImpl:query");
 
+        if (search.fetchDependency()) {
+            if(search.params().containsKey("customer_id")) {
+                LOGGER.debug("VIEW ALL BOOKINGS IN DETAIL FROM CUSTOMER.");
+                return expandedQueryForCust(search);
+            }
+            else if(search.params().containsKey("professional_id")) {
+                LOGGER.debug("VIEW ALL BOOKINGS IN DETAIL FROM PROFESSIONAL.");
+                return expandedQueryForProf(search);
+            }
+        }
+        // select * from TABLE if fetchDependency false
+        Criteria query = getQuery(TABLE, search);
         TypedQuery q = em.createNativeQuery(query.toQuery(), Booking.class);
         List<Object> binds = query.params();
         
@@ -88,32 +102,8 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
         return result;
     }
     
-    private List<Booking> expandedQuery(SearchCriteria search) {
-        String query = """
-                SELECT a.booking_id
-                        , a.scheduled_at
-                        , a.time_slot
-                        , a.status
-                        , a.payment_method
-                        , a.total_amount
-                        , a.created_at
-                        , b.service_id
-                        , b.name
-                        , c.address_line1
-                        , c.address_line2
-                        , c.city
-                        , c.pincode
-                        , a.professional_id
-                        , COALESCE(e.full_name, 'Professional not assigned') AS professional_name
-                        , COALESCE(e.phone1, '') AS phone1
-                  FROM fks_bookings a
-                 INNER JOIN fks_services b ON (a.service_id = b.service_id)
-                 INNER JOIN fks_addresses c ON (a.address_id = c.address_id)
-                 LEFT OUTER JOIN fks_professionals d ON (a.professional_id = d.professional_id)
-                 LEFT OUTER JOIN fks_users e ON (d.user_id = e.user_id AND e.role = ?)
-                 WHERE a.customer_id = ?
-                 ORDER BY a.created_at DESC;""";
-        
+    private List<Booking> expandedQueryForCust(SearchCriteria search) {
+        String query = Constants.VIEWALL_BOOKINGS_CUST;
         List<Object> val = search.params().get("customer_id");
         
         Query q = em.createNativeQuery(query);
@@ -139,6 +129,39 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
             booking.setProfessionalName((String)row[14]);
             booking.setProfessionalContact((String)row[15]);
             
+            bookings.add(booking);
+        }
+        LOGGER.debug("End of BookingDAOImpl:query");
+        return bookings;
+    }
+
+    private List<Booking> expandedQueryForProf(SearchCriteria search) {
+        String query = Constants.VIEWALL_BOOKINGS_PROF;
+        List<Object> val = search.params().get("professional_id");
+
+        Query q = em.createNativeQuery(query);
+        q.setParameter(1, "CUSTOMER");
+        q.setParameter(2, val.get(0));
+
+        List<Object[]> rows = q.getResultList();
+
+        List<Booking> bookings = new ArrayList<>(rows.size());
+        for (Object[] row : rows) {
+            Booking booking = new Booking();
+            booking.setBookingId((String)row[0]);
+            booking.setScheduledAt((Timestamp)row[1]);
+            booking.setTimeSlot((String)row[2]);
+            booking.setStatus(Enum.valueOf(Booking.Status.class, (String)row[3]));
+            booking.setPaymentMethod(Enum.valueOf(Payment.Paymentmethod.class, (String)row[4]));
+            booking.setTotalAmount((Double)row[5]);
+            booking.setCreatedAt((Timestamp)row[6]);
+            booking.setServiceId((Integer)row[7]);
+            booking.setServiceName((String)row[8]);
+            booking.setAddress(String.join(" ", (String)row[9], (String)row[10], (String)row[11], String.valueOf((Integer)row[12])));
+            booking.setCustomerId((Integer)row[13]);
+            booking.setCustomerName((String)row[14]);
+            booking.setCustomerContact((String)row[15]);
+
             bookings.add(booking);
         }
         return bookings;

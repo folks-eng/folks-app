@@ -91,6 +91,12 @@ public class Booking implements Serializable, Cloneable {
 
     @Transient
     private String professionalContact;
+
+    @Transient
+    private String customerName;
+
+    @Transient
+    private String customerContact;
     
     public Booking() {}
 
@@ -228,6 +234,22 @@ public class Booking implements Serializable, Cloneable {
 
     public void setProfessionalContact(String professionalContact) {
         this.professionalContact = professionalContact;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCustomerContact() {
+        return customerContact;
+    }
+
+    public void setCustomerContact(String customerContact) {
+        this.customerContact = customerContact;
     }
 
     public static class BookingPK {

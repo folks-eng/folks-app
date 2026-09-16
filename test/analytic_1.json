@@ -1,0 +1,6 @@
+{
+    "dataset": "Booking",
+    "dimension": "status",
+    "metric": "COUNT",
+    "measure": "*"
+}

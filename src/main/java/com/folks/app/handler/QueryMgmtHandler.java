@@ -1,32 +1,32 @@
 package com.folks.app.handler;
 
-import com.folks.app.model.Address;
-import com.folks.app.model.ItemList;
-import com.folks.app.util.QueryParams;
+import com.folks.app.bo.QueryBO;
+import com.folks.app.model.AnalyticReq;
+import com.folks.app.model.AnalyticRes;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 import java.net.HttpURLConnection;
-import java.util.List;
+import org.javalabs.decl.util.MapperUtil;
 
 /**
  *
  * @author sudip
  */
-public class QueryHandler extends AbstractHandler {
+public class QueryMgmtHandler extends AbstractHandler {
     
-    public QueryHandler(Vertx vertx) {
+    private final QueryBO queryBO;
+    
+    public QueryMgmtHandler(Vertx vertx) {
         super(vertx);
+        this.queryBO = new QueryBO();
     }
     
     public void query(RoutingContext ctx) {
-        final QueryParams params = params(ctx);
-
         vertx().executeBlocking(() -> {
-            List<Address> addresss = addressBO.viewAll(user(ctx), params);
-            List<Object> rows = (List)addresss;
+            AnalyticReq req = MapperUtil.decode(ctx.body().buffer().getBytes(), AnalyticReq.class);
+            AnalyticRes res = queryBO.execute(user(ctx), req);
 
-            ItemList itemList = build(ctx.normalizedPath(), params, rows);
-            return itemList;
+            return res;
             
         }).onComplete(result -> {
             if (result.succeeded()) {

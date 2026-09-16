@@ -259,5 +259,13 @@
     <resource-mapping name="ProfessionalMgmt" path="/admin/professionals" resource="com.folks.app.handler.ProfessionalMgmtHandler">
         <mapping uri="" method="POST" api="approve"/>
     </resource-mapping>
+
+    <resource-mapping name="ProfessionalMgmt" path="/admin/professionals" resource="com.folks.app.handler.ProfessionalMgmtHandler">
+        <mapping uri="" method="POST" api="approve"/>
+    </resource-mapping>
+
+    <resource-mapping name="QueryMgmt" path="/admin/query" resource="com.folks.app.handler.QueryMgmtHandler" schema="com.folks.app.model.AnalyticReq">
+        <mapping uri="" method="POST" api="query"/>
+    </resource-mapping>
     
 </routing-config>

@@ -27,7 +27,7 @@ public class AuditLogBO extends AbstractBO {
         this.auditLogDAO = DAOProxy.get(AuditLogDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized Handler: {}. AuditLogDAO: {}", getClass().getSimpleName(), auditLogDAO);
+            LOGGER.debug("Initialized AuditLog Business Object: {}. AuditLogDAO: {}", getClass().getSimpleName(), auditLogDAO);
         }
     }
 

@@ -1,0 +1,5 @@
+{
+    "dataset": "Professional",
+    "dimension": "is_verified",
+    "metric": "COUNT"
+}

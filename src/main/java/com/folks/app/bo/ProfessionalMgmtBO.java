@@ -1,6 +1,7 @@
 package com.folks.app.bo;
 
 import com.folks.app.auth.AppUser;
+import com.folks.app.cache.impl.CityCache;
 import com.folks.app.cache.impl.NeighbourhoodCache;
 import com.folks.app.cache.impl.ServiceCache;
 import com.folks.app.dao.DocumentDAO;
@@ -48,6 +49,11 @@ public class ProfessionalMgmtBO extends AbstractBO {
         }
     }
 
+    /**
+     * Internal API.
+     * 
+     * @param profProfile 
+     */
     public void register(ProfessionalProfile profProfile) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
@@ -59,7 +65,7 @@ public class ProfessionalMgmtBO extends AbstractBO {
         Professional professional = new Professional();
         professional.setUserId(user.getUserId());
         professional.setExperienceYears(profProfile.getExperienceYears());
-        professional.setServingCities(profProfile.getServingCities());
+        professional.setServingCities(CityCache.getCache().get(profProfile.getCityId()).getCityName());
         professional.setIsVerified(Constants.PROF_NOT_VERIFIED);
         professional.setCreatedAt(createdAt);
         professional.setUser(user);
@@ -82,12 +88,11 @@ public class ProfessionalMgmtBO extends AbstractBO {
         // Build the document parts.
         List<Document> documents = profProfile.getDocuments();
         for (Document doc : documents) {
-            doc.setUserId(user.getUserId());
             doc.setApplicationId(profProfile.getApplicationId());
             doc.setVerificationStatus(Document.Verificationstatus.PENDING);
             doc.setCreatedAt(createdAt);
         }
-        user.setDocuments(documents);
+        professional.setDocuments(documents);
         
         // Build the professional vs services mapping.
         List<Service> services = fetchServices(profProfile.getExpertise());
@@ -96,7 +101,6 @@ public class ProfessionalMgmtBO extends AbstractBO {
         List<ProfessionalService> pServices = new ArrayList<>(services.size());
         for(Service service: services) {
             ProfessionalService pService = new ProfessionalService();
-            pService.setProfessionalId(professional.getProfessionalId());
             pService.setServiceId(service.getServiceId());
             pService.setPrice(service.getBasePrice());
             pService.setIsActive(Constants.PROF_SERVICE_ACTIVE);
@@ -140,8 +144,6 @@ public class ProfessionalMgmtBO extends AbstractBO {
     }
     
     public Professional approveProfessional(AppUser usr, Map<String, String> payload) throws IllegalAccessException {
-        ensureAdmin(usr);
-        
         // Approval process:
         // 1. Update the verification status in document store.
         // 2. Update the verified status in professional store.

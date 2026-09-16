@@ -92,6 +92,7 @@ public class AuthBO extends AbstractBO {
         // Credentials matches. Procedd with token generation ...
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", user.getExternalId());
+        claims.put("name", user.getFullName());
         claims.put("iss", issuer);
         claims.put("aud", audience);
         claims.put("jti", UUID.randomUUID().toString());

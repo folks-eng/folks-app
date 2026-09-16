@@ -92,8 +92,7 @@ public class UserBO extends AbstractBO {
     public List<User> viewAll(AppUser usr, QueryParams params) throws IllegalAccessException {
         // Only admin has the privilege to view all users.
         ensureAdmin(usr);
-        validateScope(usr, "user:query");
-
+        
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 

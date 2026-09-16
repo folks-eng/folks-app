@@ -78,9 +78,6 @@ public class User implements Serializable, Cloneable {
 
     @Transient
     private List<Address> addresses;
-    
-    @Transient
-    private List<Document> documents;
 
     public User() {}
 
@@ -182,14 +179,6 @@ public class User implements Serializable, Cloneable {
 
     public void setAddresses(List<Address> addresses) {
         this.addresses = addresses;
-    }
-
-    public List<Document> getDocuments() {
-        return documents;
-    }
-
-    public void setDocuments(List<Document> documents) {
-        this.documents = documents;
     }
 
     public static class UserPK {

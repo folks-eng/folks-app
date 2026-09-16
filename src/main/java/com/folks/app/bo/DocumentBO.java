@@ -4,7 +4,9 @@ import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
 import com.folks.app.dao.DocumentDAO;
+import com.folks.app.dao.ProfessionalDAO;
 import com.folks.app.model.Document;
+import com.folks.app.model.Professional;
 import com.folks.app.model.User;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
@@ -21,12 +23,14 @@ public class DocumentBO extends AbstractBO {
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentBO.class);
     
     private final DocumentDAO documentDAO;
+    private final ProfessionalDAO professionalDAO;
     
     public DocumentBO() {
         this.documentDAO = DAOProxy.get(DocumentDAO.class);
+        this.professionalDAO = DAOProxy.get(ProfessionalDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized Handler: {}. DocumentDAO: {}. UserDAO: {}", getClass().getSimpleName(), documentDAO, userDAO);
+            LOGGER.debug("Initialized Document Business Object: {}. DocumentDAO: {}. UserDAO: {}", getClass().getSimpleName(), documentDAO, userDAO);
         }
     }
 
@@ -65,7 +69,6 @@ public class DocumentBO extends AbstractBO {
             throw new IllegalArgumentException("No document found for identifier: " + document.getDocumentId());
         }
         // Update attributes of existing record
-        existing.setUserId(document.getUserId());
         existing.setDocumentType(document.getDocumentType());
         existing.setDocumentUrl(document.getDocumentUrl());
         existing.setVerificationStatus(document.getVerificationStatus());
@@ -84,16 +87,25 @@ public class DocumentBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         
-        // Fetch the user.
-        User user = fetchUser(usr);
-
-        // We need to fetch the documents for the current user only.
-        SearchCriteria search = SearchCriteria.from(params, user.getUserId());
-        List<Document> rows = documentDAO.query(search);
-
+        List<Document> rows = null;
+        
+        if (User.isAdmin(usr.principal().priv())) {
+            SearchCriteria search = SearchCriteria.from(params);
+            rows = documentDAO.queryWithProfAttr(search);
+        }
+        else {
+            // Fetch the user.
+            Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+            if (professional == null) {
+                throw new IllegalArgumentException("No such professional found");
+            }
+            // We need to fetch the documents for the current professional only.
+            SearchCriteria search = SearchCriteria.from(params, "professionalId", professional.getProfessionalId());
+            rows = documentDAO.query(search);
+        }
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched {} expanded document record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
+            LOGGER.info("Fetched {} document record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
         }
         return rows;
     }

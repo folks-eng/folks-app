@@ -52,6 +52,9 @@ public class AuthToken {
     @JsonProperty("refresh_token")
     private String refreshToken;
     
+    @JsonProperty("name")
+    private String name;
+    
     public AuthToken() {}
     
     public static AuthToken from(Map<String, Object> claims, Integer expiryInMin) {
@@ -104,5 +107,13 @@ public class AuthToken {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -62,6 +62,9 @@ public class Professional implements Serializable, Cloneable {
     private User user;
     
     @Transient
+    private List<Document> documents;
+    
+    @Transient
     private List<ProfessionalService> profServices;
     
     @Transient
@@ -147,6 +150,14 @@ public class Professional implements Serializable, Cloneable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<Document> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<Document> documents) {
+        this.documents = documents;
     }
 
     public List<ProfessionalService> getProfServices() {

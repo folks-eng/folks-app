@@ -1,0 +1,10 @@
+{
+    "dataset": "User",
+    "metric": "COUNT",
+    "filters": [
+        {
+            "col": "role",
+            "val": "CUSTOMER"
+        }
+    ]
+}

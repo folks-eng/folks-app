@@ -277,7 +277,7 @@ CREATE TABLE fks_job_status (
 
 CREATE TABLE fks_documents (
     document_id         INT             GENERATED ALWAYS AS IDENTITY NOT NULL,
-    user_id             INT             NOT NULL,
+    professional_id     INT             NOT NULL,
     application_id      VARCHAR(36)     NOT NULL,
     document_type       VARCHAR(50)     NOT NULL,
     document_number     VARCHAR(50)     NOT NULL,
@@ -499,8 +499,8 @@ REFERENCES fks_users (user_id);
 
 ALTER TABLE fks_documents
 ADD CONSTRAINT fks_documents_fk1
-FOREIGN KEY (user_id)
-REFERENCES fks_users (user_id);
+FOREIGN KEY (professional_id)
+REFERENCES fks_professionals (professional_id);
 
 ALTER TABLE fks_bookings
 ADD CONSTRAINT fks_bookings_fk1

@@ -4,6 +4,7 @@ import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
+import com.folks.app.cache.impl.ServiceCache;
 import com.folks.app.dao.AddressDAO;
 import com.folks.app.dao.BookingDAO;
 import com.folks.app.dao.ProfessionalDAO;
@@ -189,23 +190,30 @@ public class BookingBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         
-        // Fetch the user.
-        User user = fetchUser(usr);
-        if (user == null) {
-            throw new ResourceNotFoundException("No user found for " + usr.principal().sub());
+        SearchCriteria search = null;
+        if (User.isAdmin(usr.principal().priv())) {
+            search = SearchCriteria.from(params);
         }
-        String field = null;
-        
-        if (user.getRole() == User.Role.CUSTOMER) {
-            field = "customerId";
+        else {
+            // Fetch the user.
+            User user = fetchUser(usr);
+            if (user == null) {
+                throw new ResourceNotFoundException("No user found for " + usr.principal().sub());
+            }
+            String field = null;
+            if (user.getRole() == User.Role.CUSTOMER) {
+                field = "customerId";
+            }
+            else if (user.getRole() == User.Role.PROFESSIONAL) {
+                field = "professionalId";
+            }
+            // We need to fetch the documents for the current professional only.
+            search = SearchCriteria.from(params, field, user.getUserId());
         }
-        else if (user.getRole() == User.Role.PROFESSIONAL) {
-            field = "professionalId";
-        }
-
-        // We need to fetch the bookings for the current user only.
-        SearchCriteria search = SearchCriteria.from(params, field, user.getUserId());
         List<Booking> bookings = bookingDAO.query(search);
+        for (Booking booking : bookings) {
+            booking.setServiceName(ServiceCache.getCache().get(booking.getServiceId()).getName());
+        }
 
         timer.stop();
         if (LOGGER.isInfoEnabled()) {

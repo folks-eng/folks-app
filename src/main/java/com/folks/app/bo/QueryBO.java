@@ -44,7 +44,7 @@ public class QueryBO extends AbstractBO {
     
     public AnalyticRes execute(AppUser usr, AnalyticReq analytic) throws IllegalAccessException {
         // Only admin has permission to execute query api.
-        ensureAdmin(usr);
+        // validateScope(usr, "analytic:query");
         
         StringBuilder buff = new StringBuilder(1024);
         List<Object> params = new ArrayList<>();

@@ -8,6 +8,8 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import java.util.Arrays;
 import java.util.List;
+import org.javalabs.jpa.annotation.NotSupported;
+import org.javalabs.jpa.util.QueryHints;
 
 /**
  * Concrete DAO class to handle database operations related.
@@ -72,5 +74,15 @@ public class DocumentDAOImpl extends AbstractDAO implements DocumentDAO {
         List<Document> result = q.getResultList();
         return result;
     }
+    
+    @Override
+    public List<Document> queryWithProfAttr(SearchCriteria search) {
+        return em.createNamedQuery("Document.selectWithProfAttr", Document.class)
+                .setParameter("status", search.params().get("verification_status"))
+                .setHint(QueryHints.POPULATE_RESULT_COLUMN, Boolean.TRUE)
+                .setFirstResult(search.offset())
+                .getResultList();
+    }
+    
     
 }

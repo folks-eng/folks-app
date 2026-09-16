@@ -77,5 +77,8 @@ public interface DocumentDAO {
      */
     @NotSupported
     List<Document> query(SearchCriteria search);
+    
+    @NotSupported
+    List<Document> queryWithProfAttr(SearchCriteria search);
 }
 

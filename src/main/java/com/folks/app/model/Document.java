@@ -12,9 +12,11 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
+import org.javalabs.jpa.annotation.ResultColumn;
 
 
 /**
@@ -27,7 +29,12 @@ import java.util.Objects;
 @Table(name = "fks_documents")
 @IdClass(Document.DocumentPK.class)
 @NamedNativeQueries({
-    @NamedNativeQuery(name = "Document.selectAll", query = "SELECT * FROM fks_documents")
+    @NamedNativeQuery(name = "Document.selectAll", query = "SELECT * FROM fks_documents"),
+    @NamedNativeQuery(name = "Document.selectWithProfAttr"
+            , query = "SELECT a.*, b.serving_cities, b.experience_years"
+                    + "  FROM fks_documents a"
+                    + " INNER JOIN fks_professionals b ON (a.professional_id = b.professional_id)"
+                    + " WHERE a.verification_status IN (:status)")
 })
 public class Document implements Serializable, Cloneable {
 
@@ -42,8 +49,8 @@ public class Document implements Serializable, Cloneable {
     @Column(name = "document_id", nullable = false, updatable = false, precision = 32)
     private Integer documentId;
     
-    @Column(name = "user_id", nullable = false, updatable = false, precision = 32)
-    private Integer userId;
+    @Column(name = "professional_id", nullable = false, updatable = false, precision = 32)
+    private Integer professionalId;
     
     @Column(name = "application_id", nullable = false, updatable = false, length = 36)
     private String applicationId;
@@ -69,6 +76,14 @@ public class Document implements Serializable, Cloneable {
 
     @Column(name = "updated_at", nullable = true, updatable = true)
     private Timestamp updatedAt;
+    
+    @Transient
+    @ResultColumn(name = "serving_cities")
+    private String servingCities;
+    
+    @Transient
+    @ResultColumn(name = "experience_years")
+    private Short experienceYears;
 
     public Document() {}
 
@@ -80,12 +95,12 @@ public class Document implements Serializable, Cloneable {
         return this.documentId;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public Integer getProfessionalId() {
+        return professionalId;
     }
 
-    public Integer getUserId() {
-        return this.userId;
+    public void setProfessionalId(Integer professionalId) {
+        this.professionalId = professionalId;
     }
 
     public String getApplicationId() {
@@ -150,6 +165,22 @@ public class Document implements Serializable, Cloneable {
 
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getServingCities() {
+        return servingCities;
+    }
+
+    public void setServingCities(String servingCities) {
+        this.servingCities = servingCities;
+    }
+
+    public Short getExperienceYears() {
+        return experienceYears;
+    }
+
+    public void setExperienceYears(Short experienceYears) {
+        this.experienceYears = experienceYears;
     }
 
     public static class DocumentPK {

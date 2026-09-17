@@ -3,9 +3,11 @@ package com.folks.app.bo;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
+import com.folks.app.cache.impl.CategoryCache;
 import com.folks.app.cache.impl.ServiceCache;
 import com.folks.app.dao.ProfessionalDAO;
 import com.folks.app.dao.ProfessionalServiceDAO;
+import com.folks.app.model.Category;
 import com.folks.app.model.Professional;
 import com.folks.app.model.ProfessionalService;
 import com.folks.app.model.Service;
@@ -95,17 +97,21 @@ public class ProfessionalServiceBO extends AbstractBO {
         }
 
         SearchCriteria search = SearchCriteria.from(params, "professionalId", existing.getProfessionalId());
-        List<ProfessionalService> rows = professionalServiceDAO.query(search);
-        for (ProfessionalService row : rows) {
-            Service service = ServiceCache.getCache().get(row.getServiceId());
-            row.setServiceName(service.getName());
+        List<ProfessionalService> pServices = professionalServiceDAO.query(search);
+        
+        for (ProfessionalService pService : pServices) {
+            Service service = ServiceCache.getCache().get(pService.getServiceId());
+            Category category = CategoryCache.getCache().get(service.getCategoryId());
+            
+            pService.setSubCategoryName(category.getName());
+            pService.setServiceName(service.getName());
         }
 
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched {} expanded professionalService record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
+            LOGGER.info("Fetched {} expanded professionalService record(s). Elapsed time(ms): {}", pServices.size(), timer.elapsedTimeMillis());
         }
-        return rows;
+        return pServices;
     }
 
     public ProfessionalService view(AppUser usr, Integer id) {

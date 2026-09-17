@@ -23,7 +23,7 @@ import java.util.List;
 @Dao
 public interface ProfessionalDAO {
     
-    void insertProfile(Professional professional);
+    void insert(Professional record, Boolean includeDependents);
     
     /**
      * Insert a new record in the designated table.

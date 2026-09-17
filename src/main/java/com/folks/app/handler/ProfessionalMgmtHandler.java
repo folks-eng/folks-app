@@ -38,10 +38,12 @@ public class ProfessionalMgmtHandler extends AbstractHandler {
             Professional professional = professionalMgmtBO.approveProfessional(user(ctx), payload);
             
             // Send message to message bus to add professional
-            Map<String, Object> map = Map.of("professionalId", professional.getProfessionalId(), "numberOfDays", 5);
-            vertx().eventBus().send(Constants.AVAIL_GEN_ADDRESS, AvailabilityGenEvent.from(map));
-            
-            return new ServerMessage(HttpURLConnection.HTTP_OK, "Professional has been approved");
+            if (professional.getIsVerified() == 1) {
+                Map<String, Object> map = Map.of("professionalId", professional.getProfessionalId(), "numberOfDays", 5);
+                vertx().eventBus().send(Constants.AVAIL_GEN_ADDRESS, AvailabilityGenEvent.from(map));
+            }
+            return new ServerMessage(HttpURLConnection.HTTP_OK
+                    , "Professional has been " + (professional.getIsVerified() == 1 ? " approved" : " rejected"));
             
         }).onComplete(result -> {
             if (result.succeeded()) {

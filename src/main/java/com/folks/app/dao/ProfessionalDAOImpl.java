@@ -43,34 +43,36 @@ public class ProfessionalDAOImpl extends AbstractDAO implements ProfessionalDAO 
     private ProfessionalNeighbourhoodDAO professionalNeighbourhoodDAO;
     
     @Override
-    public void insertProfile(Professional professional) {
+    public void insert(Professional professional, Boolean includeDependents) {
         // Persist the Professional entity after which the professional_id will be generated.
         // Flushing is important because it ensures that the insert statement is immediately sent to the RDBMS,
         // allowing the database-generated identity value, professional_id to become available.
         em.persist(professional);
         em.flush();
         
-        // User record is already present, no need to insert it again.
-        // Maintain the below insertion order.
-        addressDAO.insert(professional.getUser().getAddresses());
-        
-        for (Document doc : professional.getDocuments()) {
-            doc.setProfessionalId(professional.getProfessionalId());
-        }
-        // Insert documents.
-        documentDAO.insert(professional.getDocuments());
+        if (includeDependents) {
+            // User record is already present, no need to insert it again.
+            // Maintain the below insertion order.
+            addressDAO.insert(professional.getUser().getAddresses());
 
-        // Assign this professional idd to all the professional service objects.
-        for (ProfessionalService pService : professional.getProfServices()) {
-            pService.setProfessionalId(professional.getProfessionalId());
+            for (Document doc : professional.getDocuments()) {
+                doc.setProfessionalId(professional.getProfessionalId());
+            }
+            // Insert documents.
+            documentDAO.insert(professional.getDocuments());
+
+            // Assign this professional idd to all the professional service objects.
+            for (ProfessionalService pService : professional.getProfServices()) {
+                pService.setProfessionalId(professional.getProfessionalId());
+            }
+            profServiceDAO.insert(professional.getProfServices());
+
+            // Assign this professional idd to all the professional neighbourhood objects.
+            for (ProfessionalNeighbourhood pLocality : professional.getProfNeighbourhoods()) {
+                pLocality.setProfessionalId(professional.getProfessionalId());
+            }
+            professionalNeighbourhoodDAO.insert(professional.getProfNeighbourhoods());
         }
-        profServiceDAO.insert(professional.getProfServices());
-        
-        // Assign this professional idd to all the professional neighbourhood objects.
-        for (ProfessionalNeighbourhood pLocality : professional.getProfNeighbourhoods()) {
-            pLocality.setProfessionalId(professional.getProfessionalId());
-        }
-        professionalNeighbourhoodDAO.insert(professional.getProfNeighbourhoods());
     }
 
     @Override

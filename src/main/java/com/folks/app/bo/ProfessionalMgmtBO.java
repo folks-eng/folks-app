@@ -17,9 +17,11 @@ import com.folks.app.model.Service;
 import com.folks.app.model.User;
 import com.folks.app.util.AddressUtil;
 import com.folks.app.util.Constants;
+import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.javalabs.decl.util.DateUtil;
@@ -134,7 +136,7 @@ public class ProfessionalMgmtBO extends AbstractBO {
         }
         professional.setProfNeighbourhoods(profLocalities);
         
-        professionalDAO.insertProfile(professional);
+        professionalDAO.insert(professional, Boolean.TRUE);
         timer.stop();
 
         if (LOGGER.isInfoEnabled()) {
@@ -148,27 +150,38 @@ public class ProfessionalMgmtBO extends AbstractBO {
         // 1. Update the verification status in document store.
         // 2. Update the verified status in professional store.
         // 3. Generate professional calendar.
-        String extId = payload.get("externalId");
         String applicationId = payload.get("applicationId");
         String status = payload.get("status");          // APPROVED/ REJECTED
+        String comment = payload.get("comment");
         
-        Professional professional = professionalDAO.findByExtId(extId);
-        if (professional == null) {
-            throw new IllegalArgumentException("No such professional with id " + extId + " exists");
+        if (! status.equals("APPROVED") && ! status.equals("REJECTED")) {
+            throw new IllegalArgumentException("Status must be APPROVED/REJECTED");
         }
         // Fetch the document
-        Timestamp updatedAt = new Timestamp(DateUtil.currentUTCDate().getTime());
-        List<Document> documents = documentDAO.query(SearchCriteria.from(professional.getUserId()));
+        Map<String, List<String>> map = new HashMap<>();
+        map.put("applicationId", List.of(applicationId));
+        List<Document> documents = documentDAO.query(SearchCriteria.from(new QueryParams(map)));
         
+        if (documents.isEmpty()) {
+            throw new IllegalArgumentException("No application found for " + applicationId);
+        }
+        
+        Professional professional = professionalDAO.find(new Professional.ProfessionalPK(documents.get(0).getProfessionalId()));
+        if (professional == null) {
+            throw new IllegalArgumentException("No such professional with id " + documents.get(0).getProfessionalId());
+        }
+        Timestamp updatedAt = new Timestamp(DateUtil.currentUTCDate().getTime());
         for (Document document : documents) {
             if (document.getApplicationId().equals(applicationId)) {
-                document.setVerificationStatus(Document.Verificationstatus.APPROVED);
+                document.setVerificationStatus(status.equals("APPROVED") ? Document.Verificationstatus.APPROVED : Document.Verificationstatus.REJECTED);
+                document.setComment(comment);
                 document.setUpdatedAt(updatedAt);
+                
                 documentDAO.update(document);
             }
         }
         // Update profession status
-        professional.setIsVerified((short)1);
+        professional.setIsVerified(status.equals("APPROVED") ? (short)1 : (short)0);
         professionalDAO.update(professional);
         
         return professional;

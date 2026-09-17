@@ -284,6 +284,7 @@ CREATE TABLE fks_documents (
     document_url        TEXT            ,
     name_on_document    VARCHAR(50)     NOT NULL,
     verification_status VARCHAR(16)     CHECK (verification_status IN ('PENDING', 'APPROVED', 'REJECTED')),
+    comment             VARCHAR(128)    ,
     created_at          TIMESTAMP       NOT NULL,
     updated_at          TIMESTAMP     
 );

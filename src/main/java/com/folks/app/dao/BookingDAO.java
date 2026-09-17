@@ -69,6 +69,10 @@ public interface BookingDAO {
     
     int updateStatus(Booking booking);
     
+    List<Booking> findAllByCustomer(Integer customerId);
+    
+    List<Booking> findAllByProfessional(Integer professionalId);
+    
     /**
      * Query all the entries from the underlying db.
      * This is an extension of the {@link #query(SearchCriteria)} method, just that this method

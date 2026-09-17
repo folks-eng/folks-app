@@ -71,6 +71,9 @@ public class Document implements Serializable, Cloneable {
     @Enumerated(EnumType.STRING)
     private Verificationstatus verificationStatus;
 
+    @Column(name = "comment", nullable = true, updatable = true, length = 128)
+    private String comment;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
 
@@ -149,6 +152,14 @@ public class Document implements Serializable, Cloneable {
 
     public Verificationstatus getVerificationStatus() {
         return this.verificationStatus;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public void setCreatedAt(Timestamp ts) {

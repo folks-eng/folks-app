@@ -41,7 +41,7 @@ public class ProfessionalBO extends AbstractBO {
         // Fetch the user entry and create the Entity objects for inserting into tables Address, Document.
         Professional existing = professionalDAO.findByExtId(usr.principal().sub());
         if (existing == null) {
-            throw new IllegalArgumentException("User has to be registered first");
+            throw new IllegalArgumentException("Professional has to register first");
         }
         if (existing.getProfessionalId() != null) {
             throw new IllegalArgumentException("You have already applied as a professional");

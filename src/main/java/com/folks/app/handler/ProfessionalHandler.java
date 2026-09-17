@@ -98,6 +98,7 @@ public class ProfessionalHandler extends AbstractHandler {
             msg.setMessage("Inserted " + list.size() + " record(s)");
             
             return msg;
+            
         }).onComplete(result -> {
             if (result.succeeded()) {
                 sendResponse(ctx, HttpURLConnection.HTTP_CREATED, result.result());
@@ -130,13 +131,8 @@ public class ProfessionalHandler extends AbstractHandler {
             Professional professional = MapperUtil.decode(ctx.body().buffer().getBytes(), Professional.class);
 
             // First fetch the entry, to see if this already exists.
-            Professional rs = professionalBO.modify(user(ctx), professional, extId);
-
-            ServerMessage msg = new ServerMessage();
-            msg.setCode(HttpURLConnection.HTTP_OK);
-            msg.setMessage("Professional modified successfully");
-
-            return msg;
+            Professional result = professionalBO.modify(user(ctx), professional, extId);
+            return result;
             
         }).onComplete(result -> {
             if (result.succeeded()) {

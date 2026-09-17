@@ -14,6 +14,7 @@ import jakarta.persistence.Transient;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
+import org.javalabs.jpa.annotation.ResultColumn;
 
 
 /**
@@ -27,11 +28,33 @@ import java.util.Objects;
 @IdClass(Booking.BookingPK.class)
 @NamedNativeQueries({
     @NamedNativeQuery(name = "Booking.selectAll", query = "SELECT * FROM fks_bookings"),
-    @NamedNativeQuery(name = "Booking.pendingBookings"
+    @NamedNativeQuery(name = "Booking.pendingBookings", query = "SELECT * FROM fks_bookings WHERE status = ? AND scheduled_at > CURRENT_TIMESTAMP"),
+    @NamedNativeQuery(name = "Booking.queryByCustomer"
             , query = """
-                      SELECT *
-                        FROM fks_bookings
-                       WHERE status = ? AND scheduled_at > CURRENT_TIMESTAMP
+                SELECT a.*
+                        , b.address_line1 || COALESCE(b.address_line2, '') AS address
+                        , b.neighbourhood_id
+                        , COALESCE(d.full_name, 'Professional not assigned') AS professional_name
+                        , COALESCE(d.phone1, '') AS professional_contact
+                  FROM fks_bookings a
+                 INNER JOIN fks_addresses b ON (a.address_id = b.address_id)
+                  LEFT OUTER JOIN fks_professionals c ON (a.professional_id = c.professional_id)
+                  LEFT OUTER JOIN fks_users d ON (c.user_id = d.user_id AND d.role = ?)
+                 WHERE a.customer_id = ?
+                 ORDER BY a.created_at DESC;
+                      """),
+    @NamedNativeQuery(name = "Booking.queryByProfessional"
+            , query = """
+                SELECT a.*
+                        , b.address_line1 || COALESCE(b.address_line2, '') AS address
+                        , b.neighbourhood_id
+                        , c.full_name AS customer_name
+                        , c.phone1 AS customer_contact
+                  FROM fks_bookings a
+                 INNER JOIN fks_addresses b ON (a.address_id = b.address_id)
+                  LEFT OUTER JOIN fks_users c ON (a.customer_id = c.user_id AND c.role = ?)
+                 WHERE a.professional_id = ?
+                 ORDER BY a.created_at DESC;
                       """)
 })
 public class Booking implements Serializable, Cloneable {
@@ -90,19 +113,31 @@ public class Booking implements Serializable, Cloneable {
     private String updatedBy;
 
     @Transient
-    private Integer neighbourhoodId;
-    
-    @Transient
+    @ResultColumn(name = "address")
     private String address;
 
     @Transient
-    private String serviceName;
+    @ResultColumn(name = "neighbourhood_id")
+    private Integer neighbourhoodId;
 
     @Transient
+    @ResultColumn(name = "professional_name")
     private String professionalName;
 
     @Transient
+    @ResultColumn(name = "professional_contact")
     private String professionalContact;
+    
+    @Transient
+    @ResultColumn(name = "customer_name")
+    private String customerName;
+
+    @Transient
+    @ResultColumn(name = "customer_contact")
+    private String customerContact;
+    
+    @Transient
+    private String serviceName;
     
     public Booking() {}
 
@@ -256,6 +291,22 @@ public class Booking implements Serializable, Cloneable {
 
     public void setProfessionalContact(String professionalContact) {
         this.professionalContact = professionalContact;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCustomerContact() {
+        return customerContact;
+    }
+
+    public void setCustomerContact(String customerContact) {
+        this.customerContact = customerContact;
     }
 
     public static class BookingPK {

@@ -4,11 +4,14 @@ import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
+import com.folks.app.cache.impl.CityCache;
+import com.folks.app.cache.impl.NeighbourhoodCache;
 import com.folks.app.cache.impl.ServiceCache;
-import com.folks.app.dao.AddressDAO;
 import com.folks.app.dao.BookingDAO;
 import com.folks.app.dao.ProfessionalDAO;
 import com.folks.app.model.Booking;
+import com.folks.app.model.City;
+import com.folks.app.model.Neighbourhood;
 import com.folks.app.model.Professional;
 import com.folks.app.model.User;
 import com.folks.app.util.IdGenerator;
@@ -29,17 +32,15 @@ public class BookingBO extends AbstractBO {
     private static final Logger LOGGER = LoggerFactory.getLogger(BookingBO.class);
     
     private final BookingDAO bookingDAO;
-    private final AddressDAO addressDAO;
     private final ProfessionalDAO professionalDAO;
     
     public BookingBO() {
         this.bookingDAO = DAOProxy.get(BookingDAO.class);
-        this.addressDAO = DAOProxy.get(AddressDAO.class);
         this.professionalDAO = DAOProxy.get(ProfessionalDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized BookingBO: {}. BookingDAO: {}. UserDAO: {}, AddressDAO: {}. ProfessionalDAO: {}"
-                    , getClass().getSimpleName(), bookingDAO, userDAO, addressDAO, professionalDAO);
+            LOGGER.debug("Initialized BookingBO: {}. BookingDAO: {}. UserDAO: {}, ProfessionalDAO: {}"
+                    , getClass().getSimpleName(), bookingDAO, userDAO, professionalDAO);
         }
     }
 
@@ -190,27 +191,41 @@ public class BookingBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         
-        SearchCriteria search = null;
+        List<Booking> bookings = null;
+        
         if (User.isAdmin(usr.principal().priv())) {
-            search = SearchCriteria.from(params);
+            SearchCriteria search = SearchCriteria.from(params);
+            bookings = bookingDAO.query(search);
         }
         else {
-            // Fetch the user.
+            // The query came from the customer or professional
             User user = fetchUser(usr);
             if (user == null) {
                 throw new ResourceNotFoundException("No user found for " + usr.principal().sub());
             }
-            String field = null;
             if (user.getRole() == User.Role.CUSTOMER) {
-                field = "customerId";
+                bookings = bookingDAO.findAllByCustomer(user.getUserId());
             }
-            else if (user.getRole() == User.Role.PROFESSIONAL) {
-                field = "professionalId";
+            else {
+                Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+                if (professional == null || professional.getProfessionalId() == null) {
+                    throw new ResourceNotFoundException("No professional found for " + usr.principal().sub());
+                }
+                bookings = bookingDAO.findAllByProfessional(professional.getProfessionalId());
             }
-            // We need to fetch the documents for the current professional only.
-            search = SearchCriteria.from(params, field, user.getUserId());
+            // Admin user does not have the requirement to view complete details.
+            for (Booking booking : bookings) {
+                Neighbourhood nbhood = NeighbourhoodCache.getCache().get(booking.getNeighbourhoodId());
+                City city = CityCache.getCache().get(nbhood.getCityId());
+                booking.setAddress(booking.getAddress()
+                        .concat(" ")
+                        .concat(nbhood.getLocality())
+                        .concat(" ")
+                        .concat(String.valueOf(nbhood.getPincode()))
+                        .concat(" ")
+                        .concat(city.getCityName()));
+            }
         }
-        List<Booking> bookings = bookingDAO.query(search);
         for (Booking booking : bookings) {
             booking.setServiceName(ServiceCache.getCache().get(booking.getServiceId()).getName());
         }
@@ -222,13 +237,21 @@ public class BookingBO extends AbstractBO {
         return bookings;
     }
 
-    public Booking view(AppUser usr, String id) {
+    public Booking view(AppUser usr, String id) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
+        // Fetch the user.
+        User user = fetchUser(usr);
+        
         Booking booking = bookingDAO.find(new Booking.BookingPK(id));
         if (booking == null) {
             throw new IllegalArgumentException("No Booking found for id: " + id);
+        }
+        
+        // Check if this booking is associated with the customer and/or professional.
+        if (! User.isAdmin(usr.principal().priv())) {
+            ensureAuthorized(booking, user);
         }
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
@@ -242,8 +265,6 @@ public class BookingBO extends AbstractBO {
         timer.start();
 
         // We will not delete the record, instead it will be marked as CANCELLED
-        // bookingDAO.delete(booking);
-        
         Booking existing = bookingDAO.find(new Booking.BookingPK(id));
         if (existing == null) {
             throw new IllegalArgumentException("No booking found for identifier: " + id);
@@ -273,5 +294,22 @@ public class BookingBO extends AbstractBO {
     
     public List<Booking> pendingBookings() {
         return bookingDAO.pendingBooking();
+    }
+    
+    private void ensureAuthorized(Booking booking, User requestingUser) throws IllegalAccessException {
+        if (requestingUser.getRole().equals(User.Role.CUSTOMER)) {
+            if (! booking.getCustomerId().equals(requestingUser.getUserId())) {
+                throw new IllegalAccessException(UNAUTHORIZED_MSG);
+            }
+        }
+        else if (requestingUser.getRole().equals(User.Role.PROFESSIONAL)) {
+            Professional professional = professionalDAO.findByExtId(requestingUser.getExternalId());
+            if (professional == null || professional.getProfessionalId() == null) {
+                throw new ResourceNotFoundException("No professional found for " + requestingUser.getExternalId());
+            }
+            if (! booking.getProfessionalId().equals(professional.getProfessionalId())) {
+                throw new IllegalAccessException(UNAUTHORIZED_MSG);
+            }
+        }
     }
 }

@@ -3,14 +3,13 @@ package com.folks.app.dao;
 import com.folks.app.model.Availability;
 import org.javalabs.jpa.query.Criteria;
 import com.folks.app.model.Booking;
-import com.folks.app.model.Payment;
+import com.folks.app.model.User;
 import com.folks.app.util.SearchCriteria;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -88,12 +87,25 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
         }
         return q.executeUpdate();
     }
+    
+    public List<Booking> findAllByCustomer(Integer customerId) {
+        return em.createNamedQuery("Booking.queryByCustomer", Booking.class)
+                .setParameter(1, User.Role.PROFESSIONAL)
+                .setParameter(2, customerId)
+                .setHint(QueryHints.POPULATE_RESULT_COLUMN, Boolean.TRUE)
+                .getResultList();
+    }
+    
+    public List<Booking> findAllByProfessional(Integer professionalId) {
+        return em.createNamedQuery("Booking.queryByProfessional", Booking.class)
+                .setParameter(1, User.Role.CUSTOMER)
+                .setParameter(2, professionalId)
+                .setHint(QueryHints.POPULATE_RESULT_COLUMN, Boolean.TRUE)
+                .getResultList();
+    }
 
     @Override
     public List<Booking> query(SearchCriteria search) {
-        if (search.fetchDependency()) {
-            return expandedQuery(search);
-        }
         Criteria query = getQuery(TABLE, search);
 
         TypedQuery q = em.createNativeQuery(query.toQuery(), Booking.class);
@@ -108,65 +120,6 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
         
         List<Booking> result = q.getResultList();
         return result;
-    }
-    
-    private List<Booking> expandedQuery(SearchCriteria search) {
-        String query = """
-                SELECT a.booking_id
-                        , a.scheduled_at
-                        , a.time_slot
-                        , a.status
-                        , a.payment_method
-                        , a.total_amount
-                        , a.created_at
-                        , a.service_id
-                        , b.name
-                        , c.address_line1
-                        , COALESCE(c.address_line2, '') AS address_line2
-                        , e.city_name
-                        , d.pincode
-                        , f.professional_id
-                        , COALESCE(g.full_name, 'Professional not assigned') AS professional_name
-                        , COALESCE(g.phone1, '') AS phone1
-                  FROM fks_bookings a
-                 INNER JOIN fks_services b ON (a.service_id = b.service_id)
-                 INNER JOIN fks_addresses c ON (a.address_id = c.address_id)
-                 INNER JOIN fks_neighbourhoods d ON (c.neighbourhood_id = d.neighbourhood_id)
-                 INNER JOIN fks_cities e ON (d.city_id = e.city_id)
-                 LEFT OUTER JOIN fks_professionals f ON (a.professional_id = f.professional_id)
-                 LEFT OUTER JOIN fks_users g ON (f.user_id = g.user_id AND g.role = ?)
-                 WHERE a.customer_id = ?
-                 ORDER BY a.created_at DESC;
-                       """;
-        
-        List<Object> val = search.params().get("customer_id");
-        
-        Query q = em.createNativeQuery(query);
-        q.setParameter(1, "PROFESSIONAL");
-        q.setParameter(2, val.get(0));
-        
-        List<Object[]> rows = q.getResultList();
-        
-        List<Booking> bookings = new ArrayList<>(rows.size());
-        for (Object[] row : rows) {
-            Booking booking = new Booking();
-            booking.setBookingId((String)row[0]);
-            booking.setScheduledAt((Timestamp)row[1]);
-            booking.setTimeSlot((String)row[2]);
-            booking.setStatus(Enum.valueOf(Booking.Status.class, (String)row[3]));
-            booking.setPaymentMethod(Enum.valueOf(Payment.Paymentmethod.class, (String)row[4]));
-            booking.setTotalAmount((Double)row[5]);
-            booking.setCreatedAt((Timestamp)row[6]);
-            booking.setServiceId((Integer)row[7]);
-            booking.setServiceName((String)row[8]);
-            booking.setAddress(String.join(" ", (String)row[9], (String)row[10], (String)row[11], String.valueOf((Integer)row[12])));
-            booking.setProfessionalId((Integer)row[13]);
-            booking.setProfessionalName((String)row[14]);
-            booking.setProfessionalContact((String)row[15]);
-            
-            bookings.add(booking);
-        }
-        return bookings;
     }
     
     @Override

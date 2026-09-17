@@ -55,6 +55,9 @@ public class ProfessionalService implements Serializable, Cloneable {
     @Transient
     private String serviceName;
 
+    @Transient
+    private String subCategoryName;
+    
     public ProfessionalService() {}
 
     public void setId(Integer id) {
@@ -119,6 +122,14 @@ public class ProfessionalService implements Serializable, Cloneable {
 
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
+    }
+
+    public String getSubCategoryName() {
+        return subCategoryName;
+    }
+
+    public void setSubCategoryName(String subCategoryName) {
+        this.subCategoryName = subCategoryName;
     }
 
     public static class ProfessionalServicePK {

@@ -126,7 +126,8 @@ public class AddressBO extends AbstractBO {
         existing.setNeighbourhoodId(address.getNeighbourhoodId());
         existing.setLatitude(address.getLatitude());
         existing.setLongitude(address.getLongitude());
-        // existing.setIsDefault(address.getIsDefault());       // The UI is not sending it today.
+        existing.setLabel(address.getLabel());
+        existing.setIsDefault(address.getIsDefault());       // The UI is not sending it today.
         existing.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
         
         AddressUtil.enrich(existing);

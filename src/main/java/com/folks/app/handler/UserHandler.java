@@ -121,39 +121,6 @@ public class UserHandler extends AbstractHandler {
         });
     }
 
-    /**
-     * Modify an existing resource by it's id (PATCH request).
-     *
-     * <p>
-     * If no corresponding resource is found then this method will throw {@link ResourceNotFoundException}
-     * resulting a <code>404</code> response.
-     *
-     * <p>
-     * For a PATCH request, the server expects you to send  only those attribute(s) that needs to be updated.
-     *
-     * @param ctx   Vertx {@link RoutingContext} object.
-     */
-    public void patchModify(RoutingContext ctx) {
-        final String extId = ctx.pathParam("id");
-
-        // If you use a remote store, this method will safely execute the blocking code.
-        vertx().executeBlocking(() -> {
-            User user = MapperUtil.decode(ctx.body().buffer().getBytes(), User.class);
-            user.setExternalId(extId);
-            
-            User modified = userBO.patchUp(user(ctx), user);
-            return modified;
-            
-        }).onComplete(result -> {
-            if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
-            }
-            else {
-                ctx.fail(result.cause());
-            }
-        });
-    }
-
     
     /**
      * View a specific resource by it's id.

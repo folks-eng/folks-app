@@ -49,9 +49,13 @@ public abstract class AbstractBO {
     }
  
     protected void ensureAdmin(AppUser usr) throws IllegalAccessException {
-        if (! User.isAdmin(usr.principal().priv())) {
+        if (! isAdmin(usr)) {
             throw new IllegalAccessException(UNAUTHORIZED_MSG);
         }
+    }
+    
+    protected Boolean isAdmin(AppUser usr) {
+        return User.isAdmin(usr.principal().priv());
     }
     
     protected void validateScope(AppUser usr, String scope) throws IllegalAccessException {

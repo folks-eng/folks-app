@@ -180,6 +180,15 @@ public class User implements Serializable, Cloneable {
     public void setAddresses(List<Address> addresses) {
         this.addresses = addresses;
     }
+    
+    public User cloneMe() {
+        try {
+            return (User)super.clone();
+        }
+        catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static class UserPK {
 

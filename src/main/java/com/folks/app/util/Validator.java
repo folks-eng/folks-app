@@ -13,30 +13,30 @@ import java.util.List;
 public class Validator {
 
     public static void validateUser(User user) {
-        String mandatoryContact = user.getPhone1();
-        String optionalContact = user.getPhone2();
-        String email = user.getEmail();
-        
-        if (mandatoryContact == null || mandatoryContact.trim().isEmpty()) {
+        if (user.getFullName() == null || user.getFullName().isBlank()) {
+            throw new IllegalArgumentException("Customer name is required.");
+        }
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email address is required.");
+        }
+        if (user.getPhone1() == null || user.getPhone1().isBlank()) {
             throw new IllegalArgumentException("Primary mobile number is required.");
         }
-        if (!Constants.MOBILENUM_PATTERN.matcher(mandatoryContact).matches()) {
+        if (! Constants.MOBILENUM_PATTERN.matcher(user.getPhone1()).matches()) {
             throw new IllegalArgumentException("Mobile number invalid.");
         }
-        if (optionalContact != null && !optionalContact.trim().isEmpty()) {
-            if (!Constants.MOBILENUM_PATTERN.matcher(optionalContact).matches()) {
+        if (user.getPhone2() != null && ! user.getPhone2().isBlank()) {
+            if (! Constants.MOBILENUM_PATTERN.matcher(user.getPhone2()).matches()) {
                 throw new IllegalArgumentException("Mobile number invalid.");
             }
-        }
-        if (email == null || email.trim().isEmpty()) {
-            throw new IllegalArgumentException("Email is required.");
-        } else {
-            //TBD : verify email by sending mail
         }
     }
 
     public static void validateAddress(Address addr) {
-        if (addr.getAddressLine1() == null || addr.getAddressLine1().trim().isEmpty()) {
+        if (addr.getLabel() == null || addr.getLabel().isBlank()) {
+            throw new IllegalArgumentException("Label is required.");
+        }
+        if (addr.getAddressLine1() == null || addr.getAddressLine1().isBlank()) {
             throw new IllegalArgumentException("Address line1 is required.");
         }
         if (addr.getNeighbourhoodId() == null) {
@@ -45,12 +45,6 @@ public class Validator {
         if (! NeighbourhoodCache.getCache().contains(addr.getNeighbourhoodId())) {
             throw new IllegalArgumentException("Invalid neighbourhood specified");
         }
-        
-        // TBD
-//        String label = addr.getLabel();
-//        if (label == null || label.toString().isEmpty()) {
-//            throw new IllegalArgumentException("Label is required.");
-//        }
     }
 
     public static void validateProfessional(ProfessionalProfile profProfile) {

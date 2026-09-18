@@ -60,7 +60,6 @@
         <mapping uri="/:id" method="GET" api="view"/>
         <mapping uri="" method="GET" api="viewAll"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
-        <mapping uri="/:id" method="PATCH" api="patchModify"/>
         <!--mapping uri="/:id" method="DELETE" api="remove"/-->
     </resource-mapping>
     

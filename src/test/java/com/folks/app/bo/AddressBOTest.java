@@ -32,7 +32,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * @author schan280
  */
 @ExtendWith({DBExtension.class})
-public class UserBOTest {
+public class AddressBOTest {
     
     private static UserBO userBO;
     

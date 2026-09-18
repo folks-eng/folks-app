@@ -1,5 +1,6 @@
 package com.folks.app.util;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,10 @@ public final class QueryParams {
     private Boolean expand = Boolean.FALSE;
     private Integer offset = 0;
     private Integer limit = Constants.DEFAULT_SEARCH_LIMIT;
+    
+    public QueryParams() {
+        this(new HashMap<String, List<String>>());
+    }
     
     public QueryParams(Map<String, List<String>> params) {
         this.params = params;

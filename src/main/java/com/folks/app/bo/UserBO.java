@@ -27,30 +27,33 @@ public class UserBO extends AbstractBO {
 
     public UserBO() {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized UserBO: {}. UserDAO: {}", getClass().getSimpleName(), userDAO);
+            LOGGER.debug("Initialized User Business Object: {}. UserDAO: {}", getClass().getSimpleName(), userDAO);
         }
     }
 
     public User create(AppUser usr, User user) throws IllegalAccessException {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
         // Only admin has the privilege to create user.
         ensureAdmin(usr);
         validateScope(usr, "user:create");
+        
         Validator.validateUser(user);
 
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-        
         Map<String, List<String>> map = new HashMap<>();
         map.put("operator", List.of("OR"));
         map.put("phone1", List.of(user.getPhone1()));
         map.put("email", List.of(user.getEmail()));
         
         SearchCriteria search = SearchCriteria.from(new QueryParams(map));
+        
         List<User> users = userDAO.query(search);
         if (! users.isEmpty()) {
             LOGGER.warn("User for {} or {} already exists. Skipping user creation ...", user.getPhone1(), user.getEmail());
             throw new ResourceAlreadyExistsException("User for " + user.getPhone1() + " or " + user.getEmail() + " already exists");
         }
+        
         // User does not exist. Proceed to create the user ...
         user.setExternalId(IdGenerator.generate(user.getPhone1(), user.getEmail()));
         user.setRole(user.getRole() != null ? user.getRole() : User.Role.CUSTOMER);
@@ -67,16 +70,20 @@ public class UserBO extends AbstractBO {
     }
 
     public void create(AppUser usr, List<User> records) throws IllegalAccessException {
-        // Only admin has the privilege to create user in bulk.
-        ensureAdmin(usr);
-        validateScope(usr, "user:create");
-        for (User user : records)
-            Validator.validateUser(user);
-
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
+        // Only admin has the privilege to create user in bulk.
+        ensureAdmin(usr);
+        validateScope(usr, "user:create");
+        
         for (User user : records) {
+            Validator.validateUser(user);
+        }
+        for (User user : records) {
+            user.setExternalId(IdGenerator.generate(user.getPhone1(), user.getEmail()));
+            user.setRole(user.getRole() != null ? user.getRole() : User.Role.CUSTOMER);
+            user.setStatus(User.Status.ACTIVE);
             if (user.getCreatedAt() == null) {
                 user.setCreatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
             }
@@ -90,12 +97,12 @@ public class UserBO extends AbstractBO {
     }
 
     public List<User> viewAll(AppUser usr, QueryParams params) throws IllegalAccessException {
-        // Only admin has the privilege to view all users.
-        ensureAdmin(usr);
-        
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
+        // Only admin has the privilege to view all users.
+        ensureAdmin(usr);
+        
         SearchCriteria search = SearchCriteria.from(params);
         List<User> rows = userDAO.query(search);
 
@@ -111,10 +118,15 @@ public class UserBO extends AbstractBO {
         timer.start();
 
         // Only the logged in user is allowed to modify the user as identified by this id.
-        ensureAuthorized(usr, id);
+        if (! isAdmin(usr)) {
+            ensureAuthorized(usr, id);
+        }
         
         // Fetch the user entry.
-        User user = fetchUser(usr);
+        User user = userDAO.findByExtId(id);
+        if (user == null) {
+            throw new ResourceNotFoundException("No User found for id: " + id);
+        }
 
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
@@ -127,16 +139,18 @@ public class UserBO extends AbstractBO {
     erased or set to default.
      */
     public User modify(AppUser usr, User user) throws IllegalAccessException {
-        // Only the logged in user is allowed to modify the user as identified by this id.
-        ensureAuthorized(usr, user.getExternalId());
-        Validator.validateUser(user);
-
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        User existing = userDAO.find(new User.UserPK(user.getUserId()));
+        // Only the logged in user is allowed to modify the user as identified by this id.
+        if (! isAdmin(usr)) {
+            ensureAuthorized(usr, user.getExternalId());
+        }
+        Validator.validateUser(user);
+
+        User existing = userDAO.findByExtId(user.getExternalId());
         if (existing == null) {
-            throw new ResourceNotFoundException("No user found for identifier: " + user.getExternalId());
+            throw new ResourceNotFoundException("No User found for id: " + user.getExternalId());
         }
 
         existing.setFullName(user.getFullName());
@@ -158,54 +172,19 @@ public class UserBO extends AbstractBO {
         return existing;
     }
 
-    // Update only the attributes given in input
-    public User patchUp(AppUser usr, User user) throws IllegalAccessException {
-        StopWatch timer = StopWatch.newTimer();
-        timer.start();
-
-        // Only the logged in user is allowed to modify the user as identified by this id.
-        ensureAuthorized(usr, user.getExternalId());
-        Validator.validateUser(user);
-
-        // First fetch the entry, to see if this already exists.
-        User existing = userDAO.find(new User.UserPK(user.getUserId()));
-        if (existing == null) {
-            throw new ResourceNotFoundException("No user found for identifier: " + user.getExternalId());
-        }
-        if(user.getFullName() != null && !user.getFullName().trim().isEmpty())
-            existing.setFullName(user.getFullName());
-        if(user.getEmail() != null && !user.getEmail().trim().isEmpty())
-            existing.setEmail(user.getEmail());
-        if(user.getPhone1() != null && !user.getPhone1().trim().isEmpty())
-            existing.setPhone1(user.getPhone1());
-        if( user.getPhone2() != null && ! user.getPhone2().trim().isEmpty())
-            existing.setPhone2( user.getPhone2());
-
-        String attr = user.getRole().name();
-        if(attr != null && !attr.trim().isEmpty())
-            existing.setRole(user.getRole());
-        attr = user.getStatus().name();
-        if(attr != null && !attr.trim().isEmpty())
-            existing.setStatus(user.getStatus());
-        existing.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));
-
-        userDAO.update(existing);
-        timer.stop();
-
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("User record patched up successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
-        }
-        return existing;
-    }
-
     public User remove(AppUser usr, String id) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
         // Only the logged in user is allowed to modify the user as identified by this id.
-        ensureAuthorized(usr, id);
+        if (! isAdmin(usr)) {
+            ensureAuthorized(usr, id);
+        }
         // Fetch the user entry.
-        User user = fetchUser(usr);
+        User user = userDAO.findByExtId(id);
+        if (user == null) {
+            throw new ResourceNotFoundException("No User found for id: " + id);
+        }
 
         userDAO.delete(user);
         timer.stop();

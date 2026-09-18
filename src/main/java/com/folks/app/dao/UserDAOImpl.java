@@ -58,10 +58,15 @@ public class UserDAOImpl extends AbstractDAO implements UserDAO {
 
     @Override
     public User findByExtId(String externalId) {
-        return em.createNamedQuery("User.selectByExtId", User.class)
+        List<User> users = em.createNamedQuery("User.selectByExtId", User.class)
             .setParameter(1, externalId)
             .setHint(QueryHints.ALLOW_NATIVE_QUERY, Boolean.TRUE)
-            .getSingleResult();
+            .getResultList();
+        
+        if (! users.isEmpty()) {
+            return users.get(0);
+        }
+        return null;
     }
 
     @Override

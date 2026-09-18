@@ -88,6 +88,7 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
         return q.executeUpdate();
     }
     
+    @Override
     public List<Booking> findAllByCustomer(Integer customerId) {
         return em.createNamedQuery("Booking.queryByCustomer", Booking.class)
                 .setParameter(1, User.Role.PROFESSIONAL)
@@ -96,6 +97,7 @@ public class BookingDAOImpl extends AbstractDAO implements BookingDAO {
                 .getResultList();
     }
     
+    @Override
     public List<Booking> findAllByProfessional(Integer professionalId) {
         return em.createNamedQuery("Booking.queryByProfessional", Booking.class)
                 .setParameter(1, User.Role.CUSTOMER)

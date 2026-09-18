@@ -226,6 +226,7 @@ public class BookingBO extends AbstractBO {
                         .concat(city.getCityName()));
             }
         }
+        // Both admin and other users are required to see the service name.
         for (Booking booking : bookings) {
             booking.setServiceName(ServiceCache.getCache().get(booking.getServiceId()).getName());
         }
@@ -241,15 +242,14 @@ public class BookingBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        // Fetch the user.
-        User user = fetchUser(usr);
-        
         Booking booking = bookingDAO.find(new Booking.BookingPK(id));
         if (booking == null) {
             throw new IllegalArgumentException("No Booking found for id: " + id);
         }
         
+        // Fetch the user.
         // Check if this booking is associated with the customer and/or professional.
+        User user = fetchUser(usr);
         if (! User.isAdmin(usr.principal().priv())) {
             ensureAuthorized(booking, user);
         }
@@ -271,14 +271,11 @@ public class BookingBO extends AbstractBO {
         }
         
         // Fetch the user.
+        // Check if this booking is associated with the customer and/or professional.
         User user = fetchUser(usr);
-        if (! existing.getCustomerId().equals(user.getUserId())) {
-            throw new IllegalAccessException("You do not have permission to cancel this booking");
+        if (! User.isAdmin(usr.principal().priv()) && ! ! existing.getCustomerId().equals(user.getUserId())) {
+            throw new IllegalAccessException(UNAUTHORIZED_MSG);
         }
-        // if (existing.getStatus() == Booking.Status.CONFIRMED) {
-        //     throw new IllegalArgumentException("Cannot modify a booking once it is confirmed and professional is assigned");
-        // }
-        
         existing.setStatus(Booking.Status.CANCELLED);
         existing.setStatusMsg("Cancelled by user");
         existing.setUpdatedAt(new Timestamp(DateUtil.currentUTCDate().getTime()));

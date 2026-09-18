@@ -33,8 +33,13 @@ public class BookingTimer implements Handler<Long> {
             LOGGER.info("Fetched {} pending booking(s)", bookings.size());
         }
         for (Booking booking : bookings) {
-            booking.setUpdatedBy("System - BookingTimer");
-            bookingMgmtBO.assignProfessional(booking);
+            try {
+                booking.setUpdatedBy("System - BookingTimer");
+                bookingMgmtBO.assignProfessional(booking);
+            }
+            catch (RuntimeException e) {
+                LOGGER.error(e.getMessage());
+            }
         }
     }
     

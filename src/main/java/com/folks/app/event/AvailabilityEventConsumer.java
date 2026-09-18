@@ -22,11 +22,16 @@ public class AvailabilityEventConsumer implements Handler<Message<AvailabilityGe
 
     @Override
     public void handle(Message<AvailabilityGenEvent> event) {
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Received availability generation event. Event: {}", event.body());
+        try {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Received availability generation event. Event: {}", event.body());
+            }
+            AvailabilityGenEvent availEvent = event.body();
+            availMgmtBO.generate(availEvent);
         }
-        AvailabilityGenEvent availEvent = event.body();
-        availMgmtBO.generate(availEvent);
+        catch (RuntimeException e) {
+            LOGGER.error(e.getMessage());
+        }
     }
     
 }

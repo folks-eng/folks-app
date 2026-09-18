@@ -34,12 +34,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith({DBExtension.class})
 public class UserBOTest {
     
-    private static UserBO userBO;
+    private UserBO userBO;
     
-    private static AppUser ADMIN_USER;
+    private AppUser ADMIN_USER;
     
     @BeforeAll
-    public static void setup() {
+    public void setup() {
         Map<String, Object> map = new HashMap<>();
         map.put("sub", UUID.randomUUID().toString());
         map.put("name", "Admin User");

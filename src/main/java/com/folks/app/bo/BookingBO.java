@@ -193,7 +193,7 @@ public class BookingBO extends AbstractBO {
         
         List<Booking> bookings = null;
         
-        if (User.isAdmin(usr.principal().priv())) {
+        if (isAdmin(usr)) {
             SearchCriteria search = SearchCriteria.from(params);
             bookings = bookingDAO.query(search);
         }
@@ -250,7 +250,7 @@ public class BookingBO extends AbstractBO {
         // Fetch the user.
         // Check if this booking is associated with the customer and/or professional.
         User user = fetchUser(usr);
-        if (! User.isAdmin(usr.principal().priv())) {
+        if (! isAdmin(usr)) {
             ensureAuthorized(booking, user);
         }
         timer.stop();

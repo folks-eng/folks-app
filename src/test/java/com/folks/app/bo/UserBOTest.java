@@ -118,7 +118,7 @@ public class UserBOTest {
             ResourceAlreadyExistsException ex = assertThrows(ResourceAlreadyExistsException.class, () -> {
                 userBO.create(ADMIN_USER, user);
             });
-            assertEquals("User for " + user.getPhone1() + " or " + user.getEmail() + " already exists", ex.getMessage());
+            assertEquals("The mobile number " + user.getPhone1() + " or email address " + user.getEmail() + " is already registered", ex.getMessage());
         }
         catch (IllegalAccessException e) {
             fail(e.getMessage());

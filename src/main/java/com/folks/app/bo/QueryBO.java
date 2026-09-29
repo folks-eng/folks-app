@@ -134,19 +134,21 @@ public class QueryBO extends AbstractBO {
         
         List<Map<String, Object>> rows = new ArrayList<>();
         
-        if (list.get(0).getClass().isArray()) {
-            for (int i = 0; i < list.size(); i ++) {
-                Object[] res = (Object[])list.get(i);
-                if (analytic.getDimension() != null) {
-                    rows.add(Map.of(analytic.getDimension(), res[0], "count", res[1]));
-                }
-                else {
-                    rows.add(Map.of("count", res[0]));
+        if (! list.isEmpty()) {
+            if (list.get(0).getClass().isArray()) {
+                for (int i = 0; i < list.size(); i ++) {
+                    Object[] res = (Object[])list.get(i);
+                    if (analytic.getDimension() != null) {
+                        rows.add(Map.of(analytic.getDimension(), res[0], "count", res[1]));
+                    }
+                    else {
+                        rows.add(Map.of("count", res[0]));
+                    }
                 }
             }
-        }
-        else {
-            rows.add(Map.of("count", list.get(0)));
+            else {
+                rows.add(Map.of("count", list.get(0)));
+            }
         }
         response.setRows(rows);
         

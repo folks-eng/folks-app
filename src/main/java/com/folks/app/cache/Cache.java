@@ -111,4 +111,24 @@ public interface Cache<K, V> extends Serializable {
      * @return boolean
      */
     boolean readThrough();
+    
+    /**
+     * Query the cache based on a specific attribute name.
+     * 
+     * @param attrName
+     * @param attrValue
+     * @return List
+     */
+    List<V> query(String attrName, Object attrValue);
+    
+    /**
+     * Query the cache based on certain attribute name(s).
+     * 
+     * @param attrName1
+     * @param attrValue1
+     * @param attrName2
+     * @param attrValue2
+     * @return List
+     */
+    List<V> query(String attrName1, Object attrValue1, String attrName2, Object attrValue2);
 }

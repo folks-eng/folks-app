@@ -6,7 +6,9 @@ import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
 import com.folks.app.cache.impl.NeighbourhoodCache;
 import com.folks.app.dao.AddressDAO;
+import com.folks.app.dao.BookingDAO;
 import com.folks.app.model.Address;
+import com.folks.app.model.Booking;
 import com.folks.app.model.User;
 import com.folks.app.util.AddressUtil;
 import com.folks.app.util.QueryParams;
@@ -14,6 +16,7 @@ import com.folks.app.util.SearchCriteria;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.javalabs.decl.util.DateUtil;
 import org.javalabs.decl.vertx.container.ResourceNotFoundException;
 import org.slf4j.Logger;
@@ -28,9 +31,11 @@ public class AddressBO extends AbstractBO {
     private static final Logger LOGGER = LoggerFactory.getLogger(AddressBO.class);
     
     private final AddressDAO addressDAO;
+    private final BookingDAO bookingDAO;
     
     public AddressBO() {
         this.addressDAO = DAOProxy.get(AddressDAO.class);
+        this.bookingDAO = DAOProxy.get(BookingDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Initialized Handler: {}. AddressDAO: {}. UserDAO: {}", getClass().getSimpleName(), addressDAO, userDAO);
@@ -192,6 +197,19 @@ public class AddressBO extends AbstractBO {
         // First fetch the entry, to see if this already exists.
         Address address = fetchAddress(id);
         ensureAuthorized(address, user.getUserId());
+        
+        // Check if the address has any booking associated to it.
+        // We need to fetch the addresses for the current user only.
+        Map<String, List<Object>> params = new HashMap<>();
+        params.put("customer_id", List.of(user.getUserId()));
+        params.put("address_id", List.of(id));
+        params.put("status", List.of(Booking.Status.PENDING));
+        
+        SearchCriteria search = SearchCriteria.from(params);
+        List<Booking> bookings = bookingDAO.query(search);
+        if (! bookings.isEmpty()) {
+            throw new IllegalArgumentException("You already have pending booking(s) for this address. Delete the booking(s) first");
+        }
         
         addressDAO.delete(address);
         timer.stop();

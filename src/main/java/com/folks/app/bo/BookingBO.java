@@ -273,7 +273,7 @@ public class BookingBO extends AbstractBO {
         // Fetch the user.
         // Check if this booking is associated with the customer and/or professional.
         User user = fetchUser(usr);
-        if (! User.isAdmin(usr.principal().priv()) && ! ! existing.getCustomerId().equals(user.getUserId())) {
+        if (! User.isAdmin(usr.principal().priv()) && ! existing.getCustomerId().equals(user.getUserId())) {
             throw new IllegalAccessException(UNAUTHORIZED_MSG);
         }
         existing.setStatus(Booking.Status.CANCELLED);

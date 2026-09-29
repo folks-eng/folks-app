@@ -51,7 +51,7 @@ public class UserBO extends AbstractBO {
         List<User> users = userDAO.query(search);
         if (! users.isEmpty()) {
             LOGGER.warn("User for {} or {} already exists. Skipping user creation ...", user.getPhone1(), user.getEmail());
-            throw new ResourceAlreadyExistsException("User for " + user.getPhone1() + " or " + user.getEmail() + " already exists");
+            throw new ResourceAlreadyExistsException("The mobile number " + user.getPhone1() + " or email address " + user.getEmail() + " is already registered");
         }
         
         // User does not exist. Proceed to create the user ...

@@ -126,6 +126,25 @@
                     </execution>
                 </executions>
             </plugin>
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>12.2.2</version>
+                    <configuration>
+                        <failBuildOnCVSS>7</failBuildOnCVSS>
+                        <nvdApiKey>4C3A56DF-43C5-4D1C-9E90-BB20D38F1822</nvdApiKey>
+                        <dataDirectory>${user.home}/.m2/repository/org/owasp/dependency-check-data/12.2.2/</dataDirectory>
+                        <autoUpdate>true</autoUpdate>
+                        <nvdValidForHours>4</nvdValidForHours>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
         </plugins>
         <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
             <plugins>
@@ -137,6 +156,10 @@
                         <source>21</source>
                         <target>21</target>
                         <encoding>UTF-8</encoding>
+                        <compilerArgs>
+                            <arg>-Xlint:all</arg>
+                            <!--arg>-Werror</arg-->
+                        </compilerArgs>
                     </configuration>
                 </plugin>
                 <plugin>

@@ -197,7 +197,7 @@ public class AddressHandler extends AbstractHandler {
             
         }).onComplete(result -> {
             if (result.succeeded()) {
-                sendResponse(ctx, HttpURLConnection.HTTP_NOT_FOUND, result.result());
+                sendResponse(ctx, HttpURLConnection.HTTP_NO_CONTENT, result.result());
             }
             else {
                 ctx.fail(result.cause());

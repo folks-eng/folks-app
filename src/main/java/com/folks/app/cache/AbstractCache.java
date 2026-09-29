@@ -265,4 +265,14 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     public boolean readThrough() {
         return false;
     }
+
+    @Override
+    public List<V> query(String attrName, Object attrValue) {
+        return Collections.EMPTY_LIST;
+    }
+
+    @Override
+    public List<V> query(String attrName1, Object attrValue1, String attrName2, Object attrValue2) {
+        return Collections.EMPTY_LIST; 
+    }
 }

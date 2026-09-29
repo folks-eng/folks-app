@@ -2,6 +2,9 @@ package com.folks.app.cache.impl;
 
 import com.folks.app.cache.AbstractCache;
 import com.folks.app.model.Service;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * A cache to store the mapping between a service id and associated service.
@@ -31,5 +34,22 @@ public class ServiceCache extends AbstractCache<Integer, Service> {
     @Override
     public long retention() {
         return RETENTION_POLICY;
+    }
+
+    @Override
+    public List<Service> query(String attrName, Object attrValue) {
+        if (attrName.equals("categoryId")) {
+            return getAllValues().stream()
+                    .filter(s -> Objects.equals(s.getCategoryId(), attrValue))
+                    .collect(Collectors.toList());
+        }
+        else if (attrName.equals("name")) {
+            return getAllValues().stream()
+                    .filter(s -> Objects.equals(s.getName(), attrValue))
+                    .collect(Collectors.toList());
+        }
+        else {
+            throw new IllegalArgumentException("Unsupported attribute name. Supported names: categoryId, name");
+        }
     }
 }

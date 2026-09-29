@@ -3,8 +3,11 @@ package com.folks.app.bo;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
+import com.folks.app.cache.impl.CategoryCache;
+import com.folks.app.cache.impl.ServiceCache;
 import com.folks.app.dao.CategoryDAO;
 import com.folks.app.model.Category;
+import com.folks.app.model.Service;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
 import java.util.List;
@@ -109,15 +112,24 @@ public class CategoryBO extends AbstractBO {
     public List<Category> viewAllHierarchy(AppUser usr, QueryParams params) {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
-
-        SearchCriteria search = SearchCriteria.from(params);
-        List<Category> rows = categoryDAO.queryAll(search);
-
+        
+        List<Category> categories = CategoryCache.getCache().query("parentId", null);
+        for (Category category : categories) {
+            // Fetch the sub-categories for each of these categories.
+            List<Category> subCategories = CategoryCache.getCache().query("parentId", category.getCategoryId());
+            category.setSubCategories(subCategories);
+            
+            // Now for each sub-category, fetch the corresponding services.
+            for (Category subCategory : subCategories) {
+                List<Service> services = ServiceCache.getCache().query("categoryId", subCategory.getCategoryId());
+                subCategory.setServices(services);
+            }
+        }
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched {} expanded category hierarchical record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
+            LOGGER.info("Fetched {} expanded category hierarchical record(s). Elapsed time(ms): {}", categories.size(), timer.elapsedTimeMillis());
         }
-        return rows;
+        return categories;
     }
 
     public Category remove(AppUser usr, Integer id) {

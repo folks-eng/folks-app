@@ -33,9 +33,6 @@ public class Validator {
     }
 
     public static void validateAddress(Address addr) {
-        if (addr.getLabel() == null || addr.getLabel().isBlank()) {
-            throw new IllegalArgumentException("Label is required.");
-        }
         if (addr.getAddressLine1() == null || addr.getAddressLine1().isBlank()) {
             throw new IllegalArgumentException("Address line1 is required.");
         }

@@ -12,6 +12,7 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.NamedNativeQueries;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -56,6 +57,12 @@ public class ProfessionalNeighbourhood implements Serializable, Cloneable {
 
     @Column(name = "updated_at", nullable = true, updatable = true)
     private Timestamp updatedAt;
+    
+    @Transient
+    private String locality;
+    
+    @Transient
+    private Integer pincode;
 
     public ProfessionalNeighbourhood() {}
 
@@ -105,6 +112,22 @@ public class ProfessionalNeighbourhood implements Serializable, Cloneable {
 
     public Timestamp getUpdatedAt() {
         return this.updatedAt;
+    }
+
+    public String getLocality() {
+        return locality;
+    }
+
+    public void setLocality(String locality) {
+        this.locality = locality;
+    }
+
+    public Integer getPincode() {
+        return pincode;
+    }
+
+    public void setPincode(Integer pincode) {
+        this.pincode = pincode;
     }
 
     public static class ProfessionalNeighbourhoodPK {

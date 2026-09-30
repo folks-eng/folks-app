@@ -3,6 +3,8 @@ package com.folks.app.bo;
 import org.javalabs.decl.util.StopWatch;
 import org.javalabs.jpa.DAOProxy;
 import com.folks.app.auth.AppUser;
+import com.folks.app.cache.impl.NeighbourhoodCache;
+import com.folks.app.dao.ProfessionalDAO;
 import com.folks.app.model.ProfessionalNeighbourhood;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
@@ -12,6 +14,8 @@ import org.javalabs.decl.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.folks.app.dao.ProfessionalNeighbourhoodDAO;
+import com.folks.app.model.Neighbourhood;
+import com.folks.app.model.Professional;
 
 /**
  *
@@ -23,11 +27,15 @@ public class ProfessionalNeighbourhoodBO extends AbstractBO {
     
     private final ProfessionalNeighbourhoodDAO professionalNeighbourhoodDAO;
 
+    private final ProfessionalDAO professionalDAO;
+
     public ProfessionalNeighbourhoodBO() {
         this.professionalNeighbourhoodDAO = DAOProxy.get(ProfessionalNeighbourhoodDAO.class);
+        this.professionalDAO = DAOProxy.get(ProfessionalDAO.class);
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Initialized ProfessionalNeighbourhoodBO: {}. ProfessionalNeighbourhoodDAO: {}", getClass().getSimpleName(), professionalNeighbourhoodDAO);
+            LOGGER.debug("Initialized ProfessionalNeighbourhoodBO: {}. ProfessionalNeighbourhoodDAO: {}"
+                    , getClass().getSimpleName(), professionalNeighbourhoodDAO);
         }
     }
 
@@ -107,14 +115,25 @@ public class ProfessionalNeighbourhoodBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        SearchCriteria search = SearchCriteria.from(params);
-        List<ProfessionalNeighbourhood> rows = professionalNeighbourhoodDAO.query(search);
+        Professional existing = professionalDAO.findByExtId(usr.principal().sub());
+        if (existing == null || existing.getProfessionalId() == null) {
+            throw new IllegalArgumentException("No such professional is found with id " + usr.principal().sub());
+        }
+
+        SearchCriteria search = SearchCriteria.from(params, "professionalId", existing.getProfessionalId());
+        List<ProfessionalNeighbourhood> records = professionalNeighbourhoodDAO.query(search);
+        
+        for (ProfessionalNeighbourhood record : records) {
+            Neighbourhood nbhood = NeighbourhoodCache.getCache().get(record.getId());
+            record.setLocality(nbhood.getLocality());
+            record.setPincode(nbhood.getPincode());
+        }
 
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Fetched {} expanded professionalNeighbourhood record(s). Elapsed time(ms): {}", rows.size(), timer.elapsedTimeMillis());
+            LOGGER.info("Fetched {} expanded professionalNeighbourhood record(s). Elapsed time(ms): {}", records.size(), timer.elapsedTimeMillis());
         }
-        return rows;
+        return records;
     }
 
     public ProfessionalNeighbourhood view(AppUser usr, Integer id) {

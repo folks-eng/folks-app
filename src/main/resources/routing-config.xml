@@ -110,6 +110,15 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
     
+    <resource-mapping name="ProfessionalNeighbourhood" path="/professionalNeighbourhoods" resource="com.folks.app.handler.ProfessionalNeighbourhoodHandler" schema="com.folks.app.model.ProfessionalNeighbourhood">
+        <mapping uri="" method="POST" api="create"/>
+        <mapping uri="/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/:id" method="PUT" api="modify"/>
+        <mapping uri="/:id" method="GET" api="view"/>
+        <mapping uri="/:id" method="DELETE" api="remove"/>
+        <mapping uri="" method="GET" api="viewAll"/>
+    </resource-mapping>
+    
     <resource-mapping name="Availability" path="/availabilities" resource="com.folks.app.handler.AvailabilityHandler" schema="com.folks.app.model.Availability">
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="" method="POST" api="create"/>

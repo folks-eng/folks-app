@@ -59,12 +59,22 @@ public class DocumentBO extends AbstractBO {
         }
     }
 
-    public Document modify(AppUser usr, Document document) {
+    public Document modify(AppUser usr, Document document) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        // First fetch the entry, to see if this already exists.
+        Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+        if (professional == null || professional.getProfessionalId() == null) {
+            throw new IllegalArgumentException("No such professional found, or professional is not yet registered.");
+        }
+        // Fetch the document first.
         Document existing = documentDAO.find(new Document.DocumentPK(document.getDocumentId()));
+        if (document == null) {
+            throw new IllegalArgumentException("No Document found for id: " + document.getDocumentId());
+        }
+        if (! document.getProfessionalId().equals(professional.getProfessionalId())) {
+            throw new IllegalAccessException("Access to this resource is restricted");
+        }
         if (existing == null) {
             throw new IllegalArgumentException("No document found for identifier: " + document.getDocumentId());
         }
@@ -96,8 +106,8 @@ public class DocumentBO extends AbstractBO {
         else {
             // Fetch the user.
             Professional professional = professionalDAO.findByExtId(usr.principal().sub());
-            if (professional == null) {
-                throw new IllegalArgumentException("No such professional found");
+            if (professional == null || professional.getProfessionalId() == null) {
+                throw new IllegalArgumentException("No such professional found, or professional is not yet registered.");
             }
             // We need to fetch the documents for the current professional only.
             SearchCriteria search = SearchCriteria.from(params, "professionalId", professional.getProfessionalId());
@@ -110,13 +120,20 @@ public class DocumentBO extends AbstractBO {
         return rows;
     }
 
-    public Document view(AppUser usr, Integer id) {
+    public Document view(AppUser usr, Integer id) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
+        Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+        if (professional == null || professional.getProfessionalId() == null) {
+            throw new IllegalArgumentException("No such professional found, or professional is not yet registered.");
+        }
         Document document = documentDAO.find(new Document.DocumentPK(id));
         if (document == null) {
             throw new IllegalArgumentException("No Document found for id: " + id);
+        }
+        if (! document.getProfessionalId().equals(professional.getProfessionalId())) {
+            throw new IllegalAccessException("Access to this resource is restricted");
         }
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
@@ -125,15 +142,21 @@ public class DocumentBO extends AbstractBO {
         return document;
     }
 
-    public Document remove(AppUser usr, Integer id) {
+    public Document remove(AppUser usr, Integer id) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
+        Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+        if (professional == null || professional.getProfessionalId() == null) {
+            throw new IllegalArgumentException("No such professional found, or professional is not yet registered.");
+        }
         // First fetch the entry, to see if this already exists.
         Document document = documentDAO.find(new Document.DocumentPK(id));
-
         if (document == null) {
-            throw new IllegalArgumentException("No document found for id: " + id);
+            throw new IllegalArgumentException("No Document found for id: " + id);
+        }
+        if (! document.getProfessionalId().equals(professional.getProfessionalId())) {
+            throw new IllegalAccessException("Access to this resource is restricted");
         }
         documentDAO.delete(document);
         timer.stop();

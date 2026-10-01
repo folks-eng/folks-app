@@ -72,14 +72,14 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
     
-    <resource-mapping name="Category" path="/categories" resource="com.folks.app.handler.CategoryHandler" schema="com.folks.app.model.Category">
-        <mapping uri="" method="POST" api="create"/>
-        <mapping uri="/$batch" method="POST" api="batchCreate"/>
-        <mapping uri="/:id" method="PUT" api="modify"/>
-        <mapping uri="/hierarchy" method="GET" api="viewHierarchy"/>
-        <mapping uri="/:id" method="GET" api="view"/>
+    <resource-mapping name="Category" path="" resource="com.folks.app.handler.CategoryHandler" schema="com.folks.app.model.Category">
+        <mapping uri="/categories" method="POST" api="create"/>
+        <mapping uri="/categories/$batch" method="POST" api="batchCreate"/>
+        <mapping uri="/categories/:id" method="PUT" api="modify"/>
+        <mapping uri="/mgmt/categories/hierarchy" method="GET" api="viewHierarchy"/>
+        <mapping uri="/categories/:id" method="GET" api="view"/>
         <!--mapping uri="/:id" method="DELETE" api="remove"/-->
-        <mapping uri="" method="GET" api="viewAll"/>
+        <mapping uri="/categories" method="GET" api="viewAll"/>
     </resource-mapping>
     
     <resource-mapping name="Service" path="/services" resource="com.folks.app.handler.ServiceHandler" schema="com.folks.app.model.Service">

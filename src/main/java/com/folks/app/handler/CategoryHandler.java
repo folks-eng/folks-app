@@ -188,7 +188,7 @@ public class CategoryHandler extends AbstractHandler {
         final QueryParams params = params(ctx);
 
         vertx().executeBlocking(() -> {
-            List<Category> categories = categoryBO.viewAllHierarchy(user(ctx), params);
+            List<Category> categories = categoryBO.viewAllHierarchy();
             
             ItemList itemList = build(ctx.normalizedPath(), params, (List)categories);
             return itemList;

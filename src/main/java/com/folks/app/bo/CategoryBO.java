@@ -109,7 +109,7 @@ public class CategoryBO extends AbstractBO {
         return category;
     }
 
-    public List<Category> viewAllHierarchy(AppUser usr, QueryParams params) {
+    public List<Category> viewAllHierarchy() {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
         

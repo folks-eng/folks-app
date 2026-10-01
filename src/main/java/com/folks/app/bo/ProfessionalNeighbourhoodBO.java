@@ -91,10 +91,18 @@ public class ProfessionalNeighbourhoodBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
+        Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+        if (professional == null || professional.getProfessionalId() == null) {
+            throw new IllegalArgumentException("No such professional is found with id " + usr.principal().sub());
+        }
+
         // First fetch the entry, to see if this already exists.
         ProfessionalNeighbourhood existing = professionalNeighbourhoodDAO.find(new ProfessionalNeighbourhood.ProfessionalNeighbourhoodPK(professionalNeighbourhood.getId()));
         if (existing == null) {
-            throw new IllegalArgumentException("No professionalNeighbourhood found for identifier: " + professionalNeighbourhood.getId());
+            throw new IllegalArgumentException("No professional locally found for identifier: " + professionalNeighbourhood.getId());
+        }
+        if (! existing.getProfessionalId().equals(professional.getProfessionalId())) {
+            throw new IllegalAccessException("Access to this resource is restricted");
         }
         // Update attributes of existing record
         existing.setNeighbourhoodId(professionalNeighbourhood.getNeighbourhoodId());
@@ -115,12 +123,12 @@ public class ProfessionalNeighbourhoodBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
-        Professional existing = professionalDAO.findByExtId(usr.principal().sub());
-        if (existing == null || existing.getProfessionalId() == null) {
+        Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+        if (professional == null || professional.getProfessionalId() == null) {
             throw new IllegalArgumentException("No such professional is found with id " + usr.principal().sub());
         }
 
-        SearchCriteria search = SearchCriteria.from(params, "professionalId", existing.getProfessionalId());
+        SearchCriteria search = SearchCriteria.from(params, "professionalId", professional.getProfessionalId());
         List<ProfessionalNeighbourhood> records = professionalNeighbourhoodDAO.query(search);
         
         for (ProfessionalNeighbourhood record : records) {
@@ -136,13 +144,22 @@ public class ProfessionalNeighbourhoodBO extends AbstractBO {
         return records;
     }
 
-    public ProfessionalNeighbourhood view(AppUser usr, Integer id) {
+    public ProfessionalNeighbourhood view(AppUser usr, Integer id) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
+        Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+        if (professional == null || professional.getProfessionalId() == null) {
+            throw new IllegalArgumentException("No such professional is found with id " + usr.principal().sub());
+        }
+
+        // First fetch the entry, to see if this already exists.
         ProfessionalNeighbourhood professionalNeighbourhood = professionalNeighbourhoodDAO.find(new ProfessionalNeighbourhood.ProfessionalNeighbourhoodPK(id));
         if (professionalNeighbourhood == null) {
             throw new IllegalArgumentException("No OperatingProfessionalNeighbourhood found for id: " + id);
+        }
+        if (! professionalNeighbourhood.getProfessionalId().equals(professional.getProfessionalId())) {
+            throw new IllegalAccessException("Access to this resource is restricted");
         }
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
@@ -158,11 +175,18 @@ public class ProfessionalNeighbourhoodBO extends AbstractBO {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
 
+        Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+        if (professional == null || professional.getProfessionalId() == null) {
+            throw new IllegalArgumentException("No such professional is found with id " + usr.principal().sub());
+        }
+
         // First fetch the entry, to see if this already exists.
         ProfessionalNeighbourhood professionalNeighbourhood = professionalNeighbourhoodDAO.find(new ProfessionalNeighbourhood.ProfessionalNeighbourhoodPK(id));
-
         if (professionalNeighbourhood == null) {
             throw new IllegalArgumentException("No professionalNeighbourhood found for id: " + id);
+        }
+        if (! professionalNeighbourhood.getProfessionalId().equals(professional.getProfessionalId())) {
+            throw new IllegalAccessException("Access to this resource is restricted");
         }
         professionalNeighbourhoodDAO.delete(professionalNeighbourhood);
         timer.stop();

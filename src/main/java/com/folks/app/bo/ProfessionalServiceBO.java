@@ -63,14 +63,22 @@ public class ProfessionalServiceBO extends AbstractBO {
         }
     }
 
-    public ProfessionalService modify(AppUser usr, ProfessionalService professionalService) {
+    public ProfessionalService modify(AppUser usr, ProfessionalService professionalService) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
+
+        Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+        if (professional == null || professional.getProfessionalId() == null) {
+            throw new IllegalArgumentException("No such professional is found with id " + usr.principal().sub());
+        }
 
         // First fetch the entry, to see if this already exists.
         ProfessionalService existing = professionalServiceDAO.find(new ProfessionalService.ProfessionalServicePK(professionalService.getId()));
         if (existing == null) {
             throw new IllegalArgumentException("No professionalService found for identifier: " + professionalService.getId());
+        }
+        if (! professionalService.getProfessionalId().equals(professional.getProfessionalId())) {
+            throw new IllegalAccessException("Access to this resource is restricted");
         }
         // Update attributes of existing record
         existing.setProfessionalId(professionalService.getProfessionalId());
@@ -114,13 +122,21 @@ public class ProfessionalServiceBO extends AbstractBO {
         return pServices;
     }
 
-    public ProfessionalService view(AppUser usr, Integer id) {
+    public ProfessionalService view(AppUser usr, Integer id) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
+
+        Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+        if (professional == null || professional.getProfessionalId() == null) {
+            throw new IllegalArgumentException("No such professional is found with id " + usr.principal().sub());
+        }
 
         ProfessionalService professionalService = professionalServiceDAO.find(new ProfessionalService.ProfessionalServicePK(id));
         if (professionalService == null) {
             throw new IllegalArgumentException("No ProfessionalService found for id: " + id);
+        }
+        if (! professionalService.getProfessionalId().equals(professional.getProfessionalId())) {
+            throw new IllegalAccessException("Access to this resource is restricted");
         }
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
@@ -129,15 +145,23 @@ public class ProfessionalServiceBO extends AbstractBO {
         return professionalService;
     }
 
-    public ProfessionalService remove(AppUser usr, Integer id) {
+    public ProfessionalService remove(AppUser usr, Integer id) throws IllegalAccessException {
         StopWatch timer = StopWatch.newTimer();
         timer.start();
+
+        Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+        if (professional == null || professional.getProfessionalId() == null) {
+            throw new IllegalArgumentException("No such professional is found with id " + usr.principal().sub());
+        }
 
         // First fetch the entry, to see if this already exists.
         ProfessionalService professionalService = professionalServiceDAO.find(new ProfessionalService.ProfessionalServicePK(id));
 
         if (professionalService == null) {
             throw new IllegalArgumentException("No professionalService found for id: " + id);
+        }
+        if (! professionalService.getProfessionalId().equals(professional.getProfessionalId())) {
+            throw new IllegalAccessException("Access to this resource is restricted");
         }
         professionalServiceDAO.delete(professionalService);
         timer.stop();

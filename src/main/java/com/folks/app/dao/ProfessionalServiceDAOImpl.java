@@ -52,6 +52,13 @@ public class ProfessionalServiceDAOImpl implements ProfessionalServiceDAO {
     }
 
     @Override
+    public void delete(List<ProfessionalService> records) {
+        for (ProfessionalService record : records) {
+            em.remove(record);
+        }
+    }
+
+    @Override
     public ProfessionalService find(ProfessionalService.ProfessionalServicePK pk) {
         return em.find(ProfessionalService.class, pk);
     }

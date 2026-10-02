@@ -11,9 +11,13 @@ import com.folks.app.model.Category;
 import com.folks.app.model.Professional;
 import com.folks.app.model.ProfessionalService;
 import com.folks.app.model.Service;
+import com.folks.app.util.Constants;
 import com.folks.app.util.QueryParams;
 import com.folks.app.util.SearchCriteria;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
+import org.javalabs.decl.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +98,47 @@ public class ProfessionalServiceBO extends AbstractBO {
         }
         return existing;
     }
+    
+    public void updateExpertise(AppUser usr, List<Integer> subCategoryIds) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+        if (professional == null || professional.getProfessionalId() == null) {
+            throw new IllegalArgumentException("No such professional is found with id " + usr.principal().sub());
+        }
+        // First, fetch the existing mappings
+        SearchCriteria search = SearchCriteria.from(new QueryParams(), "professionalId", professional.getProfessionalId());
+        List<ProfessionalService> currentServices = professionalServiceDAO.query(search);
+        
+        // Re-Build the professional vs services mapping.
+        List<Service> services = fetchServices(subCategoryIds);
+        Timestamp createdAt = new Timestamp(DateUtil.currentUTCDate().getTime());
+        
+        // Assign individual services to this professional's profile
+        List<ProfessionalService> pServices = new ArrayList<>(services.size());
+        for(Service service: services) {
+            ProfessionalService pService = new ProfessionalService();
+            pService.setProfessionalId(professional.getProfessionalId());
+            pService.setServiceId(service.getServiceId());
+            pService.setPrice(service.getBasePrice());
+            pService.setIsActive(Constants.PROF_SERVICE_ACTIVE);
+            pService.setCreatedAt(createdAt);
+            
+            pServices.add(pService);
+        }
+        
+        // Delete existing mapping(s)
+        professionalServiceDAO.delete(currentServices);
+        
+        // Now insert new mapping(s)
+        professionalServiceDAO.insert(pServices);
+        
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Expertise modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+        }
+    }
 
     public List<ProfessionalService> viewAll(AppUser usr, QueryParams params) {
         StopWatch timer = StopWatch.newTimer();
@@ -170,5 +215,18 @@ public class ProfessionalServiceBO extends AbstractBO {
             LOGGER.info("Deleted ProfessionalService. Id: {}. Elapsed time(ms): {}", id, timer.elapsedTimeMillis());
         }
         return professionalService;
+    }
+    
+    private List<Service> fetchServices(List<Integer> expertise) {
+        List<Service> services = new ArrayList<>();
+        
+        for (Service service : ServiceCache.getCache().getAllValues()) {
+            for (Integer subCategory : expertise) {
+                if (service.getCategoryId().equals(subCategory)) {
+                    services.add(service);
+                }
+            }
+        }
+        return services;
     }
 }

@@ -109,7 +109,6 @@ public class ProfessionalBO extends AbstractBO {
         }
 
         // Update attributes of existing record
-       // LOGGER.info(existing.getUser().getRole() + " FROM DB, User id : " +existing.getUser().getUserId());
         existing.setUserId(existing.getUser().getUserId());
         existing.setBio(profObj.getBio());
         existing.setExperienceYears(profObj.getExperienceYears());

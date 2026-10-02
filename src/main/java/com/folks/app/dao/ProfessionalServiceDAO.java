@@ -58,6 +58,12 @@ public interface ProfessionalServiceDAO {
     void delete(ProfessionalService record);
     
     /**
+     * Delete the specific entry from the database.
+     * @param records    ProfessionalService entries to be deleted.
+     */
+    void delete(List<ProfessionalService> records);
+    
+    /**
      * Retrieve the entry from the database, as identified by this primary key.
      * If no matching record is found in the DB, then this api will return null.
      * 

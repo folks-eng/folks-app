@@ -126,6 +126,30 @@ public class ProfessionalServiceHandler extends AbstractHandler {
         });
     }
     
+    public void updateExpertise(RoutingContext ctx) {
+        // If you use a remote store, this method will safely execute the blocking code.
+        vertx().executeBlocking(() -> {
+            List<Integer> expertise = MapperUtil.mapper().readValue(ctx.body().buffer().getBytes(), new TypeReference<List<Integer>>() {});
+            
+            // First fetch the entry, to see if this already exists.
+            professionalServiceBO.updateExpertise(user(ctx), expertise);
+
+            ServerMessage msg = new ServerMessage();
+            msg.setCode(HttpURLConnection.HTTP_OK);
+            msg.setMessage("Expertise updated successfully");
+
+            return msg;
+            
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+    
     /**
      * View a specific resource by it's id.
      * 

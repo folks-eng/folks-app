@@ -1,7 +1,7 @@
 {
     "db.config": {
-        "url": "jdbc:postgresql://localhost:5432/folksdb",
-        "user": "folks",
+        "url": "jdbc:postgresql://localhost:5432/hearthdb",
+        "user": "hearth",
         "password": "p@$$word"
     },
     "testing" : {

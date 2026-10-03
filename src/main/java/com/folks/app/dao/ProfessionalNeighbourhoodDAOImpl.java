@@ -51,6 +51,13 @@ public class ProfessionalNeighbourhoodDAOImpl extends AbstractDAO implements Pro
     }
 
     @Override
+    public void delete(List<ProfessionalNeighbourhood> records) {
+        for (ProfessionalNeighbourhood record : records) {
+            em.remove(record);
+        }
+    }
+
+    @Override
     public ProfessionalNeighbourhood find(ProfessionalNeighbourhood.ProfessionalNeighbourhoodPK pk) {
         return em.find(ProfessionalNeighbourhood.class, pk);
     }

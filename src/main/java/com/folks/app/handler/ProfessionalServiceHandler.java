@@ -131,12 +131,11 @@ public class ProfessionalServiceHandler extends AbstractHandler {
         vertx().executeBlocking(() -> {
             List<Integer> expertise = MapperUtil.mapper().readValue(ctx.body().buffer().getBytes(), new TypeReference<List<Integer>>() {});
             
-            // First fetch the entry, to see if this already exists.
             professionalServiceBO.updateExpertise(user(ctx), expertise);
 
             ServerMessage msg = new ServerMessage();
             msg.setCode(HttpURLConnection.HTTP_OK);
-            msg.setMessage("Expertise updated successfully");
+            msg.setMessage("Professional expertise updated successfully");
 
             return msg;
             

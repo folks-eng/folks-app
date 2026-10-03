@@ -126,6 +126,29 @@ public class ProfessionalNeighbourhoodHandler extends AbstractHandler {
         });
     }
     
+    public void updateNeighbourhoods(RoutingContext ctx) {
+        // If you use a remote store, this method will safely execute the blocking code.
+        vertx().executeBlocking(() -> {
+            List<Integer> expertise = MapperUtil.mapper().readValue(ctx.body().buffer().getBytes(), new TypeReference<List<Integer>>() {});
+            
+            professionalNeighbourhoodBO.updateNeighbourhoods(user(ctx), expertise);
+
+            ServerMessage msg = new ServerMessage();
+            msg.setCode(HttpURLConnection.HTTP_OK);
+            msg.setMessage("Professional neighbourhoods updated successfully");
+
+            return msg;
+            
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+    
     /**
      * View a specific resource by it's id.
      * 

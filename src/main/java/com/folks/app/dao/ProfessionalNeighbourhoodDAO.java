@@ -58,6 +58,12 @@ public interface ProfessionalNeighbourhoodDAO {
     void delete(ProfessionalNeighbourhood record);
     
     /**
+     * Delete the set of entries from the database.
+     * @param records    ProfessionalNeighbourhood entries to be deleted.
+     */
+    void delete(List<ProfessionalNeighbourhood> records);
+    
+    /**
      * Retrieve the entry from the database, as identified by this primary key.
      * If no matching record is found in the DB, then this api will return null.
      * 

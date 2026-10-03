@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.folks.app.dao.ProfessionalNeighbourhoodDAO;
 import com.folks.app.model.Neighbourhood;
 import com.folks.app.model.Professional;
+import java.util.ArrayList;
 
 /**
  *
@@ -118,6 +119,46 @@ public class ProfessionalNeighbourhoodBO extends AbstractBO {
         }
         return existing;
     }
+    
+    public void updateNeighbourhoods(AppUser usr, List<Integer> nbHoodIds) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        Professional professional = professionalDAO.findByExtId(usr.principal().sub());
+        if (professional == null || professional.getProfessionalId() == null) {
+            throw new IllegalArgumentException("No such professional is found with id " + usr.principal().sub());
+        }
+        // First, fetch the existing mappings
+        SearchCriteria search = SearchCriteria.from(new QueryParams(), "professionalId", professional.getProfessionalId());
+        List<ProfessionalNeighbourhood> currentNeighbourhoods = professionalNeighbourhoodDAO.query(search);
+        
+        // Re-Build the professional vs services mapping.
+        List<Neighbourhood> nbhoods = fetchNeighbourhoods(nbHoodIds);
+        Timestamp createdAt = new Timestamp(DateUtil.currentUTCDate().getTime());
+        
+        // Assign individual services to this professional's profile
+        List<ProfessionalNeighbourhood> pNbHoods = new ArrayList<>(nbhoods.size());
+        for(Neighbourhood nbhood: nbhoods) {
+            ProfessionalNeighbourhood pNbHood = new ProfessionalNeighbourhood();
+            pNbHood.setProfessionalId(professional.getProfessionalId());
+            pNbHood.setNeighbourhoodId(nbhood.getNeighbourhoodId());
+            pNbHood.setStatus(ProfessionalNeighbourhood.Status.ACTIVE);
+            pNbHood.setCreatedAt(createdAt);
+            
+            pNbHoods.add(pNbHood);
+        }
+        
+        // Delete existing mapping(s)
+        professionalNeighbourhoodDAO.delete(currentNeighbourhoods);
+        
+        // Now insert new mapping(s)
+        professionalNeighbourhoodDAO.insert(pNbHoods);
+        
+        timer.stop();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Professional neighbourhoods modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+        }
+    }
 
     public List<ProfessionalNeighbourhood> viewAll(AppUser usr, QueryParams params) {
         StopWatch timer = StopWatch.newTimer();
@@ -135,6 +176,7 @@ public class ProfessionalNeighbourhoodBO extends AbstractBO {
             Neighbourhood nbhood = NeighbourhoodCache.getCache().get(record.getNeighbourhoodId());
             record.setLocality(nbhood.getLocality());
             record.setPincode(nbhood.getPincode());
+            record.setZone(nbhood.getZone());
         }
 
         timer.stop();
@@ -195,5 +237,14 @@ public class ProfessionalNeighbourhoodBO extends AbstractBO {
             LOGGER.info("Deleted OperatingProfessionalNeighbourhood. Id: {}. Elapsed time(ms): {}", id, timer.elapsedTimeMillis());
         }
         return professionalNeighbourhood;
+    }
+    
+    private List<Neighbourhood> fetchNeighbourhoods(List<Integer> nbhoodIds) {
+        List<Neighbourhood> nbhoods = new ArrayList<>();
+        
+        for (Integer nbhoodId : nbhoodIds) {
+            nbhoods.add(NeighbourhoodCache.getCache().get(nbhoodId));
+        }
+        return nbhoods;
     }
 }

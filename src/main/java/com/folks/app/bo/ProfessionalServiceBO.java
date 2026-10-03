@@ -136,7 +136,7 @@ public class ProfessionalServiceBO extends AbstractBO {
         
         timer.stop();
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Expertise modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
+            LOGGER.info("Professional expertise modified successfully. Elapsed time(ms): {}", timer.elapsedTimeMillis());
         }
     }
 

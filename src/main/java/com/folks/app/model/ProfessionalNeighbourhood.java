@@ -63,6 +63,9 @@ public class ProfessionalNeighbourhood implements Serializable, Cloneable {
     
     @Transient
     private Integer pincode;
+    
+    @Transient
+    private String zone;
 
     public ProfessionalNeighbourhood() {}
 
@@ -128,6 +131,14 @@ public class ProfessionalNeighbourhood implements Serializable, Cloneable {
 
     public void setPincode(Integer pincode) {
         this.pincode = pincode;
+    }
+
+    public String getZone() {
+        return zone;
+    }
+
+    public void setZone(String zone) {
+        this.zone = zone;
     }
 
     public static class ProfessionalNeighbourhoodPK {

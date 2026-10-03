@@ -44,6 +44,9 @@ public class Neighbourhood implements Serializable, Cloneable {
     @Column(name = "pincode", nullable = false, updatable = true, precision = 32)
     private Integer pincode;
 
+    @Column(name = "zone", nullable = false, updatable = true, length = 80)
+    private String zone;
+
     @Column(name = "latitude", nullable = true, updatable = true, precision = 20, scale = 6)
     private BigDecimal latitude;
 
@@ -97,6 +100,14 @@ public class Neighbourhood implements Serializable, Cloneable {
 
     public Integer getPincode() {
         return this.pincode;
+    }
+
+    public String getZone() {
+        return zone;
+    }
+
+    public void setZone(String zone) {
+        this.zone = zone;
     }
 
     public void setLatitude(BigDecimal latitude) {

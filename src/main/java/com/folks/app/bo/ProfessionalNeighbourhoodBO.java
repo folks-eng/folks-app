@@ -132,7 +132,7 @@ public class ProfessionalNeighbourhoodBO extends AbstractBO {
         List<ProfessionalNeighbourhood> records = professionalNeighbourhoodDAO.query(search);
         
         for (ProfessionalNeighbourhood record : records) {
-            Neighbourhood nbhood = NeighbourhoodCache.getCache().get(record.getId());
+            Neighbourhood nbhood = NeighbourhoodCache.getCache().get(record.getNeighbourhoodId());
             record.setLocality(nbhood.getLocality());
             record.setPincode(nbhood.getPincode());
         }

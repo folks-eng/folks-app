@@ -45,6 +45,7 @@ CREATE TABLE fks_neighbourhoods (
     city_id             INT             NOT NULL,
     locality            VARCHAR(80)     NOT NULL,
     pincode             INT             NOT NULL,
+    zone                VARCHAR(80)     NOT NULL,
     latitude            NUMERIC(20, 6)  ,
     longitude           NUMERIC(20, 6)  ,
     is_serviceable      SMALLINT        NOT NULL,

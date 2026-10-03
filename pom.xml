@@ -5,8 +5,8 @@
     
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.folks.app</groupId>
-    <artifactId>folks-app</artifactId>
+    <groupId>com.hearth.app</groupId>
+    <artifactId>hearth-app</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <dependencies>
@@ -171,7 +171,7 @@
                                 <Build-Time>${maven.build.timestamp}</Build-Time>
                             </manifestEntries>
                             <manifest>
-                                <mainClass>com.folks.app.main.FolksAppMain</mainClass>
+                                <mainClass>com.hearth.app.main.HearthAppMain</mainClass>
                                 <addClasspath>true</addClasspath>
                                 <classpathPrefix>lib/</classpathPrefix>
                                 <useUniqueVersions>false</useUniqueVersions>

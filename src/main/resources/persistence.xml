@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <persistence version="2">
-    <persistence-unit name="folks-app-pu">
-        <description>Persistence Unit for folks-app</description>
+    <persistence-unit name="hearth-app-pu">
+        <description>Persistence Unit for hearth-app</description>
         <provider>org.javalabs.jpa.LitePersistenceProvider</provider>
-        <class>com.folks.app.model.Country</class>
-        <class>com.folks.app.model.Province</class>
-        <class>com.folks.app.model.City</class>
-        <class>com.folks.app.model.Neighbourhood</class>
-        <class>com.folks.app.model.Category</class>
-        <class>com.folks.app.model.Service</class>
-        <class>com.folks.app.model.User</class>
-        <class>com.folks.app.model.Address</class>
-        <class>com.folks.app.model.Professional</class>
-        <class>com.folks.app.model.Document</class>
-        <class>com.folks.app.model.ProfessionalService</class>
-        <class>com.folks.app.model.ProfessionalNeighbourhood</class>
-        <class>com.folks.app.model.Availability</class>
-        <class>com.folks.app.model.Booking</class>
-        <class>com.folks.app.model.Payment</class>
-        <class>com.folks.app.model.Review</class>
-        <class>com.folks.app.model.Conversation</class>
-        <class>com.folks.app.model.Message</class>
-        <class>com.folks.app.model.JobStatus</class>
-        <class>com.folks.app.model.AuditLog</class>
-        <class>com.folks.app.model.PricingRule</class>
-        <class>com.folks.app.model.Wallet</class>
-        <class>com.folks.app.model.WalletTransaction</class>
-        <class>com.folks.app.model.Coupon</class>
-        <class>com.folks.app.model.CouponUsage</class>
+        <class>com.hearth.app.model.Country</class>
+        <class>com.hearth.app.model.Province</class>
+        <class>com.hearth.app.model.City</class>
+        <class>com.hearth.app.model.Neighbourhood</class>
+        <class>com.hearth.app.model.Category</class>
+        <class>com.hearth.app.model.Service</class>
+        <class>com.hearth.app.model.User</class>
+        <class>com.hearth.app.model.Address</class>
+        <class>com.hearth.app.model.Professional</class>
+        <class>com.hearth.app.model.Document</class>
+        <class>com.hearth.app.model.ProfessionalService</class>
+        <class>com.hearth.app.model.ProfessionalNeighbourhood</class>
+        <class>com.hearth.app.model.Availability</class>
+        <class>com.hearth.app.model.Booking</class>
+        <class>com.hearth.app.model.Payment</class>
+        <class>com.hearth.app.model.Review</class>
+        <class>com.hearth.app.model.Conversation</class>
+        <class>com.hearth.app.model.Message</class>
+        <class>com.hearth.app.model.JobStatus</class>
+        <class>com.hearth.app.model.AuditLog</class>
+        <class>com.hearth.app.model.PricingRule</class>
+        <class>com.hearth.app.model.Wallet</class>
+        <class>com.hearth.app.model.WalletTransaction</class>
+        <class>com.hearth.app.model.Coupon</class>
+        <class>com.hearth.app.model.CouponUsage</class>
         <shared-cache-mode>NONE</shared-cache-mode>
         <properties>
-            <property name="jpa-lite.entity.package" value="com.folks.app.model"/>
+            <property name="jpa-lite.entity.package" value="com.hearth.app.model"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1"/>
             <property name="javax.persistence.jdbc.user" value="test"/>
             <property name="javax.persistence.jdbc.password" value="p@$$word"/>
@@ -39,7 +39,7 @@
             <property name="javax.persistence.sql-load-script-source" value="db/reference_data.sql"/>
             <property name="javax.persistence.schema-generation.create-database-schemas" value="true"/>
             <property name="jpa-lite.logging.level" value="TRACE"/>
-            <property name="jpa-lite.dao.package" value="com.folks.app.dao"/>
+            <property name="jpa-lite.dao.package" value="com.hearth.app.dao"/>
             <property name="jpa-lite.post.construct.listener" value="org.javalabs.jpa.util.CreateScriptListener"/>
         </properties>
     </persistence-unit>

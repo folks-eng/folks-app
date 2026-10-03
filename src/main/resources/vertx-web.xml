@@ -25,7 +25,7 @@
     <verticles>
         <verticle>
             <name>app.http.server</name>
-            <class>com.folks.app.core.AppHttpServer</class>
+            <class>com.hearth.app.core.AppHttpServer</class>
             <!-- Specify http configuration file only if the verticle is supposed to start an embedded http server -->
             <config>server.xml</config>
             <deploy-options>
@@ -34,7 +34,7 @@
         </verticle>
         <verticle>
             <name>app.processor</name>
-            <class>com.folks.app.core.AppProcessor</class>
+            <class>com.hearth.app.core.AppProcessor</class>
             <deploy-options>
                 <worker>true</worker>
             </deploy-options>

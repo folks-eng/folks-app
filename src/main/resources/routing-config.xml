@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <routing-config>
-    <package name="com.folks.app.handler"/>
+    <package name="com.hearth.app.handler"/>
     <api version="1.0" basePath="/api/v1" produce="application/vnd.ex+json.v1" consume="application/json"/>
     
     <resource-mapping name="error" path="/*" failure="true" resource="org.javalabs.decl.vertx.container.handler.HttpErrorHandler"/>
@@ -9,16 +9,16 @@
     <resource-mapping name="admin"
                       path="/admin/*"
                       failure="false"
-                      resource="com.folks.app.core.AdminFilter">
+                      resource="com.hearth.app.core.AdminFilter">
     </resource-mapping>
     
-    <resource-mapping name="AuthToken" path="/mgmt" resource="com.folks.app.handler.AuthenticationHandler" schema="com.folks.app.auth.AuthToken">
+    <resource-mapping name="AuthToken" path="/mgmt" resource="com.hearth.app.handler.AuthenticationHandler" schema="com.hearth.app.auth.AuthToken">
         <mapping uri="/login" method="POST" api="authenticate" consume="application/x-www-form-urlencoded"/>
         <mapping uri="/token" method="POST" api="getToken" consume="application/x-www-form-urlencoded"/>
     </resource-mapping>
     
     
-    <resource-mapping name="Country" path="/countries" resource="com.folks.app.handler.CountryHandler" schema="com.folks.app.model.Country">
+    <resource-mapping name="Country" path="/countries" resource="com.hearth.app.handler.CountryHandler" schema="com.hearth.app.model.Country">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -27,7 +27,7 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
 
-    <resource-mapping name="Province" path="/provinces" resource="com.folks.app.handler.ProvinceHandler" schema="com.folks.app.model.Province">
+    <resource-mapping name="Province" path="/provinces" resource="com.hearth.app.handler.ProvinceHandler" schema="com.hearth.app.model.Province">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -36,7 +36,7 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
 
-    <resource-mapping name="City" path="/cities" resource="com.folks.app.handler.CityHandler" schema="com.folks.app.model.City">
+    <resource-mapping name="City" path="/cities" resource="com.hearth.app.handler.CityHandler" schema="com.hearth.app.model.City">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -45,7 +45,7 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
 
-    <resource-mapping name="Neighbourhood" path="/neighbourhoods" resource="com.folks.app.handler.NeighbourhoodHandler" schema="com.folks.app.model.Neighbourhood">
+    <resource-mapping name="Neighbourhood" path="/neighbourhoods" resource="com.hearth.app.handler.NeighbourhoodHandler" schema="com.hearth.app.model.Neighbourhood">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -54,7 +54,7 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
 
-    <resource-mapping name="User" path="/users" resource="com.folks.app.handler.UserHandler" schema="com.folks.app.model.User">
+    <resource-mapping name="User" path="/users" resource="com.hearth.app.handler.UserHandler" schema="com.hearth.app.model.User">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="GET" api="view"/>
@@ -63,7 +63,7 @@
         <!--mapping uri="/:id" method="DELETE" api="remove"/-->
     </resource-mapping>
     
-    <resource-mapping name="Address" path="/addresses" resource="com.folks.app.handler.AddressHandler" schema="com.folks.app.model.Address">
+    <resource-mapping name="Address" path="/addresses" resource="com.hearth.app.handler.AddressHandler" schema="com.hearth.app.model.Address">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -72,7 +72,7 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
     
-    <resource-mapping name="Category" path="" resource="com.folks.app.handler.CategoryHandler" schema="com.folks.app.model.Category">
+    <resource-mapping name="Category" path="" resource="com.hearth.app.handler.CategoryHandler" schema="com.hearth.app.model.Category">
         <mapping uri="/categories" method="POST" api="create"/>
         <mapping uri="/categories/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/categories/:id" method="PUT" api="modify"/>
@@ -82,7 +82,7 @@
         <mapping uri="/categories" method="GET" api="viewAll"/>
     </resource-mapping>
     
-    <resource-mapping name="Service" path="/services" resource="com.folks.app.handler.ServiceHandler" schema="com.folks.app.model.Service">
+    <resource-mapping name="Service" path="/services" resource="com.hearth.app.handler.ServiceHandler" schema="com.hearth.app.model.Service">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -91,7 +91,7 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
 
-    <resource-mapping name="Professional" path="/professionals" resource="com.folks.app.handler.ProfessionalHandler" schema="com.folks.app.model.ProfessionalMaster">
+    <resource-mapping name="Professional" path="/professionals" resource="com.hearth.app.handler.ProfessionalHandler" schema="com.hearth.app.model.ProfessionalMaster">
         <mapping uri="/register" method="POST" api="register"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="" method="POST" api="create"/>
@@ -101,7 +101,7 @@
         <!--mapping uri="/:id" method="DELETE" api="remove"/-->
     </resource-mapping>
     
-    <resource-mapping name="ProfessionalService" path="/professionalServices" resource="com.folks.app.handler.ProfessionalServiceHandler" schema="com.folks.app.model.ProfessionalService">
+    <resource-mapping name="ProfessionalService" path="/professionalServices" resource="com.hearth.app.handler.ProfessionalServiceHandler" schema="com.hearth.app.model.ProfessionalService">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -111,7 +111,7 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
     
-    <resource-mapping name="ProfessionalNeighbourhood" path="/professionalNeighbourhoods" resource="com.folks.app.handler.ProfessionalNeighbourhoodHandler" schema="com.folks.app.model.ProfessionalNeighbourhood">
+    <resource-mapping name="ProfessionalNeighbourhood" path="/professionalNeighbourhoods" resource="com.hearth.app.handler.ProfessionalNeighbourhoodHandler" schema="com.hearth.app.model.ProfessionalNeighbourhood">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -121,7 +121,7 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
     
-    <resource-mapping name="Availability" path="/availabilities" resource="com.folks.app.handler.AvailabilityHandler" schema="com.folks.app.model.Availability">
+    <resource-mapping name="Availability" path="/availabilities" resource="com.hearth.app.handler.AvailabilityHandler" schema="com.hearth.app.model.Availability">
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -131,7 +131,7 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
     
-    <resource-mapping name="Booking" path="/bookings" resource="com.folks.app.handler.BookingHandler" schema="com.folks.app.model.Booking">
+    <resource-mapping name="Booking" path="/bookings" resource="com.hearth.app.handler.BookingHandler" schema="com.hearth.app.model.Booking">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -141,7 +141,7 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
     
-    <resource-mapping name="Payment" path="/payments" resource="com.folks.app.handler.PaymentHandler" schema="com.folks.app.model.Payment">
+    <resource-mapping name="Payment" path="/payments" resource="com.hearth.app.handler.PaymentHandler" schema="com.hearth.app.model.Payment">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -150,7 +150,7 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
     
-    <resource-mapping name="Review" path="/reviews" resource="com.folks.app.handler.ReviewHandler" schema="com.folks.app.model.Review">
+    <resource-mapping name="Review" path="/reviews" resource="com.hearth.app.handler.ReviewHandler" schema="com.hearth.app.model.Review">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -159,7 +159,7 @@
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
     
-    <resource-mapping name="Conversation" path="/conversations" resource="com.folks.app.handler.ConversationHandler" schema="com.folks.app.model.Conversation">
+    <resource-mapping name="Conversation" path="/conversations" resource="com.hearth.app.handler.ConversationHandler" schema="com.hearth.app.model.Conversation">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -167,7 +167,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="Message" path="/messages" resource="com.folks.app.handler.MessageHandler" schema="com.folks.app.model.Message">
+    <resource-mapping name="Message" path="/messages" resource="com.hearth.app.handler.MessageHandler" schema="com.hearth.app.model.Message">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -175,7 +175,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="JobStatus" path="/jobStatus" resource="com.folks.app.handler.JobStatusHandler" schema="com.folks.app.model.JobStatus">
+    <resource-mapping name="JobStatus" path="/jobStatus" resource="com.hearth.app.handler.JobStatusHandler" schema="com.hearth.app.model.JobStatus">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -183,7 +183,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="Document" path="/documents" resource="com.folks.app.handler.DocumentHandler" schema="com.folks.app.model.Document">
+    <resource-mapping name="Document" path="/documents" resource="com.hearth.app.handler.DocumentHandler" schema="com.hearth.app.model.Document">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -191,7 +191,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="AuditLog" path="/auditLogs" resource="com.folks.app.handler.AuditLogHandler" schema="com.folks.app.model.AuditLog">
+    <resource-mapping name="AuditLog" path="/auditLogs" resource="com.hearth.app.handler.AuditLogHandler" schema="com.hearth.app.model.AuditLog">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -199,7 +199,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="PricingRule" path="/pricingRules" resource="com.folks.app.handler.PricingRuleHandler" schema="com.folks.app.model.PricingRule">
+    <resource-mapping name="PricingRule" path="/pricingRules" resource="com.hearth.app.handler.PricingRuleHandler" schema="com.hearth.app.model.PricingRule">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -207,7 +207,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="Wallet" path="/wallets" resource="com.folks.app.handler.WalletHandler" schema="com.folks.app.model.Wallet">
+    <resource-mapping name="Wallet" path="/wallets" resource="com.hearth.app.handler.WalletHandler" schema="com.hearth.app.model.Wallet">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -215,7 +215,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="WalletTransaction" path="/walletTransactions" resource="com.folks.app.handler.WalletTransactionHandler" schema="com.folks.app.model.WalletTransaction">
+    <resource-mapping name="WalletTransaction" path="/walletTransactions" resource="com.hearth.app.handler.WalletTransactionHandler" schema="com.hearth.app.model.WalletTransaction">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -223,7 +223,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="Coupon" path="/coupons" resource="com.folks.app.handler.CouponHandler" schema="com.folks.app.model.Coupon">
+    <resource-mapping name="Coupon" path="/coupons" resource="com.hearth.app.handler.CouponHandler" schema="com.hearth.app.model.Coupon">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -231,7 +231,7 @@
         <mapping uri="/:id" method="DELETE" api="remove"/>
         <mapping uri="" method="GET" api="viewAll"/>
     </resource-mapping>
-    <resource-mapping name="CouponUsage" path="/couponUsage" resource="com.folks.app.handler.CouponUsageHandler" schema="com.folks.app.model.CouponUsage">
+    <resource-mapping name="CouponUsage" path="/couponUsage" resource="com.hearth.app.handler.CouponUsageHandler" schema="com.hearth.app.model.CouponUsage">
         <mapping uri="" method="POST" api="create"/>
         <mapping uri="/$batch" method="POST" api="batchCreate"/>
         <mapping uri="/:id" method="PUT" api="modify"/>
@@ -243,7 +243,7 @@
     <!-- Admin APIs - Start -->
     <resource-mapping name="cache"
                       path="/admin/caches"
-                      resource="com.folks.app.handler.CacheMgmtHandler">
+                      resource="com.hearth.app.handler.CacheMgmtHandler">
 
         <mapping uri="/config/attributes" method="GET" api="viewConfigProp"/>
         <mapping uri="/statistics" method="GET" api="viewStats"/>
@@ -255,26 +255,26 @@
 
     <resource-mapping name="logger"
                       path="/admin/loggers"
-                      resource="com.folks.app.handler.LogMgmtHandler">
+                      resource="com.hearth.app.handler.LogMgmtHandler">
 
         <mapping uri="" method="GET" api="viewAll"/>
         <mapping uri="" method="PUT" api="modify"/>
     </resource-mapping>
 
-    <resource-mapping name="AvailabilityMgmt" path="/admin/availabilities" resource="com.folks.app.handler.AvailabilityMgmtHandler">
+    <resource-mapping name="AvailabilityMgmt" path="/admin/availabilities" resource="com.hearth.app.handler.AvailabilityMgmtHandler">
         <mapping uri="/calendar" method="POST" api="generate"/>
         <mapping uri="/professionals" method="GET" api="viewProfAvailability"/>
     </resource-mapping>
 
-    <resource-mapping name="ProfessionalMgmt" path="/admin/professionals" resource="com.folks.app.handler.ProfessionalMgmtHandler">
+    <resource-mapping name="ProfessionalMgmt" path="/admin/professionals" resource="com.hearth.app.handler.ProfessionalMgmtHandler">
         <mapping uri="" method="POST" api="approve"/>
     </resource-mapping>
 
-    <resource-mapping name="ProfessionalMgmt" path="/admin/professionals" resource="com.folks.app.handler.ProfessionalMgmtHandler">
+    <resource-mapping name="ProfessionalMgmt" path="/admin/professionals" resource="com.hearth.app.handler.ProfessionalMgmtHandler">
         <mapping uri="" method="POST" api="approve"/>
     </resource-mapping>
 
-    <resource-mapping name="QueryMgmt" path="/admin/query" resource="com.folks.app.handler.QueryMgmtHandler" schema="com.folks.app.model.AnalyticReq">
+    <resource-mapping name="QueryMgmt" path="/admin/query" resource="com.hearth.app.handler.QueryMgmtHandler" schema="com.hearth.app.model.AnalyticReq">
         <mapping uri="" method="POST" api="query"/>
     </resource-mapping>
     

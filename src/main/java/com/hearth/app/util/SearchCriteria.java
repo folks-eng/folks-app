@@ -1,0 +1,93 @@
+package com.hearth.app.util;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ *
+ * @author schan280
+ */
+public interface SearchCriteria {
+    
+    static SearchCriteria from(Map<String, List<Object>> params) {
+        SearchCriteriaImpl search = new SearchCriteriaImpl();
+        search.params(params);
+        
+        return search;
+    }
+    
+    static SearchCriteria from(Integer userId) {
+        return from(new QueryParams(new HashMap<String, List<String>>()), userId);
+    }
+    
+    static SearchCriteria from(QueryParams params) {
+        return from(params, null);
+    }
+    
+    static SearchCriteria from(QueryParams params, Integer userId) {
+        return from(params, "userId", userId);
+    }
+    
+    static SearchCriteria from(QueryParams params, String key, Integer userId) {
+        SearchCriteriaImpl search = new SearchCriteriaImpl();
+        search.params(params, key, userId);
+        
+        return search;
+    }
+    
+    /**
+     * Indicate whether to fetch the dependent records in a flattened structure.
+     * @return Boolean
+     */
+    Boolean fetchDependency();
+    
+    /**
+     * Return a map of search key parameters.
+     * @return Map
+     */
+    Map<String, List<Object>> params();
+    
+    /**
+     * Return the requested field(s).
+     * @return List
+     */
+    List<String> fields();
+    
+    /**
+     * Return the operator (AND or OR).
+     * @return String
+     */
+    String operator();
+    
+    /**
+     * Indicate if historical data needs to be fetched.
+     * @return boolean
+     */
+    Boolean history();
+    
+    /**
+     * Return the order by attribute to be used to sort the filtered records.
+     * @return String
+     */
+    String orderBy();
+    
+    /**
+     * If the filtered records to be sorted in ascending order.
+     * @return Boolean
+     */
+    Boolean asc();
+    
+    /**
+     * The start offset.
+     * @return Integer
+     */
+    Integer offset();
+    
+    /**
+     * Number of records to be fetched.
+     * @return Integer
+     */
+    Integer limit();
+    
+}

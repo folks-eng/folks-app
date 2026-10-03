@@ -37,11 +37,11 @@
     
     <keystore-config>
         <pem-key-config>
-            <key-path>server_cert/folks-app.key</key-path>
-            <cert-path>server_cert/folks-app.crt</cert-path>
+            <key-path>server_cert/hearth-app.key</key-path>
+            <cert-path>server_cert/hearth-app.crt</cert-path>
         </pem-key-config>
         
-        <store-name>folks.pkcs</store-name>
+        <store-name>hearth.pkcs</store-name>
         <store-password>secret</store-password>
     </keystore-config>
     
@@ -56,8 +56,8 @@
     <security-constraint>
         <auth-handler>org.javalabs.decl.vertx.container.handler.AuthorizationHandler</auth-handler>
         <jwt-opts>
-            <issuer>folks</issuer>
-            <audience>folks-ui</audience>
+            <issuer>hearth</issuer>
+            <audience>hearth-ui</audience>
             <expiry>18000</expiry> <!-- in minutes -->
         </jwt-opts>
         

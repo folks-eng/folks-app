@@ -193,28 +193,28 @@ SELECT a.service_id, a.name, a.duration_minutes, b.professional_id, c.date, c.st
 
 -- Newly Added Categories + Sub-Categories + Services --
 
-folksdb=> SELECT COUNT(*)
+hearthdb=> SELECT COUNT(*)
             FROM fks_categories
            WHERE category_id IN (101, 102, 103, 104, 105);
  count 
 -------
      5
 
-folksdb=> SELECT COUNT(*)
+hearthdb=> SELECT COUNT(*)
             FROM fks_categories
            WHERE parent_id IN (101, 102, 103, 104, 105);
  count 
 -------
     14
 
-folksdb=> SELECT COUNT(*)
+hearthdb=> SELECT COUNT(*)
             FROM fks_services a
            INNER JOIN fks_categories b ON (a.category_id = b.category_id AND b.parent_id IN (101, 102, 103, 104, 105));
  count 
 -------
     69
 
-folksdb=> SELECT MIN(service_id) AS service_id_min, MAX(service_id) AS service_id_max
+hearthdb=> SELECT MIN(service_id) AS service_id_min, MAX(service_id) AS service_id_max
             FROM fks_services a
            INNER JOIN fks_categories b ON (a.category_id = b.category_id AND b.parent_id IN (101, 102, 103, 104, 105));
 

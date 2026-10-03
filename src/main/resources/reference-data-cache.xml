@@ -3,21 +3,21 @@
 <reference-data-cache>
     
     <!-- cache
-        class="com.folks.app.cache.impl.CountryCache"
-        entity="com.folks.app.model.Country"
+        class="com.hearth.app.cache.impl.CountryCache"
+        entity="com.hearth.app.model.Country"
         query="Country.selectAll"
         idProperty="countryId"/-->
     
-    <cache class="com.folks.app.cache.impl.CountryCache"/>
+    <cache class="com.hearth.app.cache.impl.CountryCache"/>
 
-    <cache class="com.folks.app.cache.impl.ProvinceCache"/>
+    <cache class="com.hearth.app.cache.impl.ProvinceCache"/>
 
-    <cache class="com.folks.app.cache.impl.CityCache"/>
+    <cache class="com.hearth.app.cache.impl.CityCache"/>
 
-    <cache class="com.folks.app.cache.impl.NeighbourhoodCache"/>
+    <cache class="com.hearth.app.cache.impl.NeighbourhoodCache"/>
     
-    <cache class="com.folks.app.cache.impl.CategoryCache"/>
+    <cache class="com.hearth.app.cache.impl.CategoryCache"/>
 
-    <cache class="com.folks.app.cache.impl.ServiceCache"/>
+    <cache class="com.hearth.app.cache.impl.ServiceCache"/>
     
 </reference-data-cache>

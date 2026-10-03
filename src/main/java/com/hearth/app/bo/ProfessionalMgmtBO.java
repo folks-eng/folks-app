@@ -1,0 +1,202 @@
+package com.hearth.app.bo;
+
+import com.hearth.app.auth.AppUser;
+import com.hearth.app.cache.impl.CityCache;
+import com.hearth.app.cache.impl.NeighbourhoodCache;
+import com.hearth.app.cache.impl.ServiceCache;
+import com.hearth.app.dao.DocumentDAO;
+import com.hearth.app.dao.ProfessionalDAO;
+import com.hearth.app.model.Address;
+import com.hearth.app.model.Document;
+import com.hearth.app.model.Neighbourhood;
+import com.hearth.app.model.Professional;
+import com.hearth.app.model.ProfessionalNeighbourhood;
+import com.hearth.app.model.ProfessionalProfile;
+import com.hearth.app.model.ProfessionalService;
+import com.hearth.app.model.Service;
+import com.hearth.app.model.User;
+import com.hearth.app.util.AddressUtil;
+import com.hearth.app.util.Constants;
+import com.hearth.app.util.QueryParams;
+import com.hearth.app.util.SearchCriteria;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.javalabs.decl.util.DateUtil;
+import org.javalabs.decl.util.StopWatch;
+import org.javalabs.jpa.DAOProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ *
+ * @author schan280
+ */
+public class ProfessionalMgmtBO extends AbstractBO {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfessionalMgmtBO.class);
+
+    private final ProfessionalDAO professionalDAO;
+    private final DocumentDAO documentDAO;
+
+    public ProfessionalMgmtBO() {
+        this.professionalDAO = DAOProxy.get(ProfessionalDAO.class);
+        this.documentDAO = DAOProxy.get(DocumentDAO.class);
+        
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Initialized ProfessionalMgmtBO: {}. ProfessionalDAO: {}. DocumentDAO: {}"
+                    , getClass().getSimpleName(), professionalDAO, documentDAO);
+        }
+    }
+
+    /**
+     * Internal API.
+     * 
+     * @param profProfile 
+     */
+    public void register(ProfessionalProfile profProfile) {
+        StopWatch timer = StopWatch.newTimer();
+        timer.start();
+
+        Timestamp createdAt = new Timestamp(DateUtil.currentUTCDate().getTime());
+        User user = profProfile.getUser();
+
+        // Build the professional details.
+        Professional professional = new Professional();
+        professional.setUserId(user.getUserId());
+        professional.setExperienceYears(profProfile.getExperienceYears());
+        professional.setServingCities(CityCache.getCache().get(profProfile.getCityId()).getCityName());
+        professional.setIsVerified(Constants.PROF_NOT_VERIFIED);
+        professional.setCreatedAt(createdAt);
+        professional.setUser(user);
+        
+        // Build the local address.
+        Address localAddress = profProfile.getAddress();
+        localAddress.setUserId(user.getUserId());
+        if (localAddress.getLabel() == null) {
+            localAddress.setLabel(Constants.DEFAULT_LABEL);
+        }
+        if (localAddress.getIsDefault() == null) {
+            localAddress.setIsDefault(Constants.IS_DEFAULT_ADDR);     // All addresses are set to default.
+        }
+        localAddress.setCreatedAt(createdAt);
+        AddressUtil.enrich(localAddress);
+        
+        user.setAddresses(List.of(localAddress));
+        
+        
+        // Build the document parts.
+        List<Document> documents = profProfile.getDocuments();
+        for (Document doc : documents) {
+            doc.setApplicationId(profProfile.getApplicationId());
+            doc.setVerificationStatus(Document.Verificationstatus.PENDING);
+            doc.setCreatedAt(createdAt);
+        }
+        professional.setDocuments(documents);
+        
+        // Build the professional vs services mapping.
+        List<Service> services = fetchServices(profProfile.getExpertise());
+        
+        // Assign individual services to this professional's profile
+        List<ProfessionalService> pServices = new ArrayList<>(services.size());
+        for(Service service: services) {
+            ProfessionalService pService = new ProfessionalService();
+            pService.setServiceId(service.getServiceId());
+            pService.setPrice(service.getBasePrice());
+            pService.setIsActive(Constants.PROF_SERVICE_ACTIVE);
+            pService.setCreatedAt(createdAt);
+            
+            pServices.add(pService);
+        }
+        professional.setProfServices(pServices);
+        
+        // Build the professional serving localities.
+        List<Integer> nbhoodIds = profProfile.getNeighbourhoodIds();
+        
+        // -1 indicates "ALl Localities", in which case fetch all localities based on the city id.
+        if (nbhoodIds.get(0).equals(-1)) {
+            nbhoodIds = new ArrayList<>(250);
+            for (Neighbourhood nbhood : NeighbourhoodCache.getCache().getAllValues()) {
+                if (nbhood.getCityId().equals(nbhood.getCityId())) {
+                    nbhoodIds.add(nbhood.getNeighbourhoodId());
+                }
+            }
+        }
+        List<ProfessionalNeighbourhood> profLocalities = new ArrayList<>(nbhoodIds.size());
+
+        for (Integer nbhoodId : nbhoodIds) {
+            ProfessionalNeighbourhood profLocality = new ProfessionalNeighbourhood();
+            profLocality.setNeighbourhoodId(nbhoodId);
+            profLocality.setStatus(ProfessionalNeighbourhood.Status.ACTIVE);
+            profLocality.setCreatedAt(createdAt);
+
+            profLocalities.add(profLocality);
+        }
+        professional.setProfNeighbourhoods(profLocalities);
+        
+        professionalDAO.insert(professional, Boolean.TRUE);
+        timer.stop();
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Professional onboarded successfully with Id {}, Elapsed time(ms): {}"
+                    , professional.getProfessionalId(), timer.elapsedTimeMillis());
+        }
+    }
+    
+    public Professional approveProfessional(AppUser usr, Map<String, String> payload) throws IllegalAccessException {
+        // Approval process:
+        // 1. Update the verification status in document store.
+        // 2. Update the verified status in professional store.
+        // 3. Generate professional calendar.
+        String applicationId = payload.get("applicationId");
+        String status = payload.get("status");          // APPROVED/ REJECTED
+        String comment = payload.get("comment");
+        
+        if (! status.equals("APPROVED") && ! status.equals("REJECTED")) {
+            throw new IllegalArgumentException("Status must be APPROVED/REJECTED");
+        }
+        // Fetch the document
+        Map<String, List<String>> map = new HashMap<>();
+        map.put("applicationId", List.of(applicationId));
+        List<Document> documents = documentDAO.query(SearchCriteria.from(new QueryParams(map)));
+        
+        if (documents.isEmpty()) {
+            throw new IllegalArgumentException("No application found for " + applicationId);
+        }
+        
+        Professional professional = professionalDAO.find(new Professional.ProfessionalPK(documents.get(0).getProfessionalId()));
+        if (professional == null) {
+            throw new IllegalArgumentException("No such professional with id " + documents.get(0).getProfessionalId());
+        }
+        Timestamp updatedAt = new Timestamp(DateUtil.currentUTCDate().getTime());
+        for (Document document : documents) {
+            if (document.getApplicationId().equals(applicationId)) {
+                document.setVerificationStatus(status.equals("APPROVED") ? Document.Verificationstatus.APPROVED : Document.Verificationstatus.REJECTED);
+                document.setComment(comment);
+                document.setUpdatedAt(updatedAt);
+                
+                documentDAO.update(document);
+            }
+        }
+        // Update profession status
+        professional.setIsVerified(status.equals("APPROVED") ? (short)1 : (short)0);
+        professionalDAO.update(professional);
+        
+        return professional;
+    }
+    
+    private List<Service> fetchServices(List<Integer> expertise) {
+        List<Service> services = new ArrayList<>();
+        
+        for (Service service : ServiceCache.getCache().getAllValues()) {
+            for (Integer subCategory : expertise) {
+                if (service.getCategoryId().equals(subCategory)) {
+                    services.add(service);
+                }
+            }
+        }
+        return services;
+    }
+}

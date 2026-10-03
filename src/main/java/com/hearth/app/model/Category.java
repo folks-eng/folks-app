@@ -1,0 +1,191 @@
+package com.hearth.app.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.NamedNativeQueries;
+import jakarta.persistence.NamedNativeQuery;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Objects;
+
+
+/**
+ * This class is auto generated with jpa-lite framework.
+ *
+ * @author Sudiptasish Chanda
+ */
+
+@Entity
+@Table(name = "fks_categories")
+@IdClass(Category.CategoryPK.class)
+@NamedNativeQueries({
+    @NamedNativeQuery(name = "Category.selectAll", query = "SELECT * FROM fks_categories")
+})
+public class Category implements Serializable, Cloneable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "category_id", nullable = false, updatable = false, precision = 32)
+    private Integer categoryId;
+
+    @Column(name = "name", nullable = false, updatable = true, length = 128)
+    private String name;
+
+    @Column(name = "icon", nullable = false, updatable = true, length = 16)
+    private String icon;
+
+    @Column(name = "tag_line", nullable = false, updatable = true, length = 128)
+    private String tagLine;
+
+    @Column(name = "image", nullable = false, updatable = true, length = 128)
+    private String image;
+
+    @Column(name = "parent_id", nullable = true, updatable = true, precision = 32)
+    private Integer parentId;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = true, updatable = true)
+    private Timestamp updatedAt;
+    
+    @Transient
+    private List<Category> subCategories;
+    
+    @Transient
+    private List<Service> services;
+
+    public Category() {}
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getCategoryId() {
+        return this.categoryId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
+    }
+
+    public Integer getParentId() {
+        return this.parentId;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public String getTagLine() {
+        return tagLine;
+    }
+
+    public void setTagLine(String tagLine) {
+        this.tagLine = tagLine;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public List<Category> getSubCategories() {
+        return subCategories;
+    }
+
+    public void setSubCategories(List<Category> subCategories) {
+        this.subCategories = subCategories;
+    }
+
+    public List<Service> getServices() {
+        return services;
+    }
+
+    public void setServices(List<Service> services) {
+        this.services = services;
+    }
+
+    public static class CategoryPK {
+
+        private Integer categoryId;
+
+        public CategoryPK() {}
+
+        public CategoryPK(Integer categoryId) {
+            this.categoryId = categoryId;
+        }
+
+        public void setCategoryId(Integer categoryId) {
+            this.categoryId = categoryId;
+        }
+
+        public Integer getCategoryId() {
+            return this.categoryId;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 71 * hash + Objects.hashCode(this.categoryId);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final CategoryPK other = (CategoryPK)obj;
+            if (! Objects.equals(this.categoryId, other.categoryId)) {
+                return false;
+            }
+            return true;
+        }
+
+    }
+}

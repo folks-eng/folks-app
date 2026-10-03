@@ -1,6 +1,6 @@
-## Folks Application
+## Hearth Application
 
-Folks is a backend server application.
+Hearth is a backend server application.
 
 It provides the operations required to manage application resources and verify the integrity of server responses.
  
@@ -21,7 +21,7 @@ Java 17 or higher and Maven 3.x are required.
 - [SSL Configuration](#ssl-configuration)
   - [Server Configuration](#server-configuration)
   - [Keys and Certificates](#keys-and-certificates)
-- [Testing Folks Application](#testing-folks-application)
+- [Testing Hearth Application](#testing-hearth-application)
   - [Obtain an Admin Token](#step-1---obtain-an-admin-token)
   - [Create a User](#step-2---create-a-user)
   - [Generate a User Token (Non-Admin)](#step-3---generate-a-user-token-non-admin)
@@ -44,13 +44,13 @@ This sample application provides a REST API using [Declarative Vert](https://git
 ### Check Out the Code
 
 ```
-<prompt> git clone https://github.com/folks-eng/folks-app
+<prompt> git clone https://github.com/hearth-eng/hearth-app
 
 ```
 
 ### Compile the Code
 
-`folks-app` uses Maven as its build tool. Use the following command to compile the codebase. JDK 17 or later is required.
+`hearth-app` uses Maven as its build tool. Use the following command to compile the codebase. JDK 17 or later is required.
 
 ```
 <prompt> mvn clean install
@@ -70,11 +70,11 @@ To update the module version in the parent POM and all child modules, run the fo
 
 #### Prerequisites
 
-The Folks backend requires PostgreSQL. Follow the [Folks DB](https://github.com/folks-eng/folks-db) instructions to install PostgreSQL and set up the Folks schema.
+The Hearth backend requires PostgreSQL. Follow the [Hearth DB](https://github.com/hearth-eng/hearth-db) instructions to install PostgreSQL and set up the Hearth schema.
 
-#### Start Folks Server
+#### Start Hearth Server
 
-Once the database setup is complete, run `start.sh` to start the Folks backend server.
+Once the database setup is complete, run `start.sh` to start the Hearth backend server.
 
 ```
 <prompt> sh start.sh
@@ -86,8 +86,8 @@ The application should start and have an output similar to this:
     [...]
     [vert.x-eventloop-thread-1] INFO org.javalabs.decl.vertx.container.VertxHttpServer - Started Http Server. Listening to port: 8080
     [main] INFO org.javalabs.decl.vertx.container.VertxContainer - Deployment of verticle app.http.server is successful. Deployment Id: 3abd2b35-4cf7-426f-83a9-7b394710df08
-    [vert.x-worker-thread-0] INFO com.folks.app.core.AppProcessor - Scheduled default timer. Initial Delay: 0. Pause Time (ms): 1800000
-    [vert.x-worker-thread-0] INFO com.folks.app.core.AppProcessor - Started Verticle: AppProcessor
+    [vert.x-worker-thread-0] INFO com.hearth.app.core.AppProcessor - Scheduled default timer. Initial Delay: 0. Pause Time (ms): 1800000
+    [vert.x-worker-thread-0] INFO com.hearth.app.core.AppProcessor - Started Verticle: AppProcessor
     [main] INFO org.javalabs.decl.vertx.container.VertxContainer - Deployment of verticle app.processor is successful. Deployment Id: 04595511-d20a-43e2-abda-52c931c2d531
 
 
@@ -118,7 +118,7 @@ Open `http://127.0.0.1:8000/` in your browser to view the API documentation.
 
 ### Server Configuration
 
-`folks-app` is configured to start with SSL enabled. Refer to the following snippet from `server.xml`:
+`hearth-app` is configured to start with SSL enabled. Refer to the following snippet from `server.xml`:
 
 ```
 <server-config>
@@ -137,11 +137,11 @@ Open `http://127.0.0.1:8000/` in your browser to view the API documentation.
 
 ```
 
-<client-auth>`REQUIRED`</client-auth> requires clients, such as cURL or Postman, to present a valid client certificate. This enables mTLS between the client and `folks-app`.
+<client-auth>`REQUIRED`</client-auth> requires clients, such as cURL or Postman, to present a valid client certificate. This enables mTLS between the client and `hearth-app`.
 
 ### Keys and Certificates
 
-`folks-app` includes its server key, certificates, and CA certificate under `src/main/resources`.
+`hearth-app` includes its server key, certificates, and CA certificate under `src/main/resources`.
 
 ```
 src/main/resources
@@ -154,23 +154,23 @@ src/main/resources
       |
        --- server_cert
       |     |
-      |      --- folks-app.key
+      |      --- hearth-app.key
       |     |
-      |      --- folks-app.crt
+      |      --- hearth-app.crt
       |
        --- client_cert
             |
-             --- folks-client.key
+             --- hearth-client.key
             |
-             --- folks-client.crt
+             --- hearth-client.crt
 
 ```
 
 The `client_cert` directory is not used as the server identity. Its certificate and key are used by clients when establishing mTLS connections, including requests used to obtain authentication tokens.
 
-## Testing Folks Application
+## Testing Hearth Application
 
-Because `folks-app` requires SSL and mTLS, a client must present a valid client certificate when establishing a connection before making API calls.
+Because `hearth-app` requires SSL and mTLS, a client must present a valid client certificate when establishing a connection before making API calls.
 
 ### Step 1 - Obtain an Admin Token
 
@@ -185,9 +185,9 @@ We will create a token with the scope `user:create`. Likewise, create a token wi
 curl -i \
     -X POST \
     -u '9efbd3b3-a0a9-468a-8652-7f489adf6a45:7c6a180b36896a0a8c02787eeafb0e4c' \
-    --cert /path/to/folks-app/src/main/resources/client_cert/folks-client.crt \
-    --key /path/to/folks-app/src/main/resources/client_cert/folks-client.key \
-    --cacert /path/to/folks-app/src/main/resources/ca/ca_javalabs.crt \
+    --cert /path/to/hearth-app/src/main/resources/client_cert/hearth-client.crt \
+    --key /path/to/hearth-app/src/main/resources/client_cert/hearth-client.key \
+    --cacert /path/to/hearth-app/src/main/resources/ca/ca_javalabs.crt \
     -H "Content-Type: application/x-www-form-urlencoded" \
     -d 'grant_type=client_credentials&scope=user%3Acreate' \
     https://localhost:9443/api/v1/mgmt/login
@@ -215,7 +215,7 @@ If you want to override the expiry time, add the `expiry` tag and specify the ex
     <security-constraint>
         <auth-handler>org.javalabs.decl.vertx.container.handler.AuthorizationHandler</auth-handler>
         <jwt-opts>
-            <issuer>folks</issuer>
+            <issuer>hearth</issuer>
             <expiry>1440</expiry>
         </jwt-opts>
         
@@ -253,9 +253,9 @@ If you want to override the expiry time, add the `expiry` tag and specify the ex
 ```
 curl -i \
     -X POST \
-    --cert /path/to/folks-app/src/main/resources/client_cert/folks-client.crt \
-    --key /path/to/folks-app/src/main/resources/client_cert/folks-client.key \
-    --cacert /path/to/folks-app/src/main/resources/ca/ca_javalabs.crt \
+    --cert /path/to/hearth-app/src/main/resources/client_cert/hearth-client.crt \
+    --key /path/to/hearth-app/src/main/resources/client_cert/hearth-client.key \
+    --cacert /path/to/hearth-app/src/main/resources/ca/ca_javalabs.crt \
     -H "Authorization: Bearer {access_token}" \
     -H "Content-Type:application/json" \
     --data-binary @./user.json \
@@ -289,9 +289,9 @@ After the user is created, a user token can be generated for operations such as 
 ```
 curl -i \
     -X POST \
-    --cert /path/to/folks-app/src/main/resources/client_cert/folks-client.crt \
-    --key /path/to/folks-app/src/main/resources/client_cert/folks-client.key \
-    --cacert /path/to/folks-app/src/main/resources/ca/ca_javalabs.crt \
+    --cert /path/to/hearth-app/src/main/resources/client_cert/hearth-client.crt \
+    --key /path/to/hearth-app/src/main/resources/client_cert/hearth-client.key \
+    --cacert /path/to/hearth-app/src/main/resources/ca/ca_javalabs.crt \
     -H "Content-Type: application/x-www-form-urlencoded" \
     -d 'phone1=1-029837467382' \
     https://localhost:9443/api/v1/mgmt/token
@@ -319,9 +319,9 @@ Now Socretes will use this user access_token for any subsequent operation, e.g.,
 
 ```
 curl -i \
-    --cert /path/to/folks-app/src/main/resources/client_cert/folks-client.crt \
-    --key ~/Projects/folks-app/src/main/resources/client_cert/folks-client.key \
-    --cacert /path/to/folks-app/src/main/resources/ca/ca_javalabs.crt \
+    --cert /path/to/hearth-app/src/main/resources/client_cert/hearth-client.crt \
+    --key ~/Projects/hearth-app/src/main/resources/client_cert/hearth-client.key \
+    --cacert /path/to/hearth-app/src/main/resources/ca/ca_javalabs.crt \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer {user_access_token}
     https://localhost:9443/api/v1/users/234b8491-cc5e-4be1-82ac-ba8ac35ff6d8
@@ -352,8 +352,8 @@ curl -i \
 
 ```
 curl -i \
---cert src/main/resources/client_cert/folks-client.crt \
---key src/main/resources/client_cert/folks-client.key \
+--cert src/main/resources/client_cert/hearth-client.crt \
+--key src/main/resources/client_cert/hearth-client.key \
 --cacert src/main/resources/ca/ca_javalabs.crt \
 -H "Authorization:$jwt" \
 -H "Content-Type:application/json" \
@@ -396,8 +396,8 @@ curl -i \
 
 ## Keystore Handling
 
-`folks-app` uses two types of key material:
-1. `folks.pkcs` - Used for JWT signing and validation.
+`hearth-app` uses two types of key material:
+1. `hearth.pkcs` - Used for JWT signing and validation.
 2. PEM keys and certificates - Used for TLS and mTLS.
 
 ### Set Up the Browser-Facing Certificate for Node.js
@@ -408,7 +408,7 @@ curl -i \
 openssl req -new -newkey rsa:2048 -nodes \
   -keyout node-ext.key \
   -out node-ext.csr \
-  -subj "/CN=www.folks.com"
+  -subj "/CN=www.hearth.com"
 
 ```
 
@@ -464,12 +464,12 @@ For local development, create:
 certs/
 ├── ca.key
 ├── ca.crt
-├── folks-app.key
-├── folks-app.csr
-├── folks-app.crt
-├── folks-ui.key
-├── folks-ui.csr
-└── folks-ui.crt
+├── hearth-app.key
+├── hearth-app.csr
+├── hearth-app.crt
+├── hearth-ui.key
+├── hearth-ui.csr
+└── hearth-ui.crt
 ```
 
 The flow is:
@@ -478,8 +478,8 @@ The flow is:
 2. Use the CA to sign the server certificate.
 3. Use the CA to sign the client certificate.
 4. Configure:
-   - Vert.x with `folks-app.key`, `folks-app.crt`, and `ca.crt`.
-   - Node.js with `folks-ui.key`, `folks-ui.crt`, and `ca.crt`.
+   - Vert.x with `hearth-app.key`, `hearth-app.crt`, and `ca.crt`.
+   - Node.js with `hearth-ui.key`, `hearth-ui.crt`, and `ca.crt`.
 
 #### Step 1 - Create a CA
 
@@ -503,7 +503,7 @@ openssl req -x509 \
 **Generate private Key:**
 
 ```
-openssl genrsa -out folks-app.key 2048
+openssl genrsa -out hearth-app.key 2048
 ```
 
 **Generate a certificate signing request (CSR):**
@@ -511,9 +511,9 @@ openssl genrsa -out folks-app.key 2048
 ```
 openssl req \
     -new \
-    -key folks-app.key \
-    -out folks-app.csr \
-    -subj "/C=IN/ST=West Bengal/L=Kolkata/O=Folks/CN=Folks App"
+    -key hearth-app.key \
+    -out hearth-app.csr \
+    -subj "/C=IN/ST=West Bengal/L=Kolkata/O=Zetachron Technologies LLP/CN=Hearth App"
 ```
 
 **Create a file named server.ext:**
@@ -576,11 +576,11 @@ If the SAN is missing, you'll typically see hostname verification failures.
 ```
 openssl x509 \
     -req \
-    -in folks-app.csr \
+    -in hearth-app.csr \
     -CA ca_javalabs.crt \
     -CAkey ca_javalabs.key \
     -CAcreateserial \
-    -out folks-app.crt \
+    -out hearth-app.crt \
     -days 365 \
     -sha256 \
     -extfile server.ext
@@ -591,7 +591,7 @@ openssl x509 \
 **Generate the key:**
 
 ```
-openssl genrsa -out folks-ui.key 2048
+openssl genrsa -out hearth-ui.key 2048
 ```
 
 **Generate the CSR:**
@@ -599,9 +599,9 @@ openssl genrsa -out folks-ui.key 2048
 ```
 openssl req \
     -new \
-    -key folks-ui.key \
-    -out folks-ui.csr \
-    -subj "/C=IN/ST=West Bengal/L=Kolkata/O=Folks/CN=Folks UI"
+    -key hearth-ui.key \
+    -out hearth-ui.csr \
+    -subj "/C=IN/ST=West Bengal/L=Kolkata/O=Zetachron Technologies LLP/CN=Hearth UI"
 ```
 
 **Create client.ext:**
@@ -618,11 +618,11 @@ extendedKeyUsage=clientAuth
 ```
 openssl x509 \
     -req \
-    -in folks-ui.csr \
+    -in hearth-ui.csr \
     -CA ca_javalabs.crt \
     -CAkey ca_javalabs.key \
     -CAcreateserial \
-    -out folks-ui.crt \
+    -out hearth-ui.crt \
     -days 365 \
     -sha256 \
     -extfile client.ext
@@ -659,8 +659,8 @@ For example:
 `client.csr` contains a request like:
 
 ```
-CN=folks-ui
-O=Folks
+CN=hearth-ui
+O=Zetachron Technologies LLP
 C=IN
 Public Key=...
 ```
@@ -676,16 +676,16 @@ client.key
 Generate CSR
       │
       ▼
-folks-ui.csr
+hearth-ui.csr
       │
       ▼
 CA signs it
       │
       ▼
-folks-ui.crt
+hearth-ui.crt
 ```
 
-After `folks-ui.crt` has been issued, the CSR is generally not required unless the certificate needs to be reissued.
+After `hearth-ui.crt` has been issued, the CSR is generally not required unless the certificate needs to be reissued.
 
 2. `.srl` — Serial Number File
 
@@ -701,11 +701,11 @@ keytool -genkeypair \
     -sigalg SHA384withRSA \
     -keysize 2048 \
     -validity 365 \
-    -keystore folks.pkcs \
+    -keystore hearth.pkcs \
     -storetype PKCS12 \
     -storepass secret \
     -keypass secret \
-    -dname "CN=Folks App, OU=Development, O=Javalabs, L=Kolkata, S=West Bengal, C=IN"
+    -dname "CN=Hearth App, OU=Development, O=Zetachron Technologies LLP, L=Kolkata, S=West Bengal, C=IN"
 
 ```
 
@@ -714,7 +714,7 @@ keytool -genkeypair \
 ### View the Keystore
 
 ```
-keytool  -list -v -keystore folks.pkcs -storepass secret
+keytool  -list -v -keystore hearth.pkcs -storepass secret
 
 ```
 
@@ -725,8 +725,8 @@ keytool  -list -v -keystore folks.pkcs -storepass secret
 ```
 keytool -exportcert -rfc \
     -alias fks_dev \
-    -keystore folks.pkcs \
-    -file folks_pub.pem \
+    -keystore hearth.pkcs \
+    -file hearth_pub.pem \
     -storepass secret 
 
 ```
@@ -734,7 +734,7 @@ keytool -exportcert -rfc \
 #### Extract the Private Key to .pem File
 
 ```
-openssl pkcs12 -in folks.pkcs -nodes -nocerts -out folks_prv.pem 
+openssl pkcs12 -in hearth.pkcs -nodes -nocerts -out hearth_prv.pem 
 Enter Import Password:
 
 ```

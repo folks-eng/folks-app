@@ -2,12 +2,12 @@
 
 INSERT INTO public.fks_users (external_id, full_name, email, phone1, phone2, password_hash, role, status, created_at, updated_at)
 VALUES 
-(random_uuid(), 'Folks Admin', 'folks.admin@javalabs.org', '9000000000', NULL, '7c6a180b36896a0a8c02787eeafb0e4c', 'ADMIN', 'ACTIVE', CURRENT_TIMESTAMP, null),
+(random_uuid(), 'Hearth Admin', 'hearth.admin@javalabs.org', '9000000000', NULL, '7c6a180b36896a0a8c02787eeafb0e4c', 'ADMIN', 'ACTIVE', CURRENT_TIMESTAMP, null),
 (random_uuid(), 'Node Admin', 'node.admin@javalabs.org', '8000000000', NULL, '6cb75f652a9b52798eb6cf2201057c73', 'ADMIN', 'ACTIVE', CURRENT_TIMESTAMP, null),
 (random_uuid(), 'Support Admin', 'support.admin@javalabs.org', '7000000000', NULL, '6cb75f652a9b52798eb6cf2201057c73', 'ADMIN', 'ACTIVE', CURRENT_TIMESTAMP, null);
 
 
--- Reference data (Cities where folks is operational) --
+-- Reference data (Cities where hearth is operational) --
 
 --1. Countries
 

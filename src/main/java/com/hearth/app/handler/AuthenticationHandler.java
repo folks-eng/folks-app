@@ -1,0 +1,121 @@
+package com.hearth.app.handler;
+
+import org.javalabs.decl.vertx.config.internal.ConfigStorage;
+import com.hearth.app.auth.AuthToken;
+import com.hearth.app.bo.AuthBO;
+import com.hearth.app.model.AuthGrant;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.JWTOptions;
+import io.vertx.ext.auth.KeyStoreOptions;
+import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.auth.jwt.JWTAuthOptions;
+import io.vertx.ext.web.RoutingContext;
+import java.net.HttpURLConnection;
+import java.util.Arrays;
+import java.util.Map;
+
+/**
+ *
+ * @author schan280
+ */
+public class AuthenticationHandler extends AbstractHandler {
+    
+    private final JWTAuth authZ;
+    private final AuthBO authBO;
+    
+    private final ConfigStorage cs = ConfigStorage.get();
+    
+    public AuthenticationHandler(Vertx vertx) {
+        super(vertx);
+        JWTOptions jwtOpts = new JWTOptions()
+                .setAlgorithm(cs.jwtAlgo())
+                .setIssuer(cs.jwtIssuer())
+                .setAudience(Arrays.asList(cs.jwtAudience()))
+                .setExpiresInMinutes(cs.jwtExpiry());
+        
+        KeyStoreOptions keyOpts = new KeyStoreOptions()
+                .setPath(cs.keystoreFile())
+                .setPassword(cs.keystorePassword());
+        
+        this.authZ = JWTAuth.create(vertx
+                , new JWTAuthOptions()
+                        .setJWTOptions(jwtOpts)
+                        .setKeyStore(keyOpts));
+        
+        this.authBO = new AuthBO();
+    }
+    
+    /**
+     * API to authenticate a user.
+     * @param ctx 
+     */
+    public void authenticate(RoutingContext ctx) {
+        final String agent = ctx.request().headers().get("user-agent");
+        final String credential = ctx.request().getHeader("Authorization");
+        
+        vertx().executeBlocking(() -> {
+            // Add the claims.
+            AuthGrant grant = new AuthGrant();
+            grant.setGrantType(ctx.request().getParam("grant_type"));
+            grant.setScope(ctx.request().getParam("scope"));
+            
+            Map<String, Object> claims = authBO.authenticate(credential, grant, cs.jwtIssuer(), cs.jwtAudience());
+            String jwt = authZ.generateToken(JsonObject.mapFrom(claims));
+
+            AuthToken token = AuthToken.from(claims, cs.jwtExpiry());
+            token.setAccessToken(jwt);
+                
+            return token;
+            
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                // Cookie cookie = CookieUtil.create((String) ((AuthToken)result.result()).getAccess_token());
+                // ctx.response().addCookie(cookie);
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+    
+    
+    
+    /**
+     * API to create a user (non-admin) token.
+     * @param ctx 
+     */
+    public void getToken(RoutingContext ctx) {
+        final String agent = ctx.request().headers().get("user-agent");
+        final String credential = ctx.request().getHeader("Authorization");
+        
+        vertx().executeBlocking(() -> {
+            // Add the claims.
+            String type = "phone1";
+            String input = ctx.request().getParam(type);
+            if (input == null) {
+                type = "email";
+                input = ctx.request().getParam(type);
+            }
+            
+            Map<String, Object> claims = authBO.authenticate(credential, type, input, cs.jwtIssuer(), cs.jwtAudience());
+            String jwt = authZ.generateToken(JsonObject.mapFrom(claims));
+
+            AuthToken token = AuthToken.from(claims, cs.jwtExpiry());
+            token.setAccessToken(jwt);
+                
+            return token;
+            
+        }).onComplete(result -> {
+            if (result.succeeded()) {
+                // Cookie cookie = CookieUtil.create((String) ((AuthToken)result.result()).getAccess_token());
+                // ctx.response().addCookie(cookie);
+                sendResponse(ctx, HttpURLConnection.HTTP_OK, result.result());
+            }
+            else {
+                ctx.fail(result.cause());
+            }
+        });
+    }
+}

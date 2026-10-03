@@ -1,0 +1,65 @@
+package com.hearth.app.event;
+
+import com.hearth.app.bo.BookingMgmtBO;
+import com.hearth.app.model.Booking;
+import io.vertx.core.Handler;
+import io.vertx.core.eventbus.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ *
+ * @author schan280
+ */
+public class BookingEventConsumer implements Handler<Message<Booking>> {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookingEventConsumer.class);
+    
+    private final BookingMgmtBO bookingMgmtBO;
+
+    public BookingEventConsumer() {
+        this.bookingMgmtBO = new BookingMgmtBO();
+    }
+
+    @Override
+    public void handle(Message<Booking> event) {
+        // Now find and assign a professional.
+        Booking booking = event.body();
+        if (booking.getStatus() == Booking.Status.PENDING) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Received new booking creation event. Booking id: {}", booking.getBookingId());
+            }
+            assignProfessional(booking);
+        }
+        else if (booking.getStatus() == Booking.Status.CANCELLED) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Received booking cancellation event. Booking id: {}", booking.getBookingId());
+            }
+            freeProfessional(booking);
+        }
+        else {
+            LOGGER.warn("Received a booking object with status {}. Booking id: {}."
+                    + " No action will be performed", booking.getStatus(), booking.getBookingId());
+        }
+    }
+
+    private void assignProfessional(Booking booking) {
+        try {
+            booking.setUpdatedBy("System - BookingEventConsumer");
+            bookingMgmtBO.assignProfessional(booking);
+        }
+        catch (RuntimeException e) {
+            LOGGER.error("Error in assigning professional to booking {}", booking.getBookingId());
+        }
+    }
+
+    private void freeProfessional(Booking booking) {
+        try {
+            bookingMgmtBO.freeProfessional(booking);
+        }
+        catch (RuntimeException e) {
+            LOGGER.error("Error in freeing up professional from booking {}", booking.getBookingId());
+        }
+    }
+    
+}
